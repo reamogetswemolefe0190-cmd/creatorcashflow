@@ -95,3 +95,40 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON public.audit_logs(timesta
 CREATE INDEX IF NOT EXISTS idx_ai_telemetry_created_at ON public.ai_telemetry(created_at DESC);
 
 
+
+-- 8. Create Instagram OAuth Tables
+CREATE TABLE IF NOT EXISTS public.instagram_oauth_attempts (
+    state_hash TEXT PRIMARY KEY,
+    cookie_hash TEXT NOT NULL,
+    user_id TEXT NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL,
+    result_code TEXT,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.instagram_connections (
+    user_id TEXT NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    instagram_id TEXT NOT NULL,
+    page_id TEXT NOT NULL,
+    username TEXT NOT NULL,
+    meta_user_id TEXT NOT NULL,
+    token_ciphertext TEXT NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    connected_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY (user_id, instagram_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.instagram_deletion_receipts (
+    code TEXT PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.instagram_oauth_attempts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.instagram_oauth_attempts FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.instagram_connections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.instagram_connections FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.instagram_deletion_receipts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read/write during beta" ON public.instagram_deletion_receipts FOR ALL USING (true) WITH CHECK (true);
