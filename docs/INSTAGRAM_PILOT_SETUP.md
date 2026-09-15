@@ -4,7 +4,7 @@ Implemented locally; this document does not certify a live deployment or Meta ap
 
 ## 1. Database
 
-Run `migrations/20260911_instagram_connections.sql` in the Supabase SQL editor using the same project as the production CCF backend. It creates three private tables; it does not delete users, transactions or campaign records. RLS is enabled, public/anon/authenticated table privileges are revoked, and the backend service role handles ownership checks.
+For a fresh database, run `migrations/20260911_instagram_connections.sql`. For an existing database that already received that migration, run `migrations/20260914_instagram_security_hardening.sql` before deploying this version of the backend. The hardening migration removes any legacy public beta policies and installs the transactional account-reconciliation function. It does not delete users, transactions or campaign records. It only removes a saved Instagram connection when a creator excludes that account during a later Meta authorisation.
 
 The backend MUST use `SUPABASE_SERVICE_ROLE_KEY`. Never grant public access to the new tables to fix an error.
 

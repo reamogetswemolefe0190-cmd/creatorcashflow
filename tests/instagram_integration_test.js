@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const fs = require('node:fs');
 const { JWT_SECRET } = require('../config/env');
 const { createInstagramRouter } = require('../routes/instagramRoutes');
 const { seal, unseal, hash, createMetaClient, verifySignedRequest } = require('../services/metaInstagram');
@@ -18,7 +19,11 @@ const repo = {
     async consume(id, cookie) { const row = attempts.get(id); if (row?.status !== 'pending' || row.cookie_hash !== cookie || Date.parse(row.expires_at) <= Date.now()) return null; row.status = 'processing'; return { user_id: row.user_id }; },
     async finish(id, status, code) { Object.assign(attempts.get(id), { status, result_code: code }); },
     async attempt(id, user) { const row = attempts.get(id); return row?.user_id === user ? row : null; },
-    async save(accounts) { accounts.forEach(account => rows.set(key(account.user_id, account.instagram_id), account)); },
+    async replace(user, accounts) {
+        const selected = new Set(accounts.map(account => account.instagram_id));
+        for (const [rowKey, account] of rows) if (account.user_id === user && !selected.has(account.instagram_id)) rows.delete(rowKey);
+        accounts.forEach(account => rows.set(key(user, account.instagram_id), { ...account, user_id: user }));
+    },
     async list(user) { return [...rows.values()].filter(row => row.user_id === user).map(({ instagram_id, username, expires_at }) => ({ instagram_id, username, expires_at })); },
     async get(user, id) { return rows.get(key(user, id)); },
     async remove(user, id) { rows.delete(key(user, id)); },
@@ -82,9 +87,16 @@ async function testClient() {
     await assert.rejects(() => client.authorise('code'), { code: 'RECONNECT_REQUIRED' });
     const unavailable = createMetaClient(config, async () => { throw Error('secret transport details'); });
     await assert.rejects(() => unavailable.authorise('code'), { code: 'META_UNAVAILABLE' });
+    const invalidOAuth = createMetaClient(config, async () => ({ ok: false, status: 400, json: async () => ({ error: { code: 100, message: 'invalid OAuth request' } }) }));
+    await assert.rejects(() => invalidOAuth.authorise('code'), { code: 'META_PERMISSION_OR_REQUEST_FAILED' });
 }
 
 async function main() {
+    const setupSql = fs.readFileSync('database_setup.sql', 'utf8');
+    const hardeningSql = fs.readFileSync('migrations/20260914_instagram_security_hardening.sql', 'utf8');
+    assert.doesNotMatch(setupSql, /CREATE POLICY "Allow public read\/write during beta" ON public\.instagram/i, 'Instagram tables must never receive public beta policies');
+    assert.match(hardeningSql, /revoke all on public\.instagram_connections[\s\S]*from public, anon, authenticated/i);
+    assert.match(hardeningSql, /security definer[\s\S]*replace_instagram_connections|replace_instagram_connections[\s\S]*security definer/i);
     await testClient();
     const app = express(); app.use(express.json());
     app.use('/api/integrations/instagram', createInstagramRouter({ config, repo, meta }));
@@ -107,12 +119,14 @@ async function main() {
         assert.equal((await call('/status', null, { headers: { Authorization: 'Bearer offline_token' } })).status, 403);
         assert.equal((await fetch(base + '/disabled/start', { method: 'POST', headers: auth('alice') })).status, 503);
         const first = await start();
+        rows.set(key('alice', '17840000000000000'), { user_id: 'alice', instagram_id: '17840000000000000', meta_user_id: metaUserId, token_ciphertext: 'old' });
         assert.equal(new URL(first.url).searchParams.get('config_id'), config.configId);
         assert.ok(!JSON.stringify(first).includes(config.secret));
         assert.equal((await call('/callback?state=' + first.attempt + '&code=test', null)).status, 400, 'Cookie is mandatory');
         const callback = await call('/callback?state=' + first.attempt + '&code=test', null, { headers: { Cookie: first.cookie } });
         assert.equal(callback.status, 200);
         assert.equal(authCalls, 1);
+        assert.equal(rows.has(key('alice', '17840000000000000')), false, 'Deselected accounts must be removed during reconnect');
         assert.equal((await call('/callback?state=' + first.attempt + '&code=test', null, { headers: { Cookie: first.cookie } })).status, 400, 'Replay denied');
         assert.equal(authCalls, 1);
         assert.equal((await (await call('/attempt/' + first.attempt)).json()).status, 'complete');

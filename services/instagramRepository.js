@@ -21,7 +21,7 @@ function createInstagramRepository(db = supabase) {
         async attempt(stateHash, userId) {
             return result(db.from('instagram_oauth_attempts').select('status,result_code,expires_at').eq('state_hash', stateHash).eq('user_id', userId).maybeSingle());
         },
-        save: rows => result(db.from('instagram_connections').upsert(rows, { onConflict: 'user_id,instagram_id' })),
+        replace: (userId, rows) => result(db.rpc('replace_instagram_connections', { p_user_id: userId, p_connections: rows })),
         list: userId => result(db.from('instagram_connections').select('instagram_id,username,page_id,expires_at,connected_at').eq('user_id', userId)),
         get: (userId, id) => result(db.from('instagram_connections').select('*').eq('user_id', userId).eq('instagram_id', id).maybeSingle()),
         remove: (userId, id) => result(db.from('instagram_connections').delete().eq('user_id', userId).eq('instagram_id', id)),

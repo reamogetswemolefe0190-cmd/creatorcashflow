@@ -40,7 +40,7 @@ function verifySignedRequest(value, secret) {
     } catch (_) { throw new InstagramError('INVALID_SIGNATURE', 400); }
 }
 function createMetaClient(config, transport = (...args) => fetch(...args)) {
-    async function request(path, params = {}, token) {
+    async function request(path, params = {}, token, options = {}) {
         const url = new URL(`https://graph.facebook.com/${config.version}/${path}`);
         Object.entries(params).forEach(([key, value]) => { if (value !== undefined) url.searchParams.set(key, String(value)); });
         if (token) url.searchParams.set('appsecret_proof', crypto.createHmac('sha256', config.secret).update(token).digest('hex'));
@@ -53,7 +53,7 @@ function createMetaClient(config, transport = (...args) => fetch(...args)) {
             const code = payload.error?.code;
             if (code === 190) throw new InstagramError('RECONNECT_REQUIRED', 409);
             if ([4, 17, 32, 613].includes(code) || response.status === 429) throw new InstagramError('META_RATE_LIMIT', 429);
-            if (code === 100) throw new InstagramError('METRIC_UNAVAILABLE');
+            if (code === 100 && options.unsupportedMetricIsUnavailable) throw new InstagramError('METRIC_UNAVAILABLE');
             throw new InstagramError('META_PERMISSION_OR_REQUEST_FAILED');
         }
         return payload;
@@ -106,7 +106,7 @@ function createMetaClient(config, transport = (...args) => fetch(...args)) {
         const metrics = [];
         for (const name of ['reach', 'saved', 'likes', 'comments', 'shares']) {
             try {
-                const result = await request(mediaId + '/insights', { metric: name }, token);
+                const result = await request(mediaId + '/insights', { metric: name }, token, { unsupportedMetricIsUnavailable: true });
                 const metric = result.data?.find(item => item.name === name);
                 const value = metric?.values?.[0]?.value ?? metric?.total_value?.value;
                 metrics.push({ name, value: typeof value === 'number' ? value : null, available: typeof value === 'number' });

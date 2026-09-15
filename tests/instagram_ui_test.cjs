@@ -32,8 +32,8 @@ async function main() {
         });
         const page = await context.newPage();
         await page.goto(base + '/#login');
-        await page.locator('#auth-email').fill('test@example.com');
-        await page.locator('#auth-password').fill('test-only-password');
+        await page.locator('#customer-auth input[name="email"]').fill('test@example.com');
+        await page.locator('#customer-auth input[name="password"]').fill('test-only-password');
         await page.locator('#customer-auth button').click();
         await page.locator('.hq-sidebar [data-action="account-tab"][data-tab="connections"]').click();
         await page.locator('[data-ig="posts"]').waitFor();

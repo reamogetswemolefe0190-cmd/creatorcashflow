@@ -41,7 +41,7 @@ function createInstagramRouter({ config = metaConfig(), repo = createInstagramRe
             if (typeof req.query.code !== 'string' || req.query.code.length > 4096) throw new InstagramError('META_TOKEN_FAILED');
             const result = await meta.authorise(req.query.code);
             const now = new Date().toISOString();
-            await repo.save(result.accounts.map(account => ({ ...account, user_id: attempt.user_id, token_ciphertext: seal(result.token, attempt.user_id + ':' + account.instagram_id), expires_at: result.expiresAt, connected_at: now })));
+            await repo.replace(attempt.user_id, result.accounts.map(account => ({ ...account, token_ciphertext: seal(result.token, attempt.user_id + ':' + account.instagram_id), expires_at: result.expiresAt, connected_at: now })));
             await repo.finish(hash(state), 'complete', null);
             return res.type('text').send('Instagram connected. You can close this window and return to Creator Cash Flow.');
         } catch (error) {

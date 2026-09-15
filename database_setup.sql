@@ -125,10 +125,42 @@ CREATE TABLE IF NOT EXISTS public.instagram_deletion_receipts (
 );
 
 ALTER TABLE public.instagram_oauth_attempts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read/write during beta" ON public.instagram_oauth_attempts FOR ALL USING (true) WITH CHECK (true);
-
 ALTER TABLE public.instagram_connections ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read/write during beta" ON public.instagram_connections FOR ALL USING (true) WITH CHECK (true);
-
 ALTER TABLE public.instagram_deletion_receipts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read/write during beta" ON public.instagram_deletion_receipts FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public read/write during beta" ON public.instagram_oauth_attempts;
+DROP POLICY IF EXISTS "Allow public read/write during beta" ON public.instagram_connections;
+DROP POLICY IF EXISTS "Allow public read/write during beta" ON public.instagram_deletion_receipts;
+REVOKE ALL ON public.instagram_oauth_attempts, public.instagram_connections, public.instagram_deletion_receipts FROM public, anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.instagram_oauth_attempts, public.instagram_connections, public.instagram_deletion_receipts TO service_role;
+
+CREATE OR REPLACE FUNCTION public.replace_instagram_connections(p_user_id TEXT, p_connections JSONB)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+    IF jsonb_typeof(p_connections) <> 'array' OR jsonb_array_length(p_connections) = 0 THEN
+        RAISE EXCEPTION 'At least one Instagram connection is required';
+    END IF;
+    DELETE FROM public.instagram_connections existing
+    WHERE existing.user_id = p_user_id
+      AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p_connections) item WHERE item->>'instagram_id' = existing.instagram_id);
+    INSERT INTO public.instagram_connections
+        (user_id, instagram_id, page_id, meta_user_id, username, token_ciphertext, expires_at, connected_at)
+    SELECT p_user_id, item.instagram_id, item.page_id, item.meta_user_id, item.username,
+        item.token_ciphertext, item.expires_at, item.connected_at
+    FROM jsonb_to_recordset(p_connections) AS item(
+        instagram_id TEXT, page_id TEXT, meta_user_id TEXT, username TEXT,
+        token_ciphertext TEXT, expires_at TIMESTAMPTZ, connected_at TIMESTAMPTZ
+    )
+    WHERE item.instagram_id IS NOT NULL AND item.page_id IS NOT NULL
+      AND item.meta_user_id IS NOT NULL AND item.token_ciphertext IS NOT NULL
+    ON CONFLICT (user_id, instagram_id) DO UPDATE SET
+        page_id = excluded.page_id, meta_user_id = excluded.meta_user_id,
+        username = excluded.username, token_ciphertext = excluded.token_ciphertext,
+        expires_at = excluded.expires_at, connected_at = excluded.connected_at;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.replace_instagram_connections(TEXT, JSONB) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.replace_instagram_connections(TEXT, JSONB) TO service_role;
