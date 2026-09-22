@@ -1,7 +1,7 @@
 'use strict';
 
 (function() {
-    const sessionToken = localStorage.getItem('ccf_session');
+    const sessionToken = sessionStorage.getItem('ccf_session') || localStorage.getItem('ccf_session');
     if (!sessionToken) { window.location.href = '/#login'; return; }
     
     function parseJwt(token) {
@@ -37,16 +37,6 @@
             if (!res.ok) throw new Error('Failed to load workspace data');
             state.workspace = await res.json();
             
-            // Add some mock data to make the UI look alive since we don't have a full database yet
-            if (state.workspace.campaigns.length === 0) {
-                state.workspace.campaigns.push({
-                    id: 'cmp_demo_1',
-                    name: 'Spring in motion',
-                    brief: 'Show an outdoor movement routine featuring the spring collection.',
-                    fixed_fee: 60000,
-                    status: 'active'
-                });
-            }
         } catch (err) {
             state.error = err.message;
         } finally {
@@ -67,11 +57,13 @@
                 <button class="${state.tab === 'overview' ? 'is-active' : ''}" data-tab="overview">Overview</button>
                 <button class="${state.tab === 'campaigns' ? 'is-active' : ''}" data-tab="campaigns">Deal Pipeline <b>${campaignsCount}</b></button>
                 <button class="${state.tab === 'roster' ? 'is-active' : ''}" data-tab="roster">Creator Roster</button>
+                <button class="${state.tab === 'reports' ? 'is-active' : ''}" data-tab="reports">Reports</button>
             `;
         } else {
             navItems = `
                 <button class="${state.tab === 'overview' ? 'is-active' : ''}" data-tab="overview">Overview</button>
                 <button class="${state.tab === 'campaigns' ? 'is-active' : ''}" data-tab="campaigns">Campaign Tracker <b>${campaignsCount}</b></button>
+                <button class="${state.tab === 'reports' ? 'is-active' : ''}" data-tab="reports">Reports</button>
                 <button class="${state.tab === 'approvals' ? 'is-active' : ''}" data-tab="approvals">Content Approvals</button>
             `;
         }
@@ -128,7 +120,7 @@
                     <h1>See what is moving<br><em>the work forward.</em></h1>
                     <p>Make decisions with a clear view of spend, creative approvals and the next deliverable.</p>
                 </div>
-                <button class="cc-btn">Export snapshot</button>
+                <button class="cc-btn" type="button" data-open-reports>Open reports</button>
             </div>
             <div class="role-metrics">
                 <article class="role-metric role-metric-hero">
@@ -154,7 +146,7 @@
     function renderCampaigns() {
         const campaigns = state.workspace?.campaigns || [];
         if (campaigns.length === 0) {
-            return `<div class="role-panel"><p style="padding: 24px; color: #888;">No active campaigns. Create one from the Creator Dashboard.</p></div>`;
+            return `<div class="role-panel"><p style="padding: 24px; color: var(--ui-muted);">No campaigns are linked to this organisation yet.</p></div>`;
         }
 
         return campaigns.map(c => `
@@ -166,7 +158,7 @@
                     </div>
                     <span class="cc-tag">${money(c.fixed_fee)}</span>
                 </div>
-                <p style="color: #aaa; margin-top: 12px; margin-bottom: 24px;">${c.brief}</p>
+                <p style="color: var(--st-line); margin-top: 12px; margin-bottom: 24px;">${c.brief}</p>
                 <ol class="role-timeline">
                     <li class="done"><i>✓</i><div><b>Brief confirmed</b><small>Completed</small></div></li>
                     <li class="current"><i>2</i><div><b>Roster assignment</b><small>Awaiting creator confirmations</small></div></li>
@@ -182,7 +174,7 @@
             return `
                 <div class="role-panel" style="text-align: center; padding: 48px 24px;">
                     <h2 style="margin-bottom: 12px;">Build your roster</h2>
-                    <p style="color: #aaa; margin-bottom: 24px;">Invite creators to join your agency so you can track their real-time analytics and assign them to campaigns.</p>
+                    <p style="color: var(--st-line); margin-bottom: 24px;">Invite creators to join your agency so you can track their real-time analytics and assign them to campaigns.</p>
                     <button class="cc-btn cc-primary" onclick="openInviteModal()">Invite creator</button>
                 </div>
             `;
@@ -214,7 +206,7 @@
                     <div><span class="cc-kicker">PENDING</span><h2>Content Approval Room</h2></div>
                     <span class="cc-tag">0 items</span>
                 </div>
-                <div style="padding: 48px 24px; text-align: center; color: #888;">
+                <div style="padding: 48px 24px; text-align: center; color: var(--st-line);">
                     No content requires your approval at this time.
                 </div>
             </div>
@@ -223,7 +215,8 @@
 
     function renderContent() {
         let body = '';
-        if (user.role === 'agency') {
+        if (state.tab === 'reports') body = '<div id="ccf-report-root"></div>';
+        else if (user.role === 'agency') {
             if (state.tab === 'overview') body = renderAgencyOverview();
             else if (state.tab === 'campaigns') body = renderCampaigns();
             else if (state.tab === 'roster') body = renderRoster();
@@ -247,15 +240,24 @@
     function render() {
         if (!DOM.shell) return;
         if (state.loading) {
-            DOM.shell.innerHTML = '<div style="padding: 48px; color: #888; text-align: center;">Loading workspace...</div>';
+            DOM.shell.innerHTML = '<div style="padding: 48px; color: var(--st-line); text-align: center;">Loading workspace...</div>';
             return;
         }
         if (state.error) {
-            DOM.shell.innerHTML = `<div style="padding: 48px; color: #f00; text-align: center;">Error: ${state.error}</div>`;
+            DOM.shell.innerHTML = `<div style="padding: 48px; color: var(--st-primary); text-align: center;">Error: ${state.error}</div>`;
             return;
         }
 
         DOM.shell.innerHTML = renderNav() + renderContent();
+
+        if (state.tab === 'reports') {
+            const orgs = state.workspace?.organizations || [];
+            const campaigns = (state.workspace?.campaigns || []).filter(c => user.role === 'agency'
+                ? orgs.some(o => o.type === 'agency' && o.id === c.organization_id)
+                : orgs.some(o => o.type === 'brand' && o.id === c.brand_organization_id));
+            window.CCFReports?.mount(DOM.shell.querySelector('#ccf-report-root'), { token: sessionToken, campaigns, role: user.role });
+        }
+        DOM.shell.querySelector('[data-open-reports]')?.addEventListener('click', () => { state.tab = 'reports'; render(); });
 
         // Attach event listeners to tabs
         DOM.shell.querySelectorAll('.role-rail button').forEach(btn => {

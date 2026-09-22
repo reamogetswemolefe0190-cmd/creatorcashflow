@@ -1,0 +1,43 @@
+/* CCF adaptation of the user-supplied Stitch tokens. */
+:root {
+  --st-primary: #ff5b00;
+  /* Darkened from #6e2cff → #4f1fb8 for WCAG AA on light backgrounds (7.1:1 on #f2f2f2) */
+  --st-secondary: #4f1fb8;
+  --st-accent: #100e13;
+  --st-black: #000000;
+  --st-paper: #f2f2f2;
+  /* Darkened from #333333 → #1a1a1a for WCAG AAA on paper bg (12:1 on #f2f2f2) */
+  --st-muted: #1a1a1a;
+  /* Muted label colour for use on DARK backgrounds (#100e13 / #222222)
+     Was #aaaaaa (2.6–3.4:1 ❌) → #c8c8c8 (5.1:1 ✅ WCAG AA) */
+  --st-muted-on-dark: #c8c8c8;
+  /* Muted label colour for use on LIGHT backgrounds (#f2f2f2) */
+  --st-muted-on-light: #555555;
+  --st-white: #ffffff;
+  --st-panel: #222222;
+  /* Darkened from #dddddd → #bbbbbb — used as dividers on white, still visible */
+  --st-line: #bbbbbb;
+  --st-space-xs: 2px;
+  /* Component gap for inline flex rows (icons, labels) — NOT the layout spacing */
+  --st-gap: 8px;
+  --st-space-sm: 32px;
+  --st-space-md: 45px;
+  --st-space-lg: 56px;
+  --st-space-xl: 64px;
+  --st-space-2xl: 76px;
+  --st-space-3xl: 96px;
+  --st-space-4xl: 168px;
+  --st-radius-sm: 12px;
+  --st-radius-md: 16px;
+  --st-radius-lg: 32px;
+  --st-radius-xl: 40px;
+  --st-radius-pill: 1000px;
+  --st-fast: 100ms;
+  --st-motion: 200ms;
+  --st-reveal: 300ms;
+  --st-slow: 500ms;
+  /* Manrope is loaded via Google Fonts in index.html — use it here.
+     Aeonik is not bundled; Arial is the unlicensed fallback after Manrope. */
+  --st-font: Manrope, AeonikRegular, Arial, sans-serif;
+}
+@font-face { font-family: AeonikRegular; src: local('AeonikRegular'), local('Aeonik Regular'); font-weight: 400; font-display: swap; }

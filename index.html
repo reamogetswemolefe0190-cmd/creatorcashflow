@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Creator Cash Flow | Campaigns, collaborations and cash flow.</title>
-    <meta name="description" content="Run creator campaigns from brief to payment. Creator accounts are live and free; agency and brand collaboration is available through an early-access pilot."/>
-    <meta name="keywords" content="Creator Cash Flow, creator finance, campaign management, influencer marketing, creator payments, South Africa creators"/>
+    <title>Creator Cash Flow App | Software for Campaigns & Creator Finance</title>
+    <meta name="description" content="Creator Cash Flow is the ultimate financial software and campaign management app for South African creators, agencies, and brands. Manage briefs, track payments, and organize cash flow in one platform."/>
+    <meta name="keywords" content="Creator Cash Flow app, creator software, creator finance platform, campaign management tool, influencer marketing software, creator payments app, South Africa creators"/>
     
     <!-- Structured Data for SEO (Rich Snippets & Sitelinks) -->
     <script type="application/ld+json">
@@ -24,21 +24,26 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "SoftwareApplication",
       "name": "Creator Cash Flow",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
       "url": "https://creatorcashflow.co.za/",
-      "logo": "https://creatorcashflow.co.za/favicon.png",
-      "description": "Financial Intelligence for Modern Creators. Run campaigns from brief to payment.",
-      "sameAs": []
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ZAR"
+      },
+      "description": "Creator Cash Flow is a financial software and campaign management app for South African creators, agencies, and brands."
     }
     </script>
     
     <!-- Open Graph & Social Cards -->
     <meta property="og:type" content="website"/>
-    <meta property="og:title" content="Creator Cash Flow | Connected Workspaces for Creators, Agencies & Brands"/>
-    <meta property="og:description" content="Run creator campaigns from brief to payment. Creator accounts are live and free; agency and brand collaboration is available through an early-access pilot."/>
-    <meta property="og:url" content="https://creator-cash-flow-ccf.onrender.com/"/>
-    <meta name="theme-color" content="#0C100D"/>
+    <meta property="og:title" content="Creator Cash Flow App | Software for Campaigns & Creator Finance"/>
+    <meta property="og:description" content="Creator Cash Flow is the ultimate financial software and campaign management app for South African creators, agencies, and brands. Manage briefs, track payments, and organize cash flow in one platform."/>
+    <meta property="og:url" content="https://creatorcashflow.co.za/"/>
+    <meta name="theme-color" content="#100e13"/>
 
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -50,17 +55,17 @@
 
     <style>
         :root {
-            --cc-bg: #0C100D;
-            --cc-panel: #151B17;
-            --cc-panel-elevated: #1B221D;
-            --cc-ink: #F7F7F2;
-            --cc-muted: #8A9A8D;
-            --cc-line: rgba(255, 255, 255, 0.09);
-            --cc-accent: #D4F973;
-            --cc-accent-hover: #C5EC61;
-            --cc-dark: #222E25;
-            --cc-tag-bg: #1F2C22;
-            --cc-tag-text: #A3E635;
+            --cc-bg: var(--st-accent);
+            --cc-panel: var(--st-panel);
+            --cc-panel-elevated: var(--st-panel);
+            --cc-ink: var(--st-paper);
+            --cc-muted: var(--st-line);
+            --cc-line: color-mix(in srgb, var(--st-white) 9%, transparent);
+            --cc-accent: var(--st-primary);
+            --cc-accent-hover: var(--st-primary);
+            --cc-dark: var(--st-panel);
+            --cc-tag-bg: var(--st-panel);
+            --cc-tag-text: var(--st-primary);
             --cc-radius: 14px;
         }
 
@@ -71,7 +76,7 @@
         }
 
         body {
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family:var(--st-font);
             background-color: var(--cc-bg);
             color: var(--cc-ink);
             line-height: 1.5;
@@ -87,7 +92,7 @@
         }
 
         button, input, select, textarea {
-            font-family: inherit;
+            font-family:var(--st-font);
         }
 
         /* -------------------------------------------------------------
@@ -95,7 +100,7 @@
            ------------------------------------------------------------- */
         .cc-bar, .glass-pill-nav {
             padding: 14px 32px;
-            background: rgba(17, 22, 19, 0.88);
+            background: color-mix(in srgb, var(--st-accent) 88%, transparent);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--cc-line);
@@ -166,10 +171,10 @@
             position: absolute;
             top: calc(100% + 12px);
             left: 0;
-            background: #161D18;
+            background: var(--st-panel);
             border: 1px solid var(--cc-line);
             border-radius: 12px;
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 16px 36px color-mix(in srgb, var(--st-accent) 50%, transparent);
             padding: 8px;
             min-width: 250px;
             z-index: 120;
@@ -192,13 +197,13 @@
         }
 
         .cc-dropdown-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: color-mix(in srgb, var(--st-white) 5%, transparent);
         }
 
         .cc-dropdown-item strong {
             display: block;
             font-size: 13px;
-            color: #FFFFFF;
+            color: var(--st-white);
         }
 
         .cc-dropdown-item span {
@@ -214,11 +219,11 @@
         }
 
         .cc-tour-pill-btn {
-            background: #1A231C;
-            border: 1px solid rgba(212, 249, 115, 0.3);
-            color: #D4F973;
+            background: var(--st-panel);
+            border: 1px solid color-mix(in srgb, var(--st-primary) 30%, transparent);
+            color: var(--st-primary);
             font-size: 12px;
-            font-weight: 600;
+            font-weight:500;
             padding: 7px 14px;
             border-radius: 30px;
             cursor: pointer;
@@ -229,8 +234,8 @@
         }
 
         .cc-tour-pill-btn:hover {
-            background: #222E25;
-            border-color: #D4F973;
+            background: var(--st-panel);
+            border-color: var(--st-primary);
             transform: translateY(-1px);
         }
 
@@ -256,9 +261,9 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 999;
-            background: rgba(18, 24, 20, 0.88);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 249, 115, 0.15);
+            background: color-mix(in srgb, var(--st-accent) 88%, transparent);
+            border: 1px solid color-mix(in srgb, var(--st-white) 14.000000000000002%, transparent);
+            box-shadow: 0 20px 48px color-mix(in srgb, var(--st-accent) 60%, transparent), 0 0 0 1px color-mix(in srgb, var(--st-primary) 15%, transparent);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 40px;
@@ -275,12 +280,12 @@
             font-weight: 700;
             letter-spacing: 0.8px;
             text-transform: uppercase;
-            color: #A3E635;
+            color: var(--st-primary);
             padding: 0 12px 0 10px;
             display: flex;
             align-items: center;
             gap: 6px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid color-mix(in srgb, var(--st-white) 10%, transparent);
         }
 
         .cc-dock-buttons {
@@ -300,7 +305,7 @@
             border: 0;
             color: var(--cc-muted);
             font-size: 12px;
-            font-weight: 600;
+            font-weight:500;
             padding: 8px 14px;
             border-radius: 30px;
             cursor: pointer;
@@ -310,14 +315,14 @@
 
         .cc-dock-btn:hover {
             color: var(--cc-ink);
-            background: rgba(255, 255, 255, 0.05);
+            background: color-mix(in srgb, var(--st-white) 5%, transparent);
         }
 
         .cc-dock-btn.active {
             background: var(--cc-accent);
-            color: #122216;
+            color: var(--st-panel);
             font-weight: 700;
-            box-shadow: 0 2px 10px rgba(212, 249, 115, 0.25);
+            box-shadow: 0 2px 10px color-mix(in srgb, var(--st-primary) 25%, transparent);
         }
 
         /* Buttons & Utility Components */
@@ -327,7 +332,7 @@
             color: var(--cc-ink);
             padding: 11px 22px;
             border-radius: 40px;
-            font-weight: 600;
+            font-weight:500;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -340,20 +345,20 @@
 
         .cc-btn:hover {
             background: var(--cc-panel-elevated);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: color-mix(in srgb, var(--st-white) 20%, transparent);
             transform: translateY(-1px);
         }
 
         .cc-primary {
             background: var(--cc-accent);
-            color: #183122;
+            color: var(--st-panel);
             border-color: transparent;
         }
 
         .cc-primary:hover {
             background: var(--cc-accent-hover);
-            color: #12261A;
-            box-shadow: 0 4px 14px rgba(212, 249, 115, 0.25);
+            color: var(--st-panel);
+            box-shadow: 0 4px 14px color-mix(in srgb, var(--st-primary) 25%, transparent);
         }
 
         .cc-btn-nav {
@@ -376,22 +381,22 @@
 
         .cc-tag {
             font-size: 11px;
-            background: #1F2C22;
-            color: #A3E635;
+            background: var(--st-panel);
+            color: var(--st-primary);
             padding: 5px 10px;
             border-radius: 6px;
             display: inline-block;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .cc-tag-pending {
-            background: #2D2716;
-            color: #FBBF24;
+            background: var(--st-panel);
+            color: var(--st-primary);
         }
 
         .cc-tag-completed {
-            background: #19271E;
-            color: #34D399;
+            background: var(--st-panel);
+            color: var(--st-primary);
         }
 
         .cc-row {
@@ -404,7 +409,7 @@
         }
 
         .cc-row strong {
-            font-weight: 600;
+            font-weight:500;
             display: block;
             color: var(--cc-ink);
             font-size: 14px;
@@ -415,8 +420,8 @@
             place-items: center;
             width: 38px;
             height: 38px;
-            background: #1F2C22;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--st-panel);
+            border: 1px solid color-mix(in srgb, var(--st-white) 12%, transparent);
             border-radius: 50%;
             font-size: 13px;
             font-weight: 700;
@@ -429,8 +434,8 @@
             place-items: center;
             width: 28px;
             height: 28px;
-            background: #1A231C;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--st-panel);
+            border: 1px solid color-mix(in srgb, var(--st-white) 10%, transparent);
             border-radius: 50%;
             font-size: 10px;
             font-weight: 700;
@@ -442,7 +447,7 @@
             background: none;
             color: var(--cc-ink);
             padding: 0;
-            font-weight: 600;
+            font-weight:500;
             text-align: left;
             cursor: pointer;
             display: inline-flex;
@@ -475,16 +480,16 @@
             border-radius: 30px;
             font-size: 12px;
             color: var(--cc-muted);
-            background: rgba(255, 255, 255, 0.03);
+            background: color-mix(in srgb, var(--st-white) 3%, transparent);
             margin-bottom: 24px;
         }
 
         .ce-dot {
             width: 7px;
             height: 7px;
-            background: #A3E635;
+            background: var(--st-primary);
             border-radius: 50%;
-            box-shadow: 0 0 10px #A3E635;
+            box-shadow: 0 0 10px var(--st-primary);
         }
 
         .ce-hero h1 {
@@ -493,12 +498,12 @@
             letter-spacing: -2.5px;
             margin: 0 auto 22px;
             font-weight: 500;
-            color: #FFFFFF;
+            color: var(--st-white);
         }
 
         .ce-hero h1 em {
             font-style: italic;
-            color: #C4D59E;
+            color: var(--st-primary);
             font-weight: 400;
         }
 
@@ -532,7 +537,7 @@
             position: relative;
             border-radius: 20px;
             overflow: hidden;
-            background: #1C241F;
+            background: var(--st-panel);
             color: white;
             isolation: isolate;
             border: 1px solid var(--cc-line);
@@ -552,7 +557,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 30%, rgba(12, 16, 13, 0.92) 100%);
+            background: linear-gradient(180deg, color-mix(in srgb, var(--st-accent) 5%, transparent) 30%, color-mix(in srgb, var(--st-accent) 92%, transparent) 100%);
             z-index: -1;
         }
 
@@ -568,7 +573,7 @@
         }
 
         .ce-photo-label small {
-            color: #ECEEE7;
+            color: var(--st-paper);
             font-size: 11px;
             letter-spacing: 1.2px;
             text-transform: uppercase;
@@ -580,19 +585,19 @@
         .ce-photo-label h3 {
             font-size: 26px;
             line-height: 1.25;
-            color: #FFFFFF;
-            font-weight: 600;
+            color: var(--st-white);
+            font-weight:500;
         }
 
         .ce-round {
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid color-mix(in srgb, var(--st-white) 40%, transparent);
             border-radius: 50%;
             width: 48px;
             height: 48px;
             display: grid;
             place-items: center;
-            color: #FFFFFF;
-            background: rgba(255, 255, 255, 0.14);
+            color: var(--st-white);
+            background: color-mix(in srgb, var(--st-white) 14.000000000000002%, transparent);
             font-size: 22px;
             cursor: pointer;
             transition: all 0.2s;
@@ -601,7 +606,7 @@
 
         .ce-round:hover {
             background: var(--cc-accent);
-            color: #151B17;
+            color: var(--st-panel);
             border-color: var(--cc-accent);
             transform: scale(1.05);
         }
@@ -610,19 +615,19 @@
             background: var(--cc-accent);
             border-radius: 20px;
             padding: 36px;
-            color: #1A2417;
+            color: var(--st-panel);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             gap: 24px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 45px color-mix(in srgb, var(--st-accent) 35%, transparent);
         }
 
         .ce-money-top {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
-            font-weight: 800;
+            font-weight:700;
             letter-spacing: 1px;
         }
 
@@ -631,7 +636,7 @@
             letter-spacing: -2.5px;
             line-height: 1.05;
             margin-top: 10px;
-            font-weight: 800;
+            font-weight:700;
         }
 
         .ce-spark {
@@ -643,7 +648,7 @@
         }
 
         .ce-spark span {
-            background: #253320;
+            background: var(--st-panel);
             border-radius: 4px 4px 0 0;
             flex: 1;
             transition: opacity 0.2s, transform 0.2s;
@@ -655,7 +660,7 @@
         }
 
         .ce-money-bottom {
-            border-top: 1px solid rgba(37, 51, 32, 0.2);
+            border-top: 1px solid color-mix(in srgb, var(--st-panel) 20%, transparent);
             padding-top: 22px;
             font-size: 13px;
             display: flex;
@@ -679,7 +684,7 @@
             font-size: 36px;
             line-height: 1.15;
             letter-spacing: -1.2px;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .ce-section-head p {
@@ -711,7 +716,7 @@
         .ce-role h3 {
             font-size: 22px;
             margin: 12px 0 8px;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .ce-role p {
@@ -727,10 +732,10 @@
             max-width: 1136px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            background: #151E17;
+            background: var(--st-panel);
             border-radius: 20px;
             overflow: hidden;
-            color: #F5F5EA;
+            color: var(--st-paper);
             border: 1px solid var(--cc-line);
         }
 
@@ -750,7 +755,7 @@
         }
 
         .ce-team-copy h2 {
-            color: #F5F5EA;
+            color: var(--st-paper);
             font-size: 34px;
             margin: 12px 0 14px;
             line-height: 1.15;
@@ -758,7 +763,7 @@
         }
 
         .ce-team-copy p {
-            color: #ACB6A3;
+            color: var(--st-line);
             font-size: 14px;
             line-height: 1.65;
             margin-bottom: 24px;
@@ -779,8 +784,8 @@
         }
 
         .cc-login-art {
-            background: #18221B;
-            color: #FFFFFF;
+            background: var(--st-panel);
+            color: var(--st-white);
             padding: 44px;
             border-radius: 22px;
             min-height: 480px;
@@ -811,20 +816,20 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(16, 24, 18, 0.75) 0%, rgba(16, 24, 18, 0.3) 45%, rgba(16, 24, 18, 0.92) 100%);
+            background: linear-gradient(180deg, color-mix(in srgb, var(--st-accent) 75%, transparent) 0%, color-mix(in srgb, var(--st-accent) 30%, transparent) 45%, color-mix(in srgb, var(--st-accent) 92%, transparent) 100%);
             z-index: -1;
         }
 
         .cc-login-art h2 {
             font-size: 40px;
-            color: #FFFFFF;
+            color: var(--st-white);
             line-height: 1.15;
             margin: 14px 0;
             letter-spacing: -1.5px;
         }
 
         .cc-login-art p {
-            color: #C3D4CA;
+            color: var(--st-line);
             font-size: 14px;
             line-height: 1.6;
         }
@@ -856,7 +861,7 @@
             width: 100%;
             border: 1px solid var(--cc-line);
             border-radius: 10px;
-            background: #18201A;
+            background: var(--st-panel);
             color: var(--cc-ink);
             padding: 13px 16px;
             font-size: 15px;
@@ -879,7 +884,7 @@
 
         .cc-side {
             padding: 32px 18px;
-            background: #131A15;
+            background: var(--st-accent);
             border-right: 1px solid var(--cc-line);
         }
 
@@ -908,13 +913,13 @@
 
         .cc-side button:hover {
             color: var(--cc-ink);
-            background: rgba(255, 255, 255, 0.04);
+            background: color-mix(in srgb, var(--st-white) 4%, transparent);
         }
 
         .cc-side button.cc-active {
-            background: #1B241E;
-            color: #FFFFFF;
-            font-weight: 600;
+            background: var(--st-panel);
+            color: var(--st-white);
+            font-weight:500;
             border-left: 3px solid var(--cc-accent);
             border-radius: 0 10px 10px 0;
         }
@@ -942,7 +947,7 @@
         .cc-title-row h2 {
             font-size: 32px;
             letter-spacing: -1px;
-            font-weight: 600;
+            font-weight:500;
             margin: 4px 0;
         }
 
@@ -970,7 +975,7 @@
         }
 
         .cc-metric:hover {
-            border-color: rgba(255, 255, 255, 0.18);
+            border-color: color-mix(in srgb, var(--st-white) 18%, transparent);
         }
 
         .cc-num {
@@ -978,7 +983,7 @@
             letter-spacing: -1px;
             margin: 8px 0;
             font-weight: 700;
-            color: #FFFFFF;
+            color: var(--st-white);
             font-variant-numeric: tabular-nums;
         }
 
@@ -998,23 +1003,23 @@
 
         .cc-box h3 {
             font-size: 17px;
-            font-weight: 600;
+            font-weight:500;
             margin-bottom: 16px;
         }
 
         .cc-campaign-banner {
-            background: #1A241D;
-            color: #FFFFFF;
+            background: var(--st-panel);
+            color: var(--st-white);
             border-radius: var(--cc-radius);
             padding: 28px;
             margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid color-mix(in srgb, var(--st-white) 8%, transparent);
         }
 
         .cc-campaign-banner h3 {
             font-size: 24px;
             margin: 8px 0;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .ce-mini-photo {
@@ -1027,7 +1032,7 @@
 
         .cc-progress {
             height: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            background: color-mix(in srgb, var(--st-white) 10%, transparent);
             border-radius: 3px;
             margin: 16px 0 8px;
             overflow: hidden;
@@ -1058,20 +1063,20 @@
         }
 
         .cc-filter-pill {
-            background: #18201A;
+            background: var(--st-panel);
             border: 1px solid var(--cc-line);
             color: var(--cc-muted);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight:500;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .cc-filter-pill.active, .cc-filter-pill:hover {
             background: var(--cc-accent);
-            color: #122216;
+            color: var(--st-panel);
             border-color: var(--cc-accent);
         }
 
@@ -1090,9 +1095,9 @@
         }
 
         .cc-table th {
-            background: #18201A;
+            background: var(--st-panel);
             padding: 14px 18px;
-            font-weight: 600;
+            font-weight:500;
             color: var(--cc-muted);
             font-size: 11px;
             letter-spacing: 0.8px;
@@ -1112,7 +1117,7 @@
         }
 
         .cc-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: color-mix(in srgb, var(--st-white) 2%, transparent);
         }
 
         /* -------------------------------------------------------------
@@ -1130,14 +1135,14 @@
 
         .cc-inbox-threads {
             border-right: 1px solid var(--cc-line);
-            background: #131A15;
+            background: var(--st-accent);
             padding: 16px 0;
         }
 
         .cc-thread-item {
             padding: 14px 20px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid color-mix(in srgb, var(--st-white) 4%, transparent);
             transition: background 0.2s;
             display: flex;
             align-items: center;
@@ -1145,7 +1150,7 @@
         }
 
         .cc-thread-item:hover, .cc-thread-item.active {
-            background: #1C241E;
+            background: var(--st-panel);
         }
 
         .cc-thread-info {
@@ -1157,7 +1162,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 13px;
-            color: #FFFFFF;
+            color: var(--st-white);
         }
 
         .cc-thread-info strong span {
@@ -1179,7 +1184,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background: #151B17;
+            background: var(--st-panel);
         }
 
         .cc-chat-header {
@@ -1188,7 +1193,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #18201A;
+            background: var(--st-panel);
         }
 
         .cc-chat-messages {
@@ -1211,16 +1216,16 @@
 
         .cc-msg-incoming {
             align-self: flex-start;
-            background: #1E2820;
-            color: #FFFFFF;
+            background: var(--st-panel);
+            color: var(--st-white);
             border-bottom-left-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid color-mix(in srgb, var(--st-white) 6%, transparent);
         }
 
         .cc-msg-outgoing {
             align-self: flex-end;
             background: var(--cc-accent);
-            color: #122216;
+            color: var(--st-panel);
             font-weight: 500;
             border-bottom-right-radius: 4px;
         }
@@ -1237,16 +1242,16 @@
             border-top: 1px solid var(--cc-line);
             display: flex;
             gap: 12px;
-            background: #18201A;
+            background: var(--st-panel);
         }
 
         .cc-chat-input {
             flex: 1;
-            background: #111613;
+            background: var(--st-accent);
             border: 1px solid var(--cc-line);
             border-radius: 30px;
             padding: 10px 18px;
-            color: #FFFFFF;
+            color: var(--st-white);
             font-size: 13px;
             outline: none;
         }
@@ -1268,11 +1273,11 @@
 
         .cc-badge-journey {
             font-size: 12px;
-            background: #1F2C22;
-            color: #A3E635;
+            background: var(--st-panel);
+            color: var(--st-primary);
             padding: 6px 14px;
             border-radius: 20px;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .cc-steps {
@@ -1298,13 +1303,13 @@
         }
 
         .cc-step-btn[aria-pressed="true"] {
-            background: #1F2C22;
+            background: var(--st-panel);
             border-color: var(--cc-accent);
-            color: #FFFFFF;
+            color: var(--st-white);
         }
 
         .cc-step-btn:hover {
-            border-color: rgba(255, 255, 255, 0.25);
+            border-color: color-mix(in srgb, var(--st-white) 25%, transparent);
         }
 
         .cc-flow-detail {
@@ -1317,7 +1322,7 @@
            PHASE 1: PRODUCTION FOOTER
            ------------------------------------------------------------- */
         .cc-footer {
-            background: #0E1310;
+            background: var(--st-accent);
             border-top: 1px solid var(--cc-line);
             padding: 64px 32px 100px;
             margin-top: auto;
@@ -1347,13 +1352,13 @@
         }
 
         .cc-compliance-badge {
-            background: #141C16;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #A3E635;
+            background: var(--st-panel);
+            border: 1px solid color-mix(in srgb, var(--st-white) 8%, transparent);
+            color: var(--st-primary);
             font-size: 11px;
             padding: 6px 12px;
             border-radius: 20px;
-            font-weight: 600;
+            font-weight:500;
         }
 
         .cc-footer-links-grid {
@@ -1363,7 +1368,7 @@
         }
 
         .cc-footer-col h4 {
-            color: #FFFFFF;
+            color: var(--st-white);
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -1468,9 +1473,19 @@
         }
     </style>
 <link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/customer.css">
+<link rel="stylesheet" href="/customer.css?v=2">
+<style>
+@media(max-width:760px) {
+    .cc-demo-side { transition: transform 0.3s ease !important; }
+}
+</style>
+<link rel="stylesheet" href="/assets/ccf-stitch.css?v=3">
+<link rel="stylesheet" href="/assets/ccf-stitch-landing.css?v=2">
+<link rel="stylesheet" href="/assets/ccf-system.css?v=1">
+<link rel="stylesheet" href="/assets/ccf-creator.css?v=1">
 </head>
 <body>
+<a class="skip-link" href="#cc-screen">Skip to content</a>
 
     <!-- Embedded Stock Assets for Offline & Staging Reliability -->
     <template id="cc-photo-assets">
@@ -1520,13 +1535,16 @@
 
 
     <!-- Main Dynamic Screen Viewport -->
-    <main id="cc-screen"></main>
+    <main id="cc-screen" tabindex="-1"></main>
 
     <!-- PHASE 1: PRODUCTION FOOTER -->
     <footer class="customer-footer"><span>© 2026 Creator Cash Flow</span><a href="#privacy">Privacy notice</a><a href="#terms">Service information</a><a href="#security">Security</a><a href="#availability">Free release & availability</a><a href="mailto:reamogetswemolefe@creatorcashflow.co.za">Contact support</a></footer>
 
     <!-- Interactive Script Application -->
+    <script src="/assets/ccf-landing.js" defer></script>
     <script src="/product-demo.js" defer></script>
+    <script src="/assets/vendor/motion.js" defer></script>
+    <script src="/assets/ccf-creator.js" defer></script>
     <script src="https://cdn.getphyllo.com/connect/v2/phyllo-connect.js" defer></script>
 <script src="/instagram-client.js" defer></script>
 <script src="/customer.js" defer></script>

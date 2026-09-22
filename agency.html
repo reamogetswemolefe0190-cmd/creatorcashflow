@@ -6,23 +6,26 @@
     <title>Agency Dashboard | Creator Cash Flow</title>
     <link rel="stylesheet" href="/style.css">
     <style>
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: color-mix(in srgb, var(--st-accent) 80%, transparent); z-index: 1000; justify-content: center; align-items: center; }
         .modal.is-active { display: flex; }
-        .modal-content { background: #0B0B0B; padding: 32px; border-radius: 24px; width: 100%; max-width: 480px; border: 1px solid #333; }
+        .modal-content { background: var(--st-accent); padding: 32px; border-radius: 24px; width: 100%; max-width: 480px; border: 1px solid var(--st-muted); }
         .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-head h2 { font-size: 20px; color: #fff; margin: 0; }
-        .close-btn { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+        .modal-head h2 { font-size: 20px; color: var(--st-white); margin: 0; }
+        .close-btn { background: none; border: none; color: var(--st-line); font-size: 24px; cursor: pointer; }
         .copy-link-box { display: flex; gap: 8px; margin-top: 16px; margin-bottom: 24px; }
-        .copy-link-box input { flex: 1; padding: 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; }
+        .copy-link-box input { flex: 1; padding: 12px; background: var(--st-accent); border: 1px solid var(--st-muted); border-radius: 8px; color: var(--st-white); }
     </style>
+<link rel="stylesheet" href="/assets/ccf-stitch.css?v=1">
+<link rel="stylesheet" href="/assets/ccf-system.css?v=1">
+<link rel="stylesheet" href="/assets/ccf-reports.css?v=1">
 </head>
 <body class="role-workspace agency-workspace">
     <header class="public-header">
-        <a class="cc-logo" href="/#landing">Creator Cash Flow</a>
+        <a class="cc-logo" href="/#landing"><img src="/brand/logo-primary.svg" alt="Creator Cash Flow" width="144" height="56"></a>
         <div class="hq-header-actions">
             <span class="hq-plan">Agency Pilot</span>
             <button class="cc-btn cc-primary" onclick="openInviteModal()">+ Invite Creator</button>
-            <button class="hq-signout" onclick="localStorage.removeItem('ccf_session'); window.location.href='/#login'">Sign out</button>
+            <button class="hq-signout" onclick="sessionStorage.removeItem('ccf_session'); localStorage.removeItem('ccf_session'); window.location.href='/#login'">Sign out</button>
         </div>
     </header>
     <main class="role-workspace-shell"></main>
@@ -52,6 +55,7 @@
         </div>
     </div>
 
+    <script src="/assets/ccf-reports.js"></script>
     <script src="/dashboards.js"></script>
     <script>
         // Parse JWT to get organization details safely
@@ -59,7 +63,7 @@
             try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
         }
 
-        const sessionToken = localStorage.getItem('ccf_session');
+        const sessionToken = sessionStorage.getItem('ccf_session') || localStorage.getItem('ccf_session');
         const user = parseJwt(sessionToken);
 
         // Generate the unique invite link

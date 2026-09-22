@@ -173,113 +173,12 @@ const state = {
             if (!viewport) return;
 
             if (state.page === 'landing') {
-                viewport.innerHTML = `
-                    <!-- Hero Section -->
-                    <section class="ce-hero ce-hero-v2 reveal-on-scroll">
-                        <div class="ce-hero-copy reveal-on-scroll reveal-delay-1">
-                            <h1>Great campaigns.<br><em>Clearly connected.</em></h1>
-                            <p>Briefs, creators, performance and payment milestones moving together in one beautifully simple workspace.</p>
-                            <div class="cc-actions">
-                                <button class="cc-btn cc-primary" data-command="setPage('signup')">Start as a creator ↗</button>
-                                <button class="cc-btn" data-command="setPage('journey')">Watch the workflow</button>
-                            </div>
-                        </div>
-                        <div class="ce-product-stage" aria-label="Animated campaign workspace preview">
-                            <div class="ce-stage-orbit"></div>
-                            <article class="ce-stage-main">
-                                <div class="ce-stage-top"><span>SPRING IN MOTION</span><b>LIVE</b></div>
-                                <h3>One campaign.<br>Everyone in sync.</h3>
-                                <div class="ce-stage-progress"><span></span></div>
-                                <div class="ce-stage-people"><span>TM</span><span>SN</span><span>VA</span><small>Creator <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> Agency <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> Brand</small></div>
-                            </article>
-                            <article class="ce-float-card ce-float-metric"><small>VERIFIED VIEWS</small><strong>128.4K</strong><span>↑ 18.6%</span></article>
-                            <article class="ce-float-card ce-float-payment"><small>MILESTONE REACHED</small><strong>R5,000</strong><span>Ready for approval <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span></article>
-                            <div class="ce-signal ce-signal-one"></div><div class="ce-signal ce-signal-two"></div>
-                        </div>
-                    </section>
-
-                    <!-- Showcase Collage Grid -->
-                    <section class="ce-collage reveal-on-scroll">
-                        <div class="ce-photo">
-                            ${getPhotoHtml('creator')}
-                            <div class="ce-photo-label">
-                                <div>
-                                    <small>MORE SPACE TO MAKE YOUR NEXT BIG THING</small>
-                                    <h3>Keep creating.<br>We’ll help with the business.</h3>
-                                </div>
-                                <button class="ce-round" data-command="setPage('creator')" aria-label="Explore creator workspace">↗</button>
-                            </div>
-                        </div>
-
-                        <div class="ce-money">
-                            <div>
-                                <div class="ce-money-top">
-                                    <span>YOUR MONEY, AT A GLANCE</span>
-                                    <span>↗</span>
-                                </div>
-                                <div style="font-size: 13px; margin-top: 24px; color: #36462B; font-weight: 600;">Income received · September</div>
-                                <div class="ce-money-value">R38,500<span style="font-size: 18px; letter-spacing: 0; font-weight: 500;">.00</span></div>
-                                <div class="ce-spark" aria-label="Illustrative six month income trend">
-                                    <span style="height: 28px;" title="April: R14,000"></span>
-                                    <span style="height: 42px;" title="May: R21,000"></span>
-                                    <span style="height: 36px;" title="June: R18,000"></span>
-                                    <span style="height: 52px;" title="July: R26,000"></span>
-                                    <span style="height: 60px;" title="August: R30,000"></span>
-                                    <span style="height: 72px;" title="September: R38,500"></span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 8px; color: #36462B; font-weight: 700;">
-                                    <span>Apr</span>
-                                    <span>Sep</span>
-                                </div>
-                            </div>
-                            <div class="ce-money-bottom">
-                                <span>Next payment<br><strong>Vela Active</strong></span>
-                                <span>Due 30 Sep<br><strong>R12,000 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></strong></span>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Roles Architecture Section -->
-                    <section class="ce-section-head">
-                        <h2>One workflow.<br>Three clear roles.</h2>
-                        <p>Creator accounts are live. Agency and brand screens below are labelled product previews.</p>
-                    </section>
-
-                    <section class="ce-roles">
-                        <div class="ce-role">
-                            <span class="cc-kicker">01 / CREATORS · LIVE ACCOUNT</span>
-                            <h3>Your talent. Your business.</h3>
-                            <p>Manage deliverables, see upcoming payments and stay on top of your income.</p>
-                            <button class="cc-link" data-command="setPage('creator')">View creator demo ↗</button>
-                        </div>
-                        <div class="ce-role">
-                            <span class="cc-kicker">02 / AGENCIES · EARLY-ACCESS PILOT</span>
-                            <h3>Bring the whole team together.</h3>
-                            <p>Connect your roster to the right briefs and keep every approval moving.</p>
-                            <button class="cc-link" data-command="setPage('agency')">View agency preview ↗</button>
-                            <a class="cc-link ce-pilot-link" href="mailto:reamogetswemolefe@creatorcashflow.co.za?subject=Agency%20pilot%20application">Apply for pilot</a>
-                        </div>
-                        <div class="ce-role">
-                            <span class="cc-kicker">03 / BRANDS · EARLY-ACCESS PILOT</span>
-                            <h3>Good ideas. Real outcomes.</h3>
-                            <p>Set the brief, approve the work and understand where your budget goes.</p>
-                            <button class="cc-link" data-command="setPage('brand')">View brand preview ↗</button>
-                            <a class="cc-link ce-pilot-link" href="mailto:reamogetswemolefe@creatorcashflow.co.za?subject=Brand%20campaign%20enquiry">Request a campaign</a>
-                        </div>
-                    </section>
-
-                    <!-- Collaborative Teamwork Section -->
-                    <section class="ce-team">
-                        ${getPhotoHtml('team')}
-                        <div class="ce-team-copy">
-                            <div class="cc-kicker" style="color: #C4D3A9;">LESS BACK AND FORTH</div>
-                            <h2>Great work is<br>a team sport.</h2>
-                            <p>A shared brief. Clear feedback. A visible next step. Keep creators, agencies and brands on the same page.</p>
-                            <button class="cc-btn cc-primary" data-command="setPage('journey')">View sample campaign ↗</button>
-                        </div>
-                    </section>
-                `;
+                if(window.CCFLanding){
+                    viewport.innerHTML = window.CCFLanding();
+                    document.body.classList.add('ccf-marketing');
+                }
             } else if (state.page === 'login') {
+                document.body.classList.remove('ccf-marketing');
                 viewport.innerHTML = `
                     <div class="cc-login">
                         <div class="cc-login-art">
@@ -361,6 +260,13 @@ const state = {
 
                 if (state.activeWorkspaceTab === 'Overview') {
                     subViewContent = `
+                        <div class="cc-creator-next">
+                            <div>
+                                <h3>Sample campaign needs attention</h3>
+                                <p>Your action is required to move the Spring in Motion campaign forward.</p>
+                            </div>
+                            <button class="cc-btn cc-primary cc-btn-nav" data-command="openCampaignFlow('${role}')">Open shared campaign <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+                        </div>
                         <div class="cc-metrics">
                             ${metrics.map(m => `
                                 <div class="cc-metric">
@@ -572,24 +478,24 @@ const state = {
                             </div>
 
                             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
-                                <div style="background:#19221B; padding:20px; border-radius:12px; border:1px solid var(--cc-line);">
+                                <div class="cc-box" style="padding:20px; border-radius:12px;">
                                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                         <strong>Thando Mokoena</strong>
                                         <span class="cc-tag cc-tag-pending">Version 1 · Checked by Agency</span>
                                     </div>
-                                    <p class="cc-small" style="color:#FFFFFF; margin-bottom:14px;">1x 60s Reel: Outdoor Run & Natural Product Integration in Camps Bay</p>
+                                    <p class="cc-small" style="margin-bottom:14px;">1x 60s Reel: Outdoor Run & Natural Product Integration in Camps Bay</p>
                                     <div style="display:flex; gap:10px;">
                                         <button class="cc-btn cc-primary cc-btn-nav" data-command="approveBrandDeliverable('Thando Mokoena')">Approve Deliverable ✓</button>
                                         <button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Request Revision</button>
                                     </div>
                                 </div>
 
-                                <div style="background:#19221B; padding:20px; border-radius:12px; border:1px solid var(--cc-line);">
+                                <div class="cc-box" style="padding:20px; border-radius:12px;">
                                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                         <strong>Naledi Dube</strong>
                                         <span class="cc-tag cc-tag-completed">Approved for 18 Sep</span>
                                     </div>
-                                    <p class="cc-small" style="color:#FFFFFF; margin-bottom:14px;">3x Instagram Stories: Hydration Routine & Discount Link Sticker</p>
+                                    <p class="cc-small" style="margin-bottom:14px;">3x Instagram Stories: Hydration Routine & Discount Link Sticker</p>
                                     <div style="display:flex; gap:10px;">
                                         <button class="cc-btn cc-btn-nav" data-command="setPage('journey')">View Pipeline Status</button>
                                     </div>
@@ -869,36 +775,36 @@ const state = {
                     <div class="cc-shell cc-demo-shell cc-role-${role}">
                         <aside class="cc-side cc-demo-side">
                             <div class="cc-kicker">${roleLabel} workspace · preview</div>
-                            <button class="${state.activeWorkspaceTab === 'Overview' ? 'cc-active' : ''}" data-command="setWorkspaceTab('Overview')">
-                                <i data-lucide="layout-dashboard"></i> Overview
+                            <button class="${state.activeWorkspaceTab === 'Overview' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Overview' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Overview')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Overview
                             </button>
-                            <button class="${state.activeWorkspaceTab === 'Campaigns' ? 'cc-active' : ''}" data-command="setWorkspaceTab('Campaigns')">
-                                <i data-lucide="layers"></i> Campaigns
+                            <button class="${state.activeWorkspaceTab === 'Campaigns' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Campaigns' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Campaigns')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg> Campaigns
                             </button>
-                            <button class="${(state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') ? 'cc-active' : ''}" data-command="setWorkspaceTab('${isCreator ? 'Income' : isAgency ? 'Roster' : 'Partners'}')">
-                                <i data-lucide="users"></i> ${isCreator ? 'Income' : isAgency ? 'Creator roster' : 'Creator partners'}
+                            <button class="${(state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') ? 'cc-active' : ''}" ${(state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('${isCreator ? 'Income' : isAgency ? 'Roster' : 'Partners'}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ${isCreator ? 'Income' : isAgency ? 'Creator roster' : 'Creator partners'}
                             </button>
-                            <button class="${state.activeWorkspaceTab === 'Inbox' ? 'cc-active' : ''}" data-command="setWorkspaceTab('Inbox')">
-                                <i data-lucide="message-square"></i> Inbox
+                            <button class="${state.activeWorkspaceTab === 'Inbox' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Inbox' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Inbox')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Inbox
                             </button>
                             <button data-command="setPage('journey')">
-                                <i data-lucide="arrow-right-left"></i> Shared journey
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-left"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg> Shared journey
                             </button>
                         </aside>
 
-                        <main class="cc-main cc-demo-main">
+                        <div class="cc-main cc-demo-main">
                             <div class="cc-demo-context"><span><i></i>Interactive product preview</span><b>${roleLabel} perspective</b></div>
                             <div class="cc-title-row cc-demo-title">
                                 <div>
                                     <div class="cc-kicker">${roleLabel} / ${state.activeWorkspaceTab}</div>
-                                    <h2>${isCreator ? 'Good morning, ' : ''}${roleName}${isCreator ? '.' : ''}</h2>
+                                    <h1>${isCreator ? 'Good morning, ' : ''}${roleName}${isCreator ? '.' : ''}</h1>
                                     <p>${isCreator ? 'Your work is moving. Here’s where your money stands.' : isAgency ? 'Your campaigns, creators and next decisions.' : 'See what’s working. Keep your campaign moving.'}</p>
                                 </div>
                                 <div class="cc-demo-title-actions"><button class="cc-btn cc-primary" data-command="openCampaignFlow('${role}')">Open shared campaign <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button><span class="cc-avatar">${roleAvatar}</span></div>
                             </div>
 
                             ${subViewContent}
-                        </main>
+                        </div>
                     </div>
                 `;
             } else if (state.page === 'journey') {

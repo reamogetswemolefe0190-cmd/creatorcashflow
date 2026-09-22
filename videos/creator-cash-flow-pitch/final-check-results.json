@@ -1,0 +1,176 @@
+
+> check
+> npx --yes hyperframes@0.8.44 check --at 6,13,21,29,37,45,53,59 --json
+
+{
+  "ok": true,
+  "strict": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 9
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "container_overflow",
+        "severity": "warning",
+        "time": 21,
+        "selector": "div.screen.a > img:nth-of-type(1)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 662,
+          "top": 113,
+          "right": 1802,
+          "bottom": 1342.06,
+          "width": 1140,
+          "height": 1229.06
+        },
+        "containerSelector": "div.screen.a",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 830,
+          "top": 223,
+          "right": 1800,
+          "bottom": 888,
+          "width": 970,
+          "height": 665
+        },
+        "overflow": {
+          "left": 168,
+          "top": 110,
+          "bottom": 454.06
+        },
+        "dataAttributes": {
+          "data-hf-authored-opacity": ""
+        },
+        "sourceFile": "compositions/frames/03-agency.html",
+        "bbox": {
+          "x": 662,
+          "y": 113,
+          "width": 1140,
+          "height": 1229.06
+        },
+        "firstSeen": 21,
+        "lastSeen": 29,
+        "occurrences": 2,
+        "heldMs": 0
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 37,
+        "selector": "div.screen.a > img:nth-of-type(1)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 662,
+          "top": 113,
+          "right": 1802,
+          "bottom": 1282.69,
+          "width": 1140,
+          "height": 1169.69
+        },
+        "containerSelector": "div.screen.a",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 830,
+          "top": 223,
+          "right": 1800,
+          "bottom": 888,
+          "width": 970,
+          "height": 665
+        },
+        "overflow": {
+          "left": 168,
+          "top": 110,
+          "bottom": 394.69
+        },
+        "dataAttributes": {
+          "data-hf-authored-opacity": ""
+        },
+        "sourceFile": "compositions/frames/03-agency.html",
+        "bbox": {
+          "x": 662,
+          "y": 113,
+          "width": 1140,
+          "height": 1169.69
+        },
+        "firstSeen": 37,
+        "lastSeen": 37,
+        "occurrences": 1,
+        "heldMs": 0
+      }
+    ],
+    "duration": 60,
+    "samples": [
+      6,
+      13,
+      21,
+      29,
+      37,
+      45,
+      53,
+      59
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 2,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      6,
+      13,
+      29,
+      45,
+      59
+    ],
+    "checked": 58,
+    "passed": 58
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  },
+  "_meta": {
+    "version": "0.8.44",
+    "latestVersion": "0.8.44",
+    "updateAvailable": false
+  }
+}

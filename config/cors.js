@@ -17,6 +17,9 @@ function isOriginAllowed(origin) {
     if (ALLOWED_ORIGINS.includes(origin)) return true;
     try {
         const parsed = new URL(origin);
+        if (process.env.NODE_ENV !== 'production' && ['localhost', '127.0.0.1'].includes(parsed.hostname) && ['http:', 'https:'].includes(parsed.protocol)) {
+            return true;
+        }
         if (parsed.hostname.endsWith('.onrender.com') || parsed.hostname === 'onrender.com') {
             return true;
         }

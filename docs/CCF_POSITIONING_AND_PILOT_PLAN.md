@@ -86,7 +86,7 @@ Build the first report with deterministic figures and editable commentary. Inclu
 
 Start with a reviewed PDF export. Add revocable sharing when permissions and report versioning are ready. Store a dated report snapshot so later metric changes do not silently rewrite something already sent to a client.
 
-Let the pilot use authorised CSV uploads or manually supplied evidence while production social-data access is unavailable. Label these accurately as uploaded or self-reported. Missing data should remain missing. Do not call all figures verified, treat views as sales, or sum platform reach into a claimed unique audience.
+Make basic results part of Phase 1: attach each published post link and publication date to its approved deliverable, then allow a few relevant results to be added manually or from an authorised CSV. Each figure needs its source, reporting period and last update, with agency review before client sharing. Missing data should remain missing. Do not call manually supplied figures verified, treat views as sales, or sum platform reach into a claimed unique audience. When Meta API access is available for an eligible, consenting account, populate supported metrics in the same record and retain their provenance; the pilot workflow must work without that connection.
 
 AI could draft the narrative later, grounded in report data and reviewed by a person. It is not required for a useful first report.
 

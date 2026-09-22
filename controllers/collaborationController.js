@@ -145,7 +145,7 @@ async function getWorkspace(req, res) {
         const orgIds = memberships.map(m => m.organization_id);
         const assignments = memoryDb.campaign_creators.filter(a => a.creator_user_id === req.user.id);
         const campaignIds = assignments.map(a => a.campaign_id);
-        return res.json({ organizations: memoryDb.organizations.filter(o => orgIds.includes(o.id)), memberships, campaigns: memoryDb.campaigns.filter(c => orgIds.includes(c.organization_id) || campaignIds.includes(c.id)), assignments });
+        return res.json({ organizations: memoryDb.organizations.filter(o => orgIds.includes(o.id)), memberships, campaigns: memoryDb.campaigns.filter(c => orgIds.includes(c.organization_id) || orgIds.includes(c.brand_organization_id) || campaignIds.includes(c.id)), assignments });
     }
     try {
         const memberResult = await supabase.from('organization_members').select('*').eq('user_id', req.user.id);
@@ -155,8 +155,10 @@ async function getWorkspace(req, res) {
         const campaignIds = assignmentResult.data.map(a => a.campaign_id);
         const orgResult = orgIds.length ? await supabase.from('organizations').select('*').in('id', orgIds) : { data: [] };
         const ownedCampaigns = orgIds.length ? await supabase.from('campaigns').select('*').in('organization_id', orgIds) : { data: [] };
+        const brandCampaigns = orgIds.length ? await supabase.from('campaigns').select('*').in('brand_organization_id', orgIds) : { data: [] };
         const assignedCampaigns = campaignIds.length ? await supabase.from('campaigns').select('*').in('id', campaignIds) : { data: [] };
-        const merged = [...(ownedCampaigns.data || []), ...(assignedCampaigns.data || [])].filter((c, index, all) => all.findIndex(x => x.id === c.id) === index);
+        if (orgResult.error || ownedCampaigns.error || brandCampaigns.error || assignedCampaigns.error) throw orgResult.error || ownedCampaigns.error || brandCampaigns.error || assignedCampaigns.error;
+        const merged = [...(ownedCampaigns.data || []), ...(brandCampaigns.data || []), ...(assignedCampaigns.data || [])].filter((c, index, all) => all.findIndex(x => x.id === c.id) === index);
         return res.json({ organizations: orgResult.data || [], memberships: memberResult.data, campaigns: merged, assignments: assignmentResult.data });
     } catch (error) {
         return res.status(503).json({ error: 'Workspace data is unavailable. Confirm the collaboration database migration is installed.' });

@@ -5,16 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brand Dashboard | Creator Cash Flow</title>
     <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/assets/ccf-stitch.css?v=1">
+<link rel="stylesheet" href="/assets/ccf-system.css?v=1">
+<link rel="stylesheet" href="/assets/ccf-reports.css?v=1">
 </head>
 <body class="role-workspace brand-workspace">
     <header class="public-header">
-        <a class="cc-logo" href="/#landing">Creator Cash Flow</a>
+        <a class="cc-logo" href="/#landing"><img src="/brand/logo-primary.svg" alt="Creator Cash Flow" width="144" height="56"></a>
         <div class="hq-header-actions">
             <span class="hq-plan">Brand Pilot</span>
-            <button class="hq-signout" onclick="localStorage.removeItem('ccf_session'); window.location.href='/#login'">Sign out</button>
+            <button class="hq-signout" onclick="sessionStorage.removeItem('ccf_session'); localStorage.removeItem('ccf_session'); window.location.href='/#login'">Sign out</button>
         </div>
     </header>
     <main class="role-workspace-shell"></main>
+    <script src="/assets/ccf-reports.js"></script>
     <script src="/dashboards.js"></script>
 </body>
 </html>

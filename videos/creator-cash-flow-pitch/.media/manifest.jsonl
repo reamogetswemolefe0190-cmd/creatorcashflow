@@ -1,0 +1,6 @@
+{"id":"icon_001","type":"icon","path":"assets/logo-primary.svg","source":"existing","description":"logo primary","provenance":{"provider":"local","adopted":true}}
+{"id":"icon_002","type":"icon","path":"assets/logo-reversed.svg","source":"existing","description":"logo reversed","provenance":{"provider":"local","adopted":true}}
+{"id":"image_001","type":"image","path":"assets/pilot-demo-agency.png","source":"existing","description":"pilot demo agency","width":960,"height":1035,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_002","type":"image","path":"assets/pilot-demo-brand.png","source":"existing","description":"pilot demo brand","width":960,"height":1035,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_003","type":"image","path":"assets/pilot-demo-creator.png","source":"existing","description":"pilot demo creator","width":960,"height":985,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_004","type":"image","path":"assets/pilot-demo-journey-clean2.png","source":"existing","description":"pilot demo journey clean2","width":940,"height":684,"provenance":{"provider":"local","adopted":true}}

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "01-friction",
+    "title": "The chasing",
+    "duration": 7,
+    "vo": "Great creator campaigns deserve better than scattered briefs, approval messages, and another spreadsheet to chase.",
+    "asset": "",
+    "role": "hook",
+    "start": 0
+  },
+  {
+    "id": "02-promise",
+    "title": "One shared direction",
+    "duration": 7,
+    "vo": "Meet Creator Cash Flow. A campaign workspace designed to keep agencies, brands, and creators moving together.",
+    "asset": "logo-reversed.svg",
+    "role": "product_intro",
+    "start": 7
+  },
+  {
+    "id": "03-agency",
+    "title": "Agency view",
+    "duration": 8,
+    "vo": "For agencies, the pilot brings campaign progress, creator work, and the next review into one clear view.",
+    "asset": "pilot-demo-agency.png",
+    "role": "feature_showcase",
+    "start": 14
+  },
+  {
+    "id": "04-brand",
+    "title": "Brand view",
+    "duration": 8,
+    "vo": "For brands, see what needs your decision, follow delivery, and stay close to the campaign.",
+    "asset": "pilot-demo-brand.png",
+    "role": "feature_showcase",
+    "start": 22
+  },
+  {
+    "id": "05-creator",
+    "title": "Creator view",
+    "duration": 8,
+    "vo": "For creators, a clear assignment, the next deadline, and visibility over fees and payment status.",
+    "asset": "pilot-demo-creator.png",
+    "role": "feature_showcase",
+    "start": 30
+  },
+  {
+    "id": "06-evidence",
+    "title": "Performance evidence",
+    "duration": 8,
+    "vo": "Our Instagram integration connects authorised accounts to post insights. Wider access is subject to Meta approval.",
+    "asset": "",
+    "role": "benefit_highlight",
+    "start": 38
+  },
+  {
+    "id": "07-report",
+    "title": "Reporting roadmap",
+    "duration": 8,
+    "vo": "Next, generate a branded client report directly from the campaign. This is our reporting roadmap.",
+    "asset": "",
+    "role": "benefit_highlight",
+    "start": 46
+  },
+  {
+    "id": "08-close",
+    "title": "Pilot invitation",
+    "duration": 6,
+    "vo": "Less chasing. Clearer next steps. Help shape the Creator Cash Flow pilot.",
+    "asset": "logo-reversed.svg",
+    "role": "cta",
+    "start": 54
+  }
+]

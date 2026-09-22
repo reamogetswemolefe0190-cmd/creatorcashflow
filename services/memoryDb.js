@@ -38,6 +38,7 @@ const memoryDb = {
     campaign_access_grants: [],
     campaign_milestones: [],
     campaign_messages: [],
+    campaign_reports: [],
     adminUsers: [],
     audit_logs: [],
     ai_telemetry: []

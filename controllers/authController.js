@@ -19,6 +19,8 @@ async function signup(req, res) {
     if (process.env.NODE_ENV === 'production' && !supabase) {
         return res.status(503).json({ error: 'Account registration is temporarily unavailable. Please try again later.' });
     }
+    let createdUserId = null;
+    let createdOrgId = null;
     try {
         const { email, password, name, role = 'creator', organization_name = '' } = req.body;
         
@@ -26,12 +28,14 @@ async function signup(req, res) {
         if (!['creator', 'agency', 'brand'].includes(role)) {
             return res.status(400).json({ error: 'Invalid account role.' });
         }
+        const orgName = typeof organization_name === 'string' ? organization_name.trim().slice(0, 120) : '';
+        if (role !== 'creator' && orgName.length < 2) return res.status(400).json({ error: 'Organisation name is required for an agency or brand account.' });
 
         const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
         const userId = 'usr_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
         
         let orgId = null;
-        if (role !== 'creator' && organization_name) {
+        if (role !== 'creator') {
             orgId = 'org_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
         }
 
@@ -54,16 +58,6 @@ async function signup(req, res) {
                 return res.status(400).json({ success: false, error: 'An account with this email already exists.', code: 'EMAIL_ALREADY_EXISTS' });
             }
             
-            // Note: In production we need to handle creating the organization record first if orgId exists.
-            // For now, we update users table to accept role and organization_id.
-            if (orgId) {
-                await supabase.from('organizations').insert([{
-                    id: orgId,
-                    name: organization_name,
-                    type: role
-                }]);
-            }
-
             const { error } = await supabase.from('users').insert([{
                 id: userId,
                 email: email.toLowerCase(),
@@ -74,6 +68,14 @@ async function signup(req, res) {
             }]);
 
             if (error) throw error;
+            createdUserId = userId;
+            if (orgId) {
+                const { error: orgError } = await supabase.from('organizations').insert([{ id: orgId, name: orgName, type: role, created_by: userId }]);
+                if (orgError) throw orgError;
+                createdOrgId = orgId;
+                const { error: memberError } = await supabase.from('organization_members').insert([{ organization_id: orgId, user_id: userId, role: 'owner', status: 'active' }]);
+                if (memberError) throw memberError;
+            }
         } else {
             const existing = findUserByEmail(email);
             if (existing) {
@@ -89,7 +91,8 @@ async function signup(req, res) {
             
             if (orgId) {
                 if (!memoryDb.organizations) memoryDb.organizations = [];
-                memoryDb.organizations.push({ id: orgId, name: organization_name, type: role });
+                memoryDb.organizations.push({ id: orgId, name: orgName, type: role, created_by: userId });
+                memoryDb.organization_members.push({ organization_id: orgId, user_id: userId, role: 'owner', status: 'active' });
             }
         }
 
@@ -129,6 +132,10 @@ async function signup(req, res) {
         });
     } catch (err) {
         console.error(err);
+        if (supabase && createdUserId) {
+            if (createdOrgId) await supabase.from('organizations').delete().eq('id', createdOrgId);
+            await supabase.from('users').delete().eq('id', createdUserId);
+        }
         res.status(500).json({ success: false, error: 'Server error during signup.', code: 'SIGNUP_ERROR' });
     }
 }

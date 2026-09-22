@@ -1,0 +1,102 @@
+@import url('./stitch-money-variables.css');
+
+/* Shared presentation layer; existing routes, actions and data contracts are unchanged. */
+:root {
+  color-scheme: dark;
+  --cc-bg: var(--st-accent); --cc-panel: var(--st-panel); --cc-panel-elevated: var(--st-muted);
+  /* cc-muted is used for de-emphasised text in the dark app — must use muted-on-dark, not st-line */
+  --cc-muted: var(--st-muted-on-dark); --cc-line: var(--st-panel);
+  --cc-accent: var(--st-primary); --cc-accent-hover: var(--st-primary);
+  --cc-dark: var(--st-black); --cc-tag-bg: var(--st-panel); --cc-tag-text: var(--st-white);
+  --cc-radius: var(--st-radius-md);
+}
+body { font-family: var(--st-font) !important; background: var(--st-accent) !important; color: var(--st-white) !important; font-size: 16px; line-height: 1.6; }
+/* Enforce minimum readable font-size — prevent 10-11px text from audit */
+small, .hq-eyebrow, .cc-kicker, [class*="eyebrow"], [class*="kicker"] { font-size: max(12px, 0.75em) !important; }
+button, input, select, textarea { font-family: inherit; }
+button, a { touch-action: manipulation; }
+button, [role=button] { cursor: pointer; }
+button, .cc-btn, .primary-link { min-height: var(--st-space-md); }
+h1,h2,h3 { text-wrap: balance; font-weight: 500; }
+/* note: original 600/800 weights resolve to the supplied 500/700 scale. */
+b,strong { font-weight: 700; }
+input,select,textarea { accent-color: var(--st-primary); }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible {
+  outline: var(--st-space-xs) solid var(--st-primary); outline-offset: var(--st-space-xs);
+}
+.public-header { background: var(--st-accent); padding: var(--st-space-sm); gap: var(--st-space-sm); }
+.public-nav { gap: var(--st-space-sm); }
+.public-nav a { color: var(--st-white); font-size: 15px; min-height: 45px; display: inline-flex; align-items: center; }
+/* Active page indicator — underline with 2px orange */
+.public-nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.3em; text-decoration-color: var(--st-primary); text-decoration-thickness: 2px; }
+.public-nav .primary-link, .cc-btn.cc-primary, .hq-new {
+  background: var(--st-primary); color: var(--st-black); border-color: var(--st-primary);
+  border-radius: var(--st-radius-pill); padding: var(--st-space-xs) var(--st-space-sm);
+  display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.cc-btn { border-radius: var(--st-radius-pill); padding: var(--st-space-xs) var(--st-space-sm); box-shadow: none; }
+/* gap fixed: was var(--st-space-sm) = 32px, should be var(--st-gap) = 8px */
+.cc-btn,.cc-link { display: inline-flex; align-items: center; justify-content: center; gap: var(--st-gap); }
+.cc-btn svg,.cc-link svg { width: 20px !important; height: 20px !important; flex: 0 0 20px; }
+.cc-btn { white-space: nowrap; }
+body::before,body::after { display: none !important; }
+.cc-btn:hover,.primary-link:hover { transform: translateY(-2px); }
+.cc-btn:disabled { transform: none; cursor: not-allowed; }
+.public-nav a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+.ce-hero.ce-hero-v2 { padding: var(--st-space-3xl) var(--st-space-xl); gap: var(--st-space-xl); }
+.ce-hero-v2 h1 { font-weight: 400; letter-spacing: -.055em; line-height: 1; }
+.ce-hero-v2 h1 em { color: var(--st-primary); font-style: normal; }
+.ce-hero-v2 p { color: var(--st-line); }
+.ce-hero-v2 .cc-actions { margin-top: var(--st-space-sm); gap: var(--st-space-sm); }
+.ce-product-stage::before,.ce-stage-orbit,.ce-signal { display: none; }
+.ce-stage-main { background: var(--st-primary); color: var(--st-black); border: 0; border-radius: var(--st-radius-lg); box-shadow: none; transform: none; backdrop-filter: none; padding: var(--st-space-sm); }
+.ce-stage-main :is(h3,span,b,small) { color: var(--st-black); }
+.ce-stage-main h3 { font-weight: 500; }
+.ce-stage-top b { background: var(--st-black); color: var(--st-white); border: 0; }
+.ce-stage-progress { background: var(--st-black); }
+.ce-stage-progress span { background: var(--st-white); }
+.ce-stage-people>span { background: var(--st-white); color: var(--st-black); border-color: var(--st-black); }
+.ce-float-card { background: var(--st-paper); color: var(--st-black); border: 0; border-radius: var(--st-radius-md); box-shadow: none; backdrop-filter: none; padding: var(--st-space-sm); }
+.ce-float-card :is(small,strong,span) { color: var(--st-black); }
+.ce-float-payment { background: var(--st-secondary); color: var(--st-white); }
+.ce-float-payment :is(small,strong,span) { color: var(--st-white); }
+.ce-role,.customer-card,.hq-panel,.hq-form,.auth-panel,.ce-money,.ce-photo { border-radius: var(--st-radius-lg); box-shadow: none; }
+.ce-role,.customer-card,.hq-panel,.hq-form,.auth-panel { padding: var(--st-space-sm); }
+.ce-role { background: var(--st-panel); }
+.ce-role:nth-child(2) { background: var(--st-panel); }
+.ce-money,.hq-accent-card { background: var(--st-primary) !important; color: var(--st-black) !important; }
+.ce-money :is(span,strong,small,div),.hq-accent-card :is(span,strong,small) { color: var(--st-black) !important; }
+.ce-spark span { background: var(--st-black); }
+.hq-shell,.hq-sidebar,.role-workspace { background: var(--st-accent); }
+.hq-main { padding: var(--st-space-sm); }
+.hq-panel,.hq-onboarding,.hq-campaign-card,.hq-form { background: var(--st-panel); }
+.hq-sidebar button.is-active { background: var(--st-panel); box-shadow: inset 2px 0 var(--st-primary); }
+.hq-metrics strong,.ce-money-value,table { font-variant-numeric: tabular-nums; }
+.customer-footer { padding: var(--st-space-sm); gap: var(--st-space-sm); }
+.skip-link { position: fixed; top: 0; left: var(--st-space-sm); transform: translateY(-120%); z-index: 10000; background: var(--st-white); color: var(--st-black); padding: var(--st-space-sm); border-radius: var(--st-radius-sm); }
+.skip-link:focus { transform: translateY(0); }
+@media(max-width:1000px) { .ce-hero.ce-hero-v2 { padding: var(--st-space-xl) var(--st-space-sm); gap: var(--st-space-sm); } }
+@media(max-width:760px) {
+  /* Tighter header on mobile — was 32px (layout token) which is too tall */
+  .public-header { padding: 14px 20px; gap: 12px; }
+  .ce-hero.ce-hero-v2 { padding: var(--st-space-lg) var(--st-space-sm); }
+  .ce-hero-v2 h1 { font-size: clamp(40px,10vw,64px); }
+  .ce-hero-v2 .cc-actions { flex-direction: column; align-items: stretch; }
+  .ce-product-stage { height: auto; display: grid; gap: var(--st-space-sm); }
+  .ce-stage-main,.ce-float-card { position: static; width: 100%; margin: 0; transform: none !important; }
+  .ce-stage-main { min-height: 300px; }
+  .ce-float-card { padding: var(--st-space-sm); }
+  .ce-stage-main h3 { margin: var(--st-space-sm) 0; }
+  .hq-main,.customer-main { padding: var(--st-space-sm); }
+}
+/* Fix: nav disappears between 640-860px — hamburger must show in this range */
+@media(max-width:860px) {
+  .public-nav { display: none; }
+  .mobile-menu { display: inline-flex !important; }
+  /* Slightly tighter main padding on tablet-ish widths */
+  .cc-main, .customer-main { padding: 24px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .reveal-on-scroll { opacity: 1 !important; transform: none !important; }
+}
