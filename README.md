@@ -1,199 +1,167 @@
 # CreatorCashFlow
 
-> Full-stack SaaS infrastructure for creator agencies, brands and creators — combining campaign operations, payment visibility, financial workflows and AI-assisted intelligence.
+**Campaign operations for creator agencies.**
+
+CreatorCashFlow is a campaign-operations platform being built to help creator agencies coordinate campaigns, manage deliverables, track approvals and monitor payment progress in one workspace.
+
+It aims to replace fragmented workflows across spreadsheets, chat conversations and disconnected documents with a shared operating space for agency teams and their creators.
+
+**Live product:** [creatorcashflow.co.za](https://creatorcashflow.co.za)  
+**Developer:** Reamogetswe Molefe  
+**Status:** Active development · Pilot validation
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-brightgreen)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express.js-4.x-black)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-blue)](https://supabase.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![AI](https://img.shields.io/badge/AI-Gemini-purple)](https://ai.google.dev/)
-
-**Live product:** https://creatorcashflow.co.za  
-**Developer:** Reamogetswe Molefe
+[![Supabase](https://img.shields.io/badge/Database-Supabase-blue)](https://supabase.com/)
 
 ---
 
-## Overview
+## The problem
 
-CreatorCashFlow is a full-stack SaaS platform being developed for the creator economy.
+Creator campaigns involve more than finding a creator and publishing content.
 
-It provides shared workflows for **creator agencies, brands and creators** to manage campaign activity, creator deliverables, payment visibility, financial information and client reporting from one workspace.
+An agency may need to coordinate:
 
-The project began as a creator financial dashboard and has evolved into a broader campaign-operations platform with a modular backend, authentication, database persistence, external integrations, AI-assisted functionality, automated testing and performance benchmarking.
+- Campaign briefs and requirements
+- Creator assignments
+- Content deliverables
+- Review and approval cycles
+- Deadlines and campaign progress
+- Creator payment status
+- Client updates and reporting
 
-CreatorCashFlow is currently in active development and market validation.
+When these activities are managed across spreadsheets, messages and separate tools, it becomes difficult to maintain a reliable view of campaign progress.
 
----
+**CreatorCashFlow is being built to bring these workflows together.**
 
-## Core Capabilities
+## Product direction
 
-- Creator, agency and brand account workflows
-- Role-based authentication and authorization
-- Campaign and creator-assignment foundations
-- Creator transaction and cash-flow tracking
-- Agency and creator collaboration workflows
-- Payment and financial visibility
-- Administrative monitoring and metrics
-- Social-platform integration foundations
-- AI-assisted financial guidance
-- PII-aware AI processing
-- Automated security, regression and integration testing
-- Concurrency and performance benchmarking
-- Responsive multi-role user interfaces
+The initial focus is creator and talent agencies managing recurring campaigns.
 
----
-
-## Architecture
-
-CreatorCashFlow uses a modular Node.js/Express backend with separate services, middleware, controllers and routes.
+The core workflow is:
 
 ```text
-                         ┌─────────────────────────┐
-                         │        Frontend         │
-                         │ HTML • CSS • JavaScript │
-                         └────────────┬────────────┘
-                                      │
-                                      │ HTTP / JSON
-                                      ▼
-                         ┌─────────────────────────┐
-                         │     Express REST API    │
-                         └────────────┬────────────┘
-                                      │
-              ┌───────────────────────┼────────────────────────┐
-              │                       │                        │
-              ▼                       ▼                        ▼
-     ┌─────────────────┐    ┌─────────────────┐     ┌─────────────────┐
-     │ Authentication  │    │ Business Logic  │     │  Integrations   │
-     │ JWT • bcrypt    │    │ Campaigns       │     │ Phyllo          │
-     │ RBAC            │    │ Transactions    │     │ YouTube         │
-     │ Rate Limiting   │    │ Collaboration   │     │ Meta/Instagram  │
-     └────────┬────────┘    └────────┬────────┘     │ Gemini          │
-              │                      │              │ Resend          │
-              │                      │              └────────┬────────┘
-              └──────────────┬───────┘                       │
-                             ▼                               │
-                    ┌─────────────────┐                      │
-                    │    Supabase     │◄─────────────────────┘
-                    │   PostgreSQL    │
-                    └─────────────────┘
+       CLIENT / CAMPAIGN BRIEF
+                  |
+                  v
+          CAMPAIGN SETUP
+                  |
+                  v
+         CREATOR ASSIGNMENT
+                  |
+                  v
+        DELIVERABLE SUBMISSION
+                  |
+                  v
+         REVIEW & APPROVAL
+                  |
+                  v
+         PAYMENT PROGRESS
+                  |
+                  v
+          CLIENT REPORTING
 ```
 
-The backend is decomposed into:
+The goal is to give agencies a clearer view of what needs to happen, what has been completed and what still requires attention.
+
+## Core product areas
+
+### Campaign management
+
+Organise campaign information and coordinate the work required to execute a campaign.
+
+### Creator collaboration
+
+Support workflows between agencies and creators, including campaign participation and deliverable coordination.
+
+### Deliverables and approvals
+
+Track campaign content and its progress through review and approval stages.
+
+### Payment visibility
+
+Provide a clearer view of creator payment progress and campaign-related financial activity.
+
+### Client reporting
+
+Bring campaign progress and relevant information into a more organised reporting workflow.
+
+These are the product's central workflow areas. The platform is still evolving, and not every planned capability should be treated as a completed production feature.
+
+---
+
+## Engineering architecture
+
+CreatorCashFlow uses a modular Node.js and Express backend with a REST API.
+
+The application separates routing, middleware, controllers, services and configuration to keep business logic and infrastructure concerns organised.
 
 ```text
-config/        → environment and application configuration
-controllers/   → application and business logic
-middleware/    → authentication, rate limiting and error handling
-routes/        → REST API route definitions
-services/      → database, AI and external-service logic
-migrations/    → database evolution
-tests/         → integration, security and regression testing
-docs/          → API and technical documentation
+                 FRONTEND APPLICATION
+                         |
+                         | HTTP / JSON
+                         v
+                  EXPRESS REST API
+                         |
+          +--------------+--------------+
+          |              |              |
+          v              v              v
+    AUTHENTICATION   APPLICATION     INTEGRATION
+    & AUTHORIZATION    SERVICES        SERVICES
+          |              |              |
+          |              v              |
+          |        CAMPAIGN LOGIC       |
+          |        COLLABORATION        |
+          |        TRANSACTIONS         |
+          |              |              |
+          +--------------+--------------+
+                         |
+                         v
+                DATA / STORAGE LAYER
+                  Supabase + SQL
+                  Application state
 ```
 
----
+The repository includes:
 
-## Technology Stack
+| Layer | Responsibility |
+|---|---|
+| Routes | Define REST API endpoints |
+| Controllers | Handle application requests |
+| Middleware | Authentication, rate limiting and request handling |
+| Services | Business logic and external integrations |
+| Configuration | Environment and service configuration |
+| Migrations | Database schema changes |
+| Tests | Feature, integration and regression validation |
 
-### Backend
+The application includes both Supabase integration and in-memory application storage. Persistence behaviour should therefore be evaluated per workflow rather than assumed to be uniform across the entire platform.
 
-- Node.js
-- Express.js
-- JavaScript / ES6+
-- REST APIs
-- JSON Web Tokens
-- bcrypt
+## Technology stack
 
-### Database
-
-- PostgreSQL
-- Supabase
-- SQL migrations
-
-### Frontend
-
-- HTML5
-- CSS3
-- JavaScript
-- Chart.js
-- Responsive layouts
-- CSS Grid and Flexbox
-
-### Security
-
-- JWT authentication
-- Password hashing with bcrypt
-- Role-based access control
-- Helmet security headers
-- Content Security Policy
-- CORS restrictions
-- Endpoint-specific rate limiting
-- Environment-based secret management
-- Input-validation and security testing
-
-### AI
-
-- Google Gemini API
-- Structured AI service layer
-- PII masking
-- Intent categorisation
-- AI request error handling
-- Usage and telemetry foundations
-
-### External Integrations
-
-- Supabase
-- Phyllo
-- Meta / Instagram
-- YouTube
-- Google Gemini
-- Resend
-
-### Engineering Tooling
-
-- Git
-- GitHub
-- GitHub Actions
-- Automated regression tests
-- End-to-end tests
-- Security tests
-- Concurrency testing
-- Load and latency benchmarking
+| Area | Technologies |
+|---|---|
+| Backend | Node.js, Express.js |
+| Language | JavaScript, ES6+ |
+| API | REST, HTTP, JSON |
+| Authentication | JWT, bcrypt |
+| Database integration | Supabase, PostgreSQL |
+| Frontend | HTML, CSS, JavaScript |
+| Visualisation | Chart.js |
+| Security | Helmet, rate limiting, input validation |
+| AI integration | Google Gemini API |
+| Email integration | Resend |
+| Creator integrations | Phyllo, YouTube and Meta integration work |
+| Testing | Node.js test scripts, integration and stress tests |
+| CI | GitHub Actions |
 
 ---
 
-## AI Service Layer
+## Authentication and security
 
-CreatorCashFlow includes a dedicated AI service layer built around the Google Gemini API.
+The backend includes authentication and access-control foundations for different application roles.
 
-AI functionality is separated from the rest of the application so that model communication, privacy handling and upstream failures can be managed independently.
-
-The service includes:
-
-- Prompt processing
-- Gemini API communication
-- PII redaction
-- Financial-query categorisation
-- API failure handling
-- Invalid-response handling
-- Usage estimation
-- Structured service responses
-
-Before supported user text is forwarded to the AI provider, the service can redact information such as:
-
-```text
-Email addresses  → [REDACTED_EMAIL]
-Phone numbers    → [REDACTED_PHONE]
-ZAR values       → [REDACTED_ZAR]
-```
-
-This provides an additional privacy layer between application data and external AI services.
-
----
-
-## Authentication & Authorization
-
-CreatorCashFlow supports several user roles:
+The current role model includes:
 
 ```text
 Creator
@@ -202,239 +170,129 @@ Brand
 Administrator
 ```
 
-Authentication is implemented with JSON Web Tokens.
+Security-related implementations include:
 
-Passwords are hashed using bcrypt before storage.
+- JWT-based authentication
+- Password hashing with bcrypt
+- Role-based access checks
+- Protected administrative endpoints
+- Rate limiting
+- Security headers through Helmet
+- Input and request validation
+- Environment-based secret configuration
+- Security and regression tests
 
-Authenticated tokens can contain information including:
+The intention is to keep access boundaries explicit and protect sensitive application operations.
 
-```json
-{
-  "id": "user_id",
-  "email": "user@example.com",
-  "name": "Example User",
-  "role": "creator",
-  "organization_id": "organization_id"
-}
-```
+## AI service integration
 
-Administrative functionality uses additional role verification so that standard user accounts cannot access protected administrator endpoints.
+CreatorCashFlow includes a separate AI service layer using the Google Gemini API.
 
----
+The service layer is designed to isolate model requests from the rest of the application and handle upstream errors and response processing.
 
-## API Structure
+Implemented service concerns include:
 
-The Express backend currently exposes modular APIs across areas including:
+- API communication
+- Prompt processing
+- Financial-query categorisation
+- Personally identifiable information redaction
+- Response handling
+- Error handling
+- Usage estimation and telemetry
 
-```text
-/api/health
-/api/auth
-/api/admin
-/api/transactions
-/api/onboarding
-/api/integrations
-/api/youtube
-/api/agency
-/api/gemini
-/api/collaboration
-```
+AI is treated as a supporting application capability, not a replacement for the platform's underlying business logic.
 
-A more detailed REST API specification is available in:
+## External integrations
 
-```text
-docs/API.md
-```
+The repository includes integration work involving:
 
----
+- Supabase
+- Phyllo
+- YouTube
+- Meta / Instagram
+- Google Gemini
+- Resend
 
-## Security Engineering
-
-Security is treated as part of the application architecture rather than only as a deployment concern.
-
-The repository contains implementations and tests for:
-
-- authentication boundaries
-- authorization
-- rate limiting
-- CORS restrictions
-- content-security policies
-- standardized error handling
-- PII redaction
-- secret/environment handling
-- malformed-input rejection
-- unauthorized route access
-- administrator privilege enforcement
-- brute-force protection
-- security regression testing
-
-For example, the project contains bounded sliding-window rate limiters for authentication, administrative actions, transaction operations and AI requests.
+Integration availability and completeness vary. Some capabilities remain under development or require external provider configuration.
 
 ---
 
-## Automated Testing
+## Testing and engineering validation
 
-CreatorCashFlow contains multiple layers of automated testing.
+The project includes automated checks for application behaviour and selected integration workflows.
 
-The testing approach covers:
-
-```text
-Feature validation
-Authentication
-Authorization
-REST API behavior
-Administrative workflows
-Integration flows
-Security boundaries
-AI service behavior
-UI contracts
-Full user journeys
-Regression testing
-Adversarial testing
-Concurrency testing
-Performance benchmarking
-```
-
-Run the primary test suite with:
+The primary test command is:
 
 ```bash
 npm test
 ```
 
-Administrative tests:
+Additional test commands include:
 
 ```bash
 npm run test:admin
 ```
 
-Performance tests:
+```bash
+npm run test:instagram
+```
+
+```bash
+npm run test:ui
+```
+
+The repository's testing work covers areas such as:
+
+- Authentication and authorization
+- API behaviour
+- Administrative workflows
+- Collaboration flows
+- Integration behaviour
+- UI contracts
+- Regression checks
+
+These tests are used during development to identify regressions and validate selected application workflows.
+
+## Performance testing
+
+CreatorCashFlow includes a custom Node.js HTTP load-testing harness.
+
+It supports configurable virtual-user concurrency and test duration, and records:
+
+- Request counts
+- Successful and failed responses
+- Throughput
+- Average latency
+- p50, p90, p95 and p99 latency
+- Endpoint-level performance
+
+Run the local stress test using:
 
 ```bash
 npm run test:stress
 ```
 
----
+The default script runs with 150 concurrent virtual users for 15 seconds against the local application.
 
-## CI/CD
-
-GitHub Actions is used to automatically validate the project when changes are pushed or pull requests are created.
-
-The CI workflow tests against multiple Node.js versions.
-
-Current automated checks include:
-
-```text
-Dependency installation
-Environment-file protection
-Secret / PII checks
-Express server startup
-Health endpoint verification
-Core regression tests
-Administrative tests
-End-to-end tests
-Security tests
-Adversarial tests
-```
-
-The workflow currently tests against:
-
-```text
-Node.js 18
-Node.js 20
-```
+This is a development benchmark, not evidence of production-scale capacity. Results depend on the machine, application configuration and test environment.
 
 ---
 
-## Performance Engineering
+## Running locally
 
-CreatorCashFlow includes a custom Node.js concurrency and load-testing harness.
+### Requirements
 
-The benchmark system records:
-
-- total requests
-- successful requests
-- failed requests
-- requests per second
-- minimum latency
-- average latency
-- p50 latency
-- p90 latency
-- p95 latency
-- p99 latency
-- endpoint-level performance
-
-One recorded benchmark used:
-
-```text
-Concurrent users:       150
-Total HTTP requests:    2,706
-Successful requests:    2,706
-Request success rate:   100%
-Requests per second:    ~529
-Average latency:        ~265 ms
-```
-
-The benchmark covered endpoints including:
-
-```text
-POST /api/auth/signup
-POST /api/auth/login
-GET  /api/transactions
-POST /api/transactions
-GET  /api/admin/metrics
-```
-
-Performance optimisation is ongoing, particularly around latency under higher concurrency.
-
----
-
-## Repository Structure
-
-```text
-creator_cash_flow_ccf/
-│
-├── .github/
-│   └── workflows/
-│
-├── config/
-│
-├── controllers/
-│
-├── middleware/
-│
-├── routes/
-│
-├── services/
-│
-├── migrations/
-│
-├── tests/
-│
-├── docs/
-│
-├── assets/
-│
-├── marketing/
-│
-├── database_setup.sql
-├── server.js
-├── app.js
-├── admin.js
-├── dashboards.js
-├── package.json
-├── stress_harness.js
-├── stress_test_report.json
-└── README.md
-```
-
----
-
-## Running the Project Locally
+- Node.js 18 or later
+- npm
+- Git
+- Supabase credentials for workflows that require the configured database
+- API credentials for optional external services
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/reamogetswemolefe0190-cmd/creator_cash_flow_ccf.git
-cd creator_cash_flow_ccf
+git clone https://github.com/reamogetswemolefe0190-cmd/creatorcashflow.git
+cd creatorcashflow
 ```
 
 ### 2. Install dependencies
@@ -445,21 +303,9 @@ npm install
 
 ### 3. Configure environment variables
 
-Copy the example environment file:
+Create a local `.env` file using the repository's `.env.example` as a reference, if available.
 
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Then configure the services you want to use.
-
-Typical variables include:
+Typical configuration may include:
 
 ```env
 PORT=5000
@@ -479,159 +325,89 @@ PHYLLO_CLIENT_SECRET=
 RESEND_API_KEY=
 ```
 
-Never commit real API keys or secrets to the repository.
+Only configure credentials required by the features you intend to run. Never commit real secrets to GitHub.
 
-### 4. Start the development server
+### 4. Start the application
+
+Development mode:
 
 ```bash
 npm run dev
 ```
 
-Or run normally:
+Standard mode:
 
 ```bash
 npm start
 ```
 
-The API will typically be available at:
-
-```text
-http://localhost:5000
-```
-
----
-
-## Example Health Check
-
-Once the server is running:
+### 5. Run the test suite
 
 ```bash
-curl http://localhost:5000/api/health
+npm test
 ```
 
-The health endpoint provides application diagnostics including system state and integration information.
-
 ---
 
-## Development Philosophy
+## Current development priorities
 
-CreatorCashFlow is being developed around several principles:
-
-### User-first product development
-
-Features are designed around actual creator-agency workflows rather than building technology only for the sake of adding features.
-
-### Security by design
-
-Authentication, authorization, rate limiting, privacy controls and regression tests are built into the architecture.
-
-### Measure instead of assume
-
-Performance is benchmarked with automated load testing rather than described with unsupported scalability claims.
-
-### AI where it adds value
-
-AI functionality is kept behind a dedicated service layer and is combined with conventional application logic rather than replacing deterministic software behavior.
-
-### Ship, test and iterate
-
-The project is continuously improved through product feedback, automated testing, debugging and measurable technical validation.
-
----
-
-## Current Development Focus
-
-CreatorCashFlow is currently moving from MVP development toward commercial validation.
+CreatorCashFlow is being developed with a focus on moving from a working product foundation toward real agency usage.
 
 Current priorities include:
 
-- improving agency campaign workflows
-- strengthening creator/brand collaboration
-- expanding production integrations
-- improving client reporting
-- improving payment-status visibility
-- strengthening security and reliability
-- improving performance under load
-- onboarding early agency pilot users
+- Refining campaign and deliverable workflows
+- Improving agency and creator collaboration
+- Strengthening approval and payment-progress visibility
+- Improving client-facing reporting
+- Validating workflows with early agency users
+- Improving data consistency and persistence
+- Strengthening integration reliability
+- Iterating on the product based on pilot feedback
+
+The immediate objective is to make the core agency workflow useful and dependable before expanding into additional functionality.
+
+## Product philosophy
+
+**Solve the workflow before expanding the feature set.**
+
+CreatorCashFlow is being developed around four principles:
+
+1. **Operational clarity:** Agencies should be able to understand campaign status without piecing together information from multiple tools.
+2. **Practical collaboration:** Creators and agency teams need a shared view of responsibilities and deliverables.
+3. **Financial visibility:** Payment progress should be easier to monitor alongside campaign execution.
+4. **Iterative development:** Product decisions should be informed by actual user workflows and feedback.
+
+## About the developer
+
+I'm Reamogetswe Molefe, a mechanical engineering student at the University of Johannesburg and an independent software developer.
+
+I build software products that explore practical problems across business operations, applied AI and full-stack engineering.
+
+CreatorCashFlow is one of my ongoing projects, through which I'm developing experience in:
+
+- Backend architecture and REST API development
+- Authentication and application security
+- Database integration
+- Third-party API integration
+- AI service integration
+- Automated testing
+- Product development and validation
+
+Another project, [Kohort](https://github.com/reamogetswemolefe0190-cmd/kohort), explores AI orchestration, synthetic research workflows and deterministic analytics.
+
+**GitHub:** [reamogetswemolefe0190-cmd](https://github.com/reamogetswemolefe0190-cmd)
 
 ---
 
-## Product Direction
+## Project status
 
-The long-term goal is to create shared infrastructure for creator campaigns.
+**Active development · Pilot validation**
 
-Instead of agencies managing campaigns across spreadsheets, chats, disconnected files and separate financial systems, CreatorCashFlow aims to provide a shared operating layer connecting:
+CreatorCashFlow is being developed and tested as an agency-first campaign-operations product. The live site is available at [creatorcashflow.co.za](https://creatorcashflow.co.za).
 
-```text
-Agency
-   │
-   ├── Campaign brief
-   ├── Creator assignments
-   ├── Deliverables
-   ├── Reviews / approvals
-   ├── Payment progress
-   └── Client reporting
-   │
-   ▼
-Creator ───────────────────── Brand
-```
-
-The initial focus is creator and talent agencies managing recurring campaigns.
-
----
-
-## Live Product
-
-CreatorCashFlow is available at:
-
-### https://creatorcashflow.co.za
-
-The product is still under active development, so some integrations and workflows may remain experimental or pilot-stage.
-
----
-
-## About the Developer
-
-### Reamogetswe Molefe
-
-I am a Mechanical Engineering student at the **University of Johannesburg** with a strong interest in software engineering, AI systems, SaaS development and product engineering.
-
-I build software independently alongside my engineering studies, with a focus on turning real-world problems into working technical products.
-
-My current areas of development include:
-
-```text
-JavaScript
-Node.js
-Express
-REST APIs
-PostgreSQL / Supabase
-Python
-AI / LLM integrations
-Automation
-Authentication & application security
-Testing
-Product design
-SaaS development
-```
-
-Other AI engineering work includes **Kohort**, a Python-based multi-stage synthetic market-research system combining LLM orchestration, deterministic analytics and AI quality evaluation.
-
-GitHub:
-
-https://github.com/reamogetswemolefe0190-cmd
-
----
-
-## Status
-
-**Active Development — 2026**
-
-CreatorCashFlow is currently being developed, tested and validated with the goal of progressing from working product infrastructure into real-world agency pilots.
-
----
+The project is not presented as a fully mature financial platform. Its focus is on validating the core campaign workflows and building a reliable foundation for real-world agency use.
 
 <p align="center">
   <strong>CreatorCashFlow</strong><br>
-  Building infrastructure for the creator economy.
+  Less campaign admin. More operational clarity.
 </p>
