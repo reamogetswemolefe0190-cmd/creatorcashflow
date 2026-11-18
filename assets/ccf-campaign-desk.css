@@ -160,7 +160,9 @@ body.campaign-live .campaign-empty{border:0;border-bottom:1px solid var(--cd-lin
 #cc-screen .pilot-result-grid>div{display:grid;gap:6px}.pilot-result-grid span{font-size:12px;color:var(--ui-muted)}.pilot-result-grid strong{font-size:26px;color:var(--ui-text);font-variant-numeric:tabular-nums}
 #cc-screen .pilot-message-local{font-size:13px!important;color:var(--ui-muted)!important}
 #cc-screen .pilot-thread-empty i{display:none}
-@media(max-width:1050px){#cc-screen .pilot-campaign-grid{grid-template-columns:1fr;gap:42px}#cc-screen .pilot-collab-panel{border-left:0;border-top:1px solid var(--ui-border);padding:32px 0 0}}
+@media(max-width:1050px){#cc-screen .pilot-campaign-grid{grid-template-columns:1fr;gap:42px}#cc-screen .pilot-collab-panel{border-left:0;border-top:1px solid var(--ui-border);padding:32px 0 0}#cc-screen .pilot-stage-rail{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){#cc-screen .pilot-stage-rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1024px){body.ccf-marketing .public-nav{gap:14px}.public-header{gap:16px}}
 @media(max-width:760px){#cc-screen .customer-main:has(.pilot-campaign-demo){padding:32px 18px 80px}#cc-screen .pilot-campaign-head{display:block;margin-bottom:32px}#cc-screen .pilot-campaign-head h1{font-size:41px}#cc-screen .pilot-campaign-owner{min-width:0;margin-top:24px}#cc-screen .pilot-stage-rail{display:flex;overflow-x:auto;gap:6px;margin-bottom:30px;scrollbar-width:thin}#cc-screen .pilot-stage-rail>div,#cc-screen .pilot-stage-rail>div.is-current,#cc-screen .pilot-stage-rail>div.is-current+div{display:flex;flex:0 0 130px;padding:10px 2px}#cc-screen .pilot-stage-rail>div:not(.is-current):not(.is-complete){opacity:.55}#cc-screen .pilot-media-preview{height:280px}#cc-screen .pilot-deliverable-head{display:block}#cc-screen .pilot-action-bar{display:block}#cc-screen .pilot-action-bar .customer-actions{display:grid;gap:10px}#cc-screen .pilot-action-bar .cc-btn{width:100%}#cc-screen .pilot-payment-row{grid-template-columns:1fr 1fr}#cc-screen .pilot-collab-panel{padding-top:28px}}
 
 /* Public role previews show the same campaign-desk model, labelled as sample data. */

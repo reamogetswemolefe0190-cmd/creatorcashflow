@@ -37,3 +37,14 @@ Raw data: `tmp/mobile-audit3.json` (post-fix), `tmp/mobile-audit.json` (pre-fix)
 
 - Text contrast ratios (needs a contrast tool / visual pass), screen-reader flow, and real-device testing on iOS Safari (fallback path) — the automated pass ran in Chromium only.
 - Authenticated workspace screens (`agency.html`/`brand.html` dashboards) render demo/login states without credentials; audit the logged-in dashboards with real accounts on a phone.
+
+## Addendum — `#journey` demo page at 768–1024px (same day, after a screenshot review)
+
+The first pass only audited logged-out shell markup, so it missed content states rendered into `#cc-screen`. A screenshot of `index.html#journey` at ~862px showed clipped content. A logged-in repro (test server + real API signup/campaign/deliverable flow) plus a width sweep of `#journey` (375–1440) found and fixed:
+
+| Bug | Root cause | Fix |
+|---|---|---|
+| Stage rail steps spilled past the right edge at 768/862px | `assets/ccf-campaign-desk.css` set `#cc-screen .pilot-stage-rail{overflow:visible}` over a `repeat(6,minmax(145px,1fr))` grid (870px+ min) | ≤1050px → `repeat(3,minmax(0,1fr))`, ≤900px → `repeat(2,minmax(0,1fr))` (≤760px already switches to a horizontal scroll strip) |
+| Header nav wrapped: "Request the demo" CTA broke to two lines, "Exit demo" link clipped at 862px | `.public-nav a` / `.primary-link` had no `white-space:nowrap`; narrative gap 28px too wide at ≤1024px | `white-space:nowrap` on `.public-nav a`, `.public-nav .primary-link`, `.demo-notice a` (customer.css); `@media(max-width:1024px){body.ccf-marketing .public-nav{gap:14px}.public-header{gap:16px}}` in ccf-campaign-desk.css (loads after narrative.css, so it wins the cascade) |
+
+Re-verified after the fix: 0 overflowing elements at 375/414/768/862/1024/1280/1440 on `#journey`; full public-route audit (42 combos: `/`, `#landing`, `#journey`, agency, brand, invite, logo_showcase × 6 widths) → **0 flags, `scrollWidth == innerWidth` everywhere**. The only remaining probe hits were false positives: the off-screen `.ccf-n-honeypot` (intentionally at -10000px) and chapter-preview `<img>`s mid Ken Burns zoom, which are clipped by `overflow:hidden` on `.ccf-n-chapter-visual` and never grow the page (`overflow-x:clip` on `html,body`). Tests after the fix: full_site 11/11, pivot 37/37, admin_auth 31/31, admin_metrics 34/34, collaboration_flow 51/0; legacy-scan unchanged at 8 (7 deferred test-file findings + 1 kept scrollspy fallback).
