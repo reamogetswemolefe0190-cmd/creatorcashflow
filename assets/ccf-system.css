@@ -372,3 +372,10 @@ body :is(button,a):active{opacity:.8}
 @media(max-width:800px){.ccf-site .ccf-hero-visual{height:400px}.ccf-site .ccf-hero-visual>img{object-position:58% 40%}}
 @media(max-width:430px){.ccf-site .ccf-hero-visual{height:360px}.ccf-site .ccf-photo-credit{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Mobile tap targets — WCAG 2.5.8 (>=24px) / Apple HIG (44px): header, footer, prose and form links + buttons */
+@media (max-width: 640px) {
+  .public-header a:not(.cc-btn), .customer-footer a, .invite-header a, .campaign-header a,
+  .ccf-n-request a, .customer-main a:not(.cc-btn), .campaign-root a:not(.cc-btn) { min-height: 44px; display: inline-flex; align-items: center; }
+  button:not(.admin-tab-btn) { min-height: 44px; }
+}

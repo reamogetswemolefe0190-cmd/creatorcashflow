@@ -122,6 +122,10 @@
     } catch (error) { status.textContent = `${error.message} You can also email reamogetswemolefe@creatorcashflow.co.za.`; status.dataset.state = 'error'; }
     finally { button.disabled = false; button.innerHTML = `Email me the demo ${arrow}`; status.focus(); }
   });
-  const watch = new MutationObserver(() => initLanding(document.querySelector('.ccf-next')));
+  const watch = new MutationObserver(() => {
+    initLanding(document.querySelector('.ccf-next'));
+    // route changes replace the landing root — kill ScrollTriggers whose trigger is gone
+    if (window.ScrollTrigger) ScrollTrigger.getAll().forEach(t => { if (t.trigger && !t.trigger.isConnected) t.kill(); });
+  });
   document.addEventListener('DOMContentLoaded', () => { const screen = document.getElementById('cc-screen'); if (screen) watch.observe(screen, { childList: true }); initLanding(document.querySelector('.ccf-next')); });
 })();

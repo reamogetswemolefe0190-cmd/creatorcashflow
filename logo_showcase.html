@@ -28,6 +28,7 @@
         .preview-glow {
             background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
         }
+        @media (max-width: 640px) { button { min-height: 44px; } } /* mobile tap targets, WCAG 2.5.8 / Apple HIG */
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-emerald-500/20 selection:text-emerald-400">
