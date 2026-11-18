@@ -43,8 +43,16 @@ export default {
         }
 
         if (path.startsWith('/api/')) {
-            const app = await getExpressApp(env);
-            return handleWithExpress(app, request);
+            try {
+                const app = await getExpressApp(env);
+                return await handleWithExpress(app, request);
+            } catch (err) {
+                console.error('worker_error', err);
+                return new Response(JSON.stringify({ error: 'internal_error' }), {
+                    status: 500,
+                    headers: { 'content-type': 'application/json' }
+                });
+            }
         }
 
         // R2 object storage serving (uploaded campaign assets). In production a

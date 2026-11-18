@@ -1,62 +1,74 @@
 {
-  // Creator Cash Flow — Cloudflare Workers config (local dev first, deploy later)
   "name": "ccf-app",
   "main": "worker/entry.js",
   "compatibility_date": "2026-11-01",
-  "compatibility_flags": ["nodejs_compat"],
-
-  // iconv-lite's node streams extension breaks under the esbuild bundle; the
-  // shim covers the charsets body-parser/raw-body actually need.
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "alias": {
     "iconv-lite": "./worker/shims/iconv-lite.js"
   },
-
-  // Static frontend (html/css/js/images) served from the app directory.
-  // Code/server files are excluded so they are never exposed as assets.
   "assets": {
     "binding": "ASSETS",
     "directory": "./"
   },
-
-  // D1 (SQLite) — primary database replacing Supabase Postgres
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "ccf-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "2b2e4165-a9d1-4237-b4d4-6d22a1ed0578",
       "migrations_dir": "worker/migrations"
     }
   ],
-
-  // KV — rate limiter + short-lived state replacing in-memory Maps
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "ccf-kv-local"
+      "id": "09afd2ef1fd84b53baf882a6715833a7"
     }
   ],
-
-  // R2 — campaign asset storage replacing Supabase Storage bucket
   "r2_buckets": [
     {
       "binding": "ASSETS_BUCKET",
       "bucket_name": "campaign-assets"
     }
   ],
-
-  // Cron triggers — automation v1 (invitation expiry, due-date nudges, report-on-publish)
   "triggers": {
-    "crons": ["0 8 * * *"]
+    "crons": [
+      "0 8 * * *"
+    ]
   },
-
-  // Non-secret config. Secrets go in .dev.vars (local) / `cf secret` (prod).
   "vars": {
     "APP_ENV": "local",
     "APP_ORIGIN": "http://127.0.0.1:5001"
   },
-
   "dev": {
     "port": 5001,
     "ip": "127.0.0.1"
+  },
+  "env": {
+    "production": {
+      "assets": { "binding": "ASSETS", "directory": "./" },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "ccf-db", "database_id": "2b2e4165-a9d1-4237-b4d4-6d22a1ed0578", "migrations_dir": "worker/migrations" }
+      ],
+      "kv_namespaces": [
+        { "binding": "KV", "id": "09afd2ef1fd84b53baf882a6715833a7" }
+      ],
+      "r2_buckets": [
+        { "binding": "ASSETS_BUCKET", "bucket_name": "campaign-assets" }
+      ],
+      "triggers": { "crons": ["0 8 * * *"] },
+      "vars": {
+        "APP_ENV": "production",
+        "APP_ORIGIN": "https://creatorcashflow.co.za",
+        "NODE_ENV": "production",
+        "ADMIN_EMAIL": "admin@creatorcashflow.co.za",
+        "FALLBACK_ADMIN_EMAIL": "admin@creatorcashflow.com",
+        "FROM_EMAIL": "Creator Cash Flow <hello@creatorcashflow.co.za>",
+        "DEMO_REQUEST_INBOX": "reamogetswemolefe0190@gmail.com",
+        "RESEND_API_URL": "https://api.resend.com",
+        "YOUTUBE_REDIRECT_URI": "https://creatorcashflow.co.za/api/youtube/auth/callback"
+      }
+    }
   }
 }
