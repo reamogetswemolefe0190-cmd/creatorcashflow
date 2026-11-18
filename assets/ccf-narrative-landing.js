@@ -18,6 +18,7 @@
   };
   window.CCFLanding = function () {
     return `<div class="ccf-next ccf-site">
+      <div class="ccf-scroll-progress" aria-hidden="true"></div>
       <section class="ccf-n-opening" aria-labelledby="ccf-n-heading">
         <div class="ccf-n-hero"><h1 id="ccf-n-heading">Every campaign.<br><span>Everyone in sync.</span></h1><p>Creator campaigns move through people, not inboxes. Give your agency, creators and brand one clear place to move the work forward.</p>
           <div class="ccf-n-actions"><a class="ccf-n-button ccf-n-button-primary" href="#request-demo">Request the demo ${arrow}</a><a class="ccf-n-button ccf-n-button-outline" href="#journey">Explore a sample campaign ${arrow}</a></div>
@@ -69,6 +70,28 @@
       root.querySelectorAll('.ccf-n-chapter-visual').forEach(visual => previewObserver.observe(visual));
     }
     if (location.hash === '#request-demo') requestAnimationFrame(() => root.querySelector('#request-demo')?.scrollIntoView());
+    initScrollFx(root);
+  }
+  // Scroll effects (gsap-framer-scroll-animation skill): fixed page progress bar + scrubbed
+  // parallax/zoom on chapter visuals. Transform/opacity only; skipped under prefers-reduced-motion.
+  function initScrollFx(root) {
+    if (!window.gsap || !window.ScrollTrigger || !root || root.dataset.ccfScrollFx) return;
+    root.dataset.ccfScrollFx = 'true';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // no scroll animation for reduced motion
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.to('.ccf-scroll-progress', {
+      scaleX: 1, ease: 'none', transformOrigin: 'left center',
+      scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
+    });
+    root.querySelectorAll('.ccf-n-chapter').forEach(chapter => {
+      const img = chapter.querySelector('.ccf-n-chapter-visual img');
+      if (!img) return;
+      gsap.fromTo(img, { yPercent: -6, scale: 1.08 }, {
+        yPercent: 6, scale: 1, ease: 'none',
+        scrollTrigger: { trigger: chapter, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+    ScrollTrigger.refresh(); // landing markup is injected dynamically after load
   }
   document.addEventListener('submit', async event => {
     if (event.target.id !== 'ccf-demo-request') return;
