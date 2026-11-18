@@ -296,8 +296,10 @@
             scrollbar-width: none;
         }
 
-        .cc-dock-buttons::-webkit-scrollbar {
-            display: none;
+        @supports not (scrollbar-width: none) {
+            .cc-dock-buttons::-webkit-scrollbar {
+                display: none;
+            }
         }
 
         .cc-dock-btn {

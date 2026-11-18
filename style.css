@@ -668,8 +668,10 @@ button, a, .onboard-choice-card, .admin-tab-btn, .mobile-nav-item {
 }
 
 /* Custom Scrollbar Utility */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
+@supports not (scrollbar-width: none) {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 }
 .no-scrollbar {
     -ms-overflow-style: none;
