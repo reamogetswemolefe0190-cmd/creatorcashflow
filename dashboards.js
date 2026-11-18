@@ -55,12 +55,41 @@
         return { label: 'Review campaign progress', owner: 'Open the campaign file', priority: 2 };
     }
 
+    // Dashboard aggregates (dashboard-design skill: 3-6 numbers answering the screen's question).
+    function aggregates() {
+        const campaigns = state.workspace?.campaigns || [];
+        const deliverables = campaigns.flatMap(c => state.campaignDetails[c.id]?.deliverables || []);
+        const assignments = state.workspace?.assignments || [];
+        return {
+            campaigns,
+            awaitingReview: campaigns.filter(c => (state.campaignDetails[c.id]?.deliverables || []).some(d => d.status === 'submitted')).length,
+            published: deliverables.filter(d => d.status === 'published').length,
+            deliverables: deliverables.length,
+            accepted: assignments.filter(a => a.consent_status === 'accepted').length,
+            assigned: assignments.length,
+            fees: campaigns.reduce((sum, c) => sum + (Number(c.fixed_fee) || 0), 0)
+        };
+    }
+
+    // One card divided by hairlines; tile = label + big tabular value + one-word baseline.
+    function kpiStrip(tiles) {
+        return `<section class="cd-kpis" aria-label="Key numbers">${tiles.map(t => `<div class="cd-kpi${t.warn ? ' is-warn' : ''}"><span class="cd-kpi-label">${escape(t.label)}</span><strong class="cd-kpi-value"${t.title ? ` title="${escape(t.title)}"` : ''}>${escape(t.value)}</strong><span class="cd-kpi-base">${escape(t.base)}</span></div>`).join('')}</section>`;
+    }
+
+    function pageHead(title, pill, action) {
+        return `<header class="cd-page-head"><div class="cd-page-head-text"><h1>${escape(title)}</h1>${pill ? `<span class="cd-head-pill">${escape(pill)}</span>` : ''}</div>${action || ''}</header>`;
+    }
+
     function queueRow(campaign) {
         const handoff = campaignHandoff(campaign);
-        return `<a class="cd-queue-row" href="/campaign.html?id=${encodeURIComponent(campaign.id)}">
+        const deliverables = state.campaignDetails[campaign.id]?.deliverables || [];
+        const done = deliverables.filter(d => d.status === 'approved' || d.status === 'published').length;
+        const pct = deliverables.length ? Math.round(done / deliverables.length * 100) : 0;
+        return `<a class="cd-queue-row${handoff.priority === 0 ? ' is-urgent' : ''}" href="/campaign.html?id=${encodeURIComponent(campaign.id)}">
             <span class="cd-queue-title"><strong>${escape(campaign.name)}</strong><small>${escape(campaign.brief || 'Open the campaign file for its brief.')}</small></span>
-            <span class="cd-queue-state"><strong>${escape(handoff.label)}</strong><small>${escape(handoff.owner)}</small></span>
+            <span class="cd-queue-state"><strong>${handoff.priority === 0 ? '<span class="cd-chip">Needs decision</span>' : ''}${escape(handoff.label)}</strong><small>${escape(handoff.owner)}${deliverables.length ? ` · ${done}/${deliverables.length} deliverables` : ''}</small></span>
             <svg class="cd-queue-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19 19 5M8 5h11v11"/></svg>
+            <span class="cd-share" aria-hidden="true"><span style="width:${pct}%"></span></span>
         </a>`;
     }
 
@@ -120,12 +149,19 @@
     }
 
     function renderAgencyOverview() {
-        const campaigns = (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
+        const a = aggregates();
+        const campaigns = a.campaigns.toSorted((x, y) => campaignHandoff(x).priority - campaignHandoff(y).priority);
         const queue = campaigns.length
             ? campaigns.map(queueRow).join('')
             : '<div class="cd-empty"><h2>Start with one real campaign.</h2><p>Add a brief, then bring in a registered creator and a brand reviewer when the work is ready.</p><button class="cc-btn cc-primary" type="button" data-open-campaigns>Create the first campaign</button></div>';
-        return `<header class="cd-page-head"><div><h1>Work needing a decision</h1><p>Every campaign has a next move. Start with the work that can move now.</p></div><button class="cc-btn cc-primary" type="button" data-open-campaigns>New campaign</button></header>
-            <section class="cd-work-layout" aria-label="Agency campaign desk">
+        return pageHead('Work needing a decision', `${campaigns.length} campaign${campaigns.length === 1 ? '' : 's'}`, '<button class="cc-btn cc-primary" type="button" data-open-campaigns>New campaign</button>')
+            + kpiStrip([
+                { label: 'Awaiting review', value: a.awaitingReview, base: a.awaitingReview ? 'needs a decision now' : 'none waiting', warn: a.awaitingReview > 0 },
+                { label: 'Active campaigns', value: campaigns.length, base: 'in this workspace' },
+                { label: 'Creators accepted', value: `${a.accepted} of ${a.assigned}`, base: 'assigned to campaigns' },
+                { label: 'Agreed fees', value: money(a.fees), base: 'across campaigns', title: 'ZAR ' + a.fees.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+            ])
+            + `<section class="cd-work-layout" aria-label="Agency campaign desk">
                 <div class="cd-work-main"><div class="cd-section-heading"><h2>Campaign queue</h2><span>${campaigns.length} ${campaigns.length === 1 ? 'campaign' : 'campaigns'}</span></div><div class="cd-queue">${queue}</div></div>
                 <aside class="cd-context"><h2>How work moves</h2><ol class="cd-flow"><li><strong>Set the brief</strong><span>Define the work in one campaign record.</span></li><li><strong>Assign the creator</strong><span>The creator accepts before sharing a draft.</span></li><li><strong>Review and publish</strong><span>Record the decision, link and labelled result.</span></li></ol><p>Money movement and platform-verified campaign reporting are not part of this pilot.</p></aside>
             </section>`;
@@ -135,8 +171,15 @@
         const brandOrg = (state.workspace?.organizations || []).find(org => org.type === 'brand');
         const campaigns = (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
         const requests = state.brandRequests.map(item => `<article class="cd-request"><div><h3>${escape(item.campaign_name)}</h3><p>An agency asked this brand workspace to review the brief and submitted deliverables.</p></div><div class="cd-request-actions"><button class="cc-btn cc-primary" type="button" data-brand-request="${escape(item.id)}" data-brand-decision="accepted">Accept access</button><button class="cc-btn" type="button" data-brand-request="${escape(item.id)}" data-brand-decision="declined">Decline</button></div></article>`).join('');
-        return `<header class="cd-page-head"><div><h1>Decisions waiting for your brand</h1><p>Review access and content in the context of the campaign. Nothing outside a shared campaign is visible here.</p></div></header>
-            <section class="cd-work-layout" aria-label="Brand review desk"><div class="cd-work-main">
+        const a = aggregates();
+        return pageHead('Decisions waiting for your brand', `${state.brandRequests.length + a.awaitingReview} waiting`, '')
+            + kpiStrip([
+                { label: 'Access requests', value: state.brandRequests.length, base: 'waiting on brand', warn: state.brandRequests.length > 0 },
+                { label: 'Shared campaigns', value: campaigns.length, base: 'visible to brand' },
+                { label: 'Drafts awaiting review', value: a.awaitingReview, base: 'submitted', warn: a.awaitingReview > 0 },
+                { label: 'Published links', value: a.published, base: 'recorded on deliverables' }
+            ])
+            + `<section class="cd-work-layout" aria-label="Brand review desk"><div class="cd-work-main">
                 <div class="cd-section-heading"><h2>Access requests</h2><span>${state.brandRequests.length} pending</span></div>
                 ${state.brandRequestsError ? `<p role="alert">${escape(state.brandRequestsError)}</p>` : requests || '<p class="cd-quiet">No access requests are waiting.</p>'}
                 <div class="cd-section-heading cd-section-spaced"><h2>Shared campaigns</h2><span>${campaigns.length} available</span></div>
@@ -148,7 +191,15 @@
         const campaigns = state.workspace?.campaigns || [];
         const agencyOrgs = (state.workspace?.organizations || []).filter(org => org.type === 'agency');
         const createForm = user.role === 'agency' ? `<section class="cd-create"><div><h2>Start a campaign</h2><p>A clear brief gives every participant the same starting point. You can add the creator and brand after creation.</p></div><form id="agency-create-campaign" class="cd-create-form"><label>Campaign name<input name="name" required minlength="2" maxlength="160" autocomplete="off"></label><label>Brief<textarea name="brief" maxlength="4000" rows="4" placeholder="What needs to be made, by whom, and for when?"></textarea></label><div class="cd-form-pair"><label>Agreed creator fee (ZAR)<input name="fixedFee" type="number" min="0" step="0.01" value="0"></label><label>Agency<select name="organizationId" required>${agencyOrgs.map(org => `<option value="${escape(org.id)}">${escape(org.name)}</option>`).join('')}</select></label></div><button class="cc-btn cc-primary" type="submit" ${agencyOrgs.length ? '' : 'disabled'}>Create campaign</button><p id="campaign-create-status" role="status" aria-live="polite"></p>${agencyOrgs.length ? '' : '<p>Create an agency organisation before starting a campaign.</p>'}</form></section>` : '';
-        return `<header class="cd-page-head"><div><h1>Campaigns</h1><p>A shared record from brief to published link.</p></div></header>${createForm}<section class="cd-all-campaigns"><div class="cd-section-heading"><h2>All campaigns</h2><span>${campaigns.length} total</span></div><div class="cd-queue">${campaigns.length ? campaigns.map(queueRow).join('') : '<p class="cd-quiet">No campaigns are linked to this workspace yet.</p>'}</div></section>`;
+        const a = aggregates();
+        return pageHead('Campaigns', `${campaigns.length} total`, '')
+            + kpiStrip([
+                { label: 'Active campaigns', value: campaigns.length, base: 'linked to workspace' },
+                { label: 'Awaiting review', value: a.awaitingReview, base: 'submitted drafts', warn: a.awaitingReview > 0 },
+                { label: 'Published', value: a.published, base: 'of ' + a.deliverables + ' deliverables' },
+                { label: 'Agreed fees', value: money(a.fees), base: 'across campaigns', title: 'ZAR ' + a.fees.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+            ])
+            + `${createForm}<section class="cd-all-campaigns"><div class="cd-section-heading"><h2>All campaigns</h2><span>${campaigns.length} total</span></div><div class="cd-queue">${campaigns.length ? campaigns.map(queueRow).join('') : '<p class="cd-quiet">No campaigns are linked to this workspace yet.</p>'}</div></section>`;
     }
 
     function renderRoster() {
@@ -210,14 +261,15 @@
                 `).join('')}
             </div>` : '';
 
-        return `<header class="cd-page-head">
-            <div>
-                <h1>People in campaigns</h1>
-                <p>Manage your creators and team collaborators.</p>
-            </div>
-            ${agencyOrgs.length ? `<button class="cc-btn cc-primary" type="button" data-toggle-invite>${state.showInvite ? 'Close form' : '+ Invite member'}</button>` : ''}
-        </header>
-        ${inviteSection}
+        const pendingCount = invitations.filter(i => i.status === 'pending').length;
+        return pageHead('People', `${assignments.length + pendingCount} total`, agencyOrgs.length ? `<button class="cc-btn cc-primary" type="button" data-toggle-invite>${state.showInvite ? 'Close form' : '+ Invite member'}</button>` : '')
+            + kpiStrip([
+                { label: 'Creator assignments', value: assignments.length, base: 'active' },
+                { label: 'Accepted', value: assignments.filter(a => a.consent_status === 'accepted').length, base: 'of ' + assignments.length + ' assigned' },
+                { label: 'Pending invitations', value: pendingCount, base: 'awaiting reply', warn: pendingCount > 0 },
+                { label: 'Agency organisations', value: agencyOrgs.length, base: 'in workspace' }
+            ])
+            + `${inviteSection}
         <section class="cd-all-campaigns">
             <div class="cd-section-heading"><h2>Active creator assignments</h2><span>${assignments.length} total</span></div>
             <div class="cd-queue">${assignments.length ? assignments.map(a => `<a class="cd-queue-row" href="/campaign.html?id=${encodeURIComponent(a.campaign_id)}"><span class="cd-queue-title"><strong>Creator ${escape(a.creator_user_id)}</strong><small>Campaign ${escape(a.campaign_id)}</small></span><span class="cd-queue-state"><strong>${escape(a.consent_status === 'accepted' ? 'Accepted' : 'Awaiting acceptance')}</strong><small>Open the campaign to see the work</small></span></a>`).join('') : '<div class="cd-empty"><h2>No creator assignments yet.</h2><p>Open a campaign to assign someone who has a CCF account, or invite them above.</p><button class="cc-btn cc-primary" type="button" data-open-campaigns>View campaigns</button></div>'}</div>
@@ -226,8 +278,16 @@
     }
 
     function renderApprovals() {
-        const waiting = (state.workspace?.campaigns || []).filter(campaign => (state.campaignDetails[campaign.id]?.deliverables || []).some(item => item.status === 'submitted'));
-        return `<header class="cd-page-head"><div><h1>Reviews</h1><p>Submitted drafts need a recorded decision. Open the campaign to approve or request a change.</p></div></header><section class="cd-all-campaigns"><div class="cd-section-heading"><h2>Drafts awaiting review</h2><span>${waiting.length} ${waiting.length === 1 ? 'campaign' : 'campaigns'}</span></div><div class="cd-queue">${waiting.length ? waiting.map(queueRow).join('') : '<p class="cd-quiet">Nothing is waiting for review right now.</p>'}</div></section>`;
+        const a = aggregates();
+        const waiting = a.campaigns.filter(campaign => (state.campaignDetails[campaign.id]?.deliverables || []).some(item => item.status === 'submitted'));
+        return pageHead('Reviews', `${waiting.length} waiting`, '')
+            + kpiStrip([
+                { label: 'Drafts awaiting review', value: waiting.length, base: 'needs a decision', warn: waiting.length > 0 },
+                { label: 'Shared campaigns', value: a.campaigns.length, base: 'visible to brand' },
+                { label: 'Published links', value: a.published, base: 'recorded on deliverables' },
+                { label: 'Deliverables total', value: a.deliverables, base: 'across shared campaigns' }
+            ])
+            + `<section class="cd-all-campaigns"><div class="cd-section-heading"><h2>Drafts awaiting review</h2><span>${waiting.length} ${waiting.length === 1 ? 'campaign' : 'campaigns'}</span></div><div class="cd-queue">${waiting.length ? waiting.map(queueRow).join('') : '<p class="cd-quiet">Nothing is waiting for review right now.</p>'}</div></section>`;
     }
 
     function renderContent() {
@@ -248,11 +308,13 @@
     function render() {
         if (!DOM.shell) return;
         if (state.loading) {
-            DOM.shell.innerHTML = '<div style="padding: 48px; color: var(--st-line); text-align: center;">Loading workspace...</div>';
+            // Skeleton shaped like the final screen: KPI strip + queue rows (dashboard-design skill: States).
+            DOM.shell.innerHTML = `<section class="role-content"><div class="cd-kpis">${'<div class="cd-kpi cd-skel"></div>'.repeat(4)}</div><div class="cd-skel-row"></div><div class="cd-skel-row"></div><div class="cd-skel-row short"></div></section>`;
             return;
         }
         if (state.error) {
-            DOM.shell.innerHTML = `<div style="padding: 48px; color: var(--st-primary); text-align: center;">Error: ${state.error}</div>`;
+            DOM.shell.innerHTML = `<section class="role-content"><div class="cd-state-card"><h2>Workspace could not load</h2><p>${escape(state.error)}</p><button class="cc-btn cc-primary" type="button" data-retry>Retry</button></div></section>`;
+            DOM.shell.querySelector('[data-retry]').addEventListener('click', () => { state.loading = true; state.error = null; render(); loadWorkspace(); });
             return;
         }
 

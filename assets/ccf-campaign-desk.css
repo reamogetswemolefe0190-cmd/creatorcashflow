@@ -263,5 +263,49 @@ body.role-workspace .role-content{background:#fff!important}
 @media(max-width:760px){body.role-workspace .role-rail{background:#fff!important}.cd-page-head{min-height:0;margin:4px 0 32px;padding:34px 28px;border-radius:24px}.cd-page-head::after{width:100%;right:-40%;top:-60%}.cd-page-head h1{font-size:clamp(34px,9vw,45px)!important}.cd-page-head .cc-btn{margin-top:4px}.cd-context{padding:28px}.cd-flow{display:grid;grid-template-columns:1fr}.cd-flow li{border-left:1px solid hsl(0 0% 100% / .45)}#cc-screen .ccf-preview-hero{margin:14px 0 24px;padding:28px 22px;border-radius:20px}#cc-screen .ccf-preview-hero h1{font-size:34px}}
 @media(max-width:520px){body.role-workspace .role-content{padding:16px 14px 80px}.cd-page-head{padding:30px 22px}.cd-page-head p{font-size:15px}.cd-work-layout{gap:30px}.cd-queue-row{padding:19px 12px}.cd-context{border-radius:16px}.cd-campaign-title h1{font-size:41px}.cd-focus{padding:28px;border-radius:20px}#cc-screen .ccf-preview-content{padding-inline:14px}#cc-screen .ccf-preview-mobile-tabs button{min-height:46px}}
 body.role-workspace .cd-context p,body.role-workspace .cd-context .cd-workspace-id :is(span,strong,small){color:#fff!important}
+
+/* ---- Role dashboards (dashboard-design skill): compact quiet header, KPI strip, flagged queue, states ---- */
+body.role-workspace .cd-page-head{position:static;isolation:auto;overflow:visible;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:0;padding:0 0 22px;margin:0 0 30px;border-radius:0;border-bottom:1px solid var(--cd-line);background:transparent}
+body.role-workspace .cd-page-head::after{display:none}
+body.role-workspace .cd-page-head h1{font-size:clamp(28px,3vw,40px)!important;line-height:1.1!important;letter-spacing:-.03em!important;margin:0;max-width:none}
+body.role-workspace .cd-page-head p{display:none}
+body.role-workspace .cd-page-head .cc-btn.cc-primary{box-shadow:none!important}
+.cd-page-head-text{display:flex;align-items:baseline;gap:14px;min-width:0}
+.cd-head-pill{flex-shrink:0;padding:5px 12px;border:1px solid var(--cd-line);border-radius:999px;background:var(--cd-canvas);font-size:12.5px;font-weight:600;color:var(--cd-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cd-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--cd-paper);border:1px solid var(--cd-line);border-radius:16px;margin:0 0 36px;overflow:hidden}
+.cd-kpi{min-width:0;padding:20px 22px 18px;border-left:1px solid var(--cd-line)}
+.cd-kpi:first-child{border-left:0}
+.cd-kpi-label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cd-muted)}
+.cd-kpi-value{display:block;margin-top:8px;font-size:clamp(24px,2.4vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.1;color:var(--cd-ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.cd-kpi-base{display:block;margin-top:6px;font-size:12.5px;color:var(--cd-muted)}
+.cd-kpi.is-warn .cd-kpi-value{color:var(--cd-action)}
+.cd-kpi.is-warn .cd-kpi-base{color:var(--cd-action);font-weight:600}
+.cd-chip{display:inline-block;margin-right:8px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--cd-action) 14%,transparent);color:var(--cd-action);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:2px}
+.cd-queue-row{position:relative}
+.cd-queue-row.is-urgent{background:color-mix(in srgb,var(--cd-action) 5%,transparent)}
+.cd-share{position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--cd-line);overflow:hidden}
+.cd-share span{display:block;height:100%;border-radius:3px;background:hsl(258 100% 60%);opacity:.75}
+.cd-skel{min-height:98px;background:var(--cd-canvas)}
+.cd-skel-row{position:relative;height:64px;margin-top:12px;border-radius:12px;background:var(--cd-canvas);overflow:hidden}
+.cd-skel-row.short{width:62%}
+.cd-skel::after,.cd-skel-row::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,hsl(0 0% 100% / .75),transparent);animation:cd-skel-sweep 1.4s infinite}
+@keyframes cd-skel-sweep{to{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.cd-skel::after,.cd-skel-row::after{animation:none}}
+.cd-state-card{max-width:520px;margin:64px auto;padding:36px;border:1px solid var(--cd-line);border-radius:18px;background:var(--cd-paper);text-align:center}
+.cd-state-card h2{margin:0 0 10px;font-size:22px;color:var(--cd-ink)}
+.cd-state-card p{margin:0 0 22px;line-height:1.55;color:var(--cd-muted)!important}
+.cd-empty{border:1px dashed var(--cd-line);border-radius:16px;background:transparent}
+/* Aside stays quiet: white card, ink text — attention belongs on the data, not the decoration. */
+body.role-workspace .cd-context{background:var(--cd-paper);border:1px solid var(--cd-line);border-radius:16px;padding:28px;color:var(--cd-ink)}
+body.role-workspace .cd-context :is(h2,p,.cd-flow li strong){color:var(--cd-ink)!important}
+body.role-workspace .cd-context .cd-flow li span{color:var(--cd-muted)!important}
+body.role-workspace .cd-context .cd-flow li{border-color:var(--cd-line)}
+body.role-workspace .cd-context .cd-flow li::before{background:var(--cd-canvas);border-color:var(--cd-line);color:var(--cd-ink)}
+body.role-workspace .cd-context .cd-workspace-id{border-color:var(--cd-line)}
+body.role-workspace .cd-context .cd-workspace-id :is(span,strong){color:var(--cd-ink)!important}
+body.role-workspace .cd-context .cd-workspace-id small{color:var(--cd-muted)!important}
+@media(max-width:1100px){.cd-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.cd-kpi:nth-child(3){border-left:0}.cd-kpi:nth-child(n+3){border-top:1px solid var(--cd-line)}}
+@media(max-width:760px){body.role-workspace .cd-page-head{flex-direction:column;align-items:stretch;gap:16px;padding-bottom:20px}body.role-workspace .cd-page-head .cc-btn{width:100%}.cd-page-head-text{flex-wrap:wrap;gap:10px}}
+@media(max-width:520px){.cd-kpi{padding:16px 16px 14px}.cd-kpi-value{font-size:24px}}
 /* Liquid glass on the workspace header (loads last, so it wins the cascade; !important beats the #fff!important mobile rule above). */
 .campaign-header.lg-glass{background:color-mix(in srgb,var(--cd-paper,#fff) 58%,transparent)!important}
