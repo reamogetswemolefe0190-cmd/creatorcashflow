@@ -2,7 +2,15 @@
 // Creator Cash Flow - Supabase Cloud Database Client & Helpers
 // ==========================================================================
 
-const { createClient } = require('@supabase/supabase-js');
+// Lazy + optional: after the Cloudflare cutover @supabase/supabase-js is a
+// devDependency (migration tooling only); the Worker uses D1 and plain node
+// uses the memory fallback, so a missing package must not crash startup.
+let createClient = null;
+try {
+    ({ createClient } = require('@supabase/supabase-js'));
+} catch (_) {
+    createClient = null;
+}
 const {
     isStressTest,
     SUPABASE_URL,
@@ -24,7 +32,7 @@ if (globalThis.__CCF_D1__) {
     const { createD1Client } = require('./d1Client');
     supabase = createD1Client(globalThis.__CCF_D1__);
     console.log('Connected to Cloudflare D1 (SQLite)');
-} else if (!isStressTest && SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key') {
+} else if (!isStressTest && SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key' && createClient) {
     supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('🔌 Connected to Supabase Cloud Database: ' + SUPABASE_URL);
 } else {
