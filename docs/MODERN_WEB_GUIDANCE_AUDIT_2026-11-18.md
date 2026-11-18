@@ -79,7 +79,26 @@ npx --yes modern-web-guidance@latest legacy-scan . --json
 
 Dropped/fallback code can still match static scans — re-scan to confirm the intended findings are resolved, not to force zero.
 
+## Resolution status — remediation 2026-11-18 (branch `fix/modern-web-guidance-audit`)
+
+Plan: `tasks/plan.md` + `tasks/todo.md` (CCF root). Snapshot commit `d49ecc8`; all fixes are atomic commits on top. `npm test` fully green after remediation; `legacy-scan` 30 → 8 findings.
+
+| Finding | Status | Commit |
+|---|---|---|
+| `secure-external-subresources` (gsap CTA + CDN scripts in index/admin) | RESOLVED — pinned lucide@1.74.0 / chart.js@4.6.1, SRI sha384 + crossorigin + referrerpolicy on all pinned subresources; Google Fonts got crossorigin/referrerpolicy (no integrity — css2 varies by UA); `cdn.tailwindcss.com` kept as documented exception (runtime compiler) | `146ca7f` |
+| `autofill-sign-in-form` (admin.html:177) | RESOLVED — `autocomplete="current-password"` + `name="password"` | `f353d1b` |
+| `js/replace-children-innerhtml` (app.js ×6) | RESOLVED — `replaceChildren()` | `34a589d` |
+| `js/copying-array-methods` (app.js ×2, ccf-creator.js, dashboards.js ×2, adminController.js) | RESOLVED — `toReversed()` / `toSorted()` (receivers verified real arrays) | `34a589d`, `ed49cdc` |
+| `js/structured-clone` (admin.js ×5) | RESOLVED — `structuredClone()` (fixtures verified plain data) | `783d3bc` |
+| `scrollspy/js` (ccf-narrative-landing.js) | MODERNIZED WITH KEPT FALLBACK — CSS `scroll-target-group:auto` + `:is(:target-current, [aria-current=step])`; IO kept for aria-current mirror (mandatory) + reveal; intentionally still flagged by the scanner | `b576843` |
+| `customize-scrollbar-color-and-thickness` (admin.html ×3) | RESOLVED — `scrollbar-color`/`scrollbar-width` (thumb 0.35 white for ≥3:1 contrast, WCAG 1.4.11), webkit rules in `@supports not`; index.html/style.css webkit rules wrapped in `@supports not (scrollbar-width: none)` | `83c9c69` |
+| `js/*` findings in test/harness files (stress_harness, test_metrics_concurrency, test_full_site, test_admin_metrics_stress) | DEFERRED by user decision — dev-only files, backlog = Task 9 in `tasks/todo.md` | — |
+
+Known-bad test suites at baseline (environment: no full Supabase config; fail identically before remediation): `campaign_reports_test.cjs`, `invitation_flow_test.js`, `rls_and_workspace_separation_test.js`, `site_audit_test.cjs`, `test_admin_ui.js` (71/1), `landing_content_test.cjs`. Not in `npm test` chain; `npm test` is green end-to-end.
+
+Side observation (NOT fixed, out of scope): `app.js:755` in the WIP snapshot has unescaped quotes inside a double-quoted string (`innerText = "Let's … <svg width="14"…"`) — a real SyntaxError in the unshipped file; `node --check app.js` fails on it at `d49ecc8` too.
+
 ## Notes
 
 - The skill was installed into the CCF project at `.agents/skills/modern-web-guidance/` (universal) and `.vibe/skills/modern-web-guidance/` (Mistral Vibe). Socket flagged 1 alert on the package; Snyk rates it Low Risk; source is `github.com/GoogleChrome/modern-web-guidance-src`.
-- `prototype-and-docs/prototype` (the Next.js app on :5173) was not scanned in this pass; run the same `legacy-scan` there if you want it covered.
+- `prototype-and-docs/prototype` (the Next.js app on :5173) was not scanned in this pass — out of scope per user decision; run the same `legacy-scan` there if you want it covered.
