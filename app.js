@@ -228,7 +228,7 @@ async function loadUserTransactions() {
 
             // Update Timeline graph points dynamically from DB
             const timelineMap = {};
-            state.activities.slice().reverse().forEach(a => {
+            state.activities.toReversed().forEach(a => {
                 const dateKey = a.date;
                 if (!timelineMap[dateKey]) timelineMap[dateKey] = { rev: 0, exp: 0 };
                 if (a.type === 'income') timelineMap[dateKey].rev += a.amount;
@@ -372,7 +372,7 @@ function renderStep4Platforms() {
     const listContainer = document.getElementById('onboarding-connect-list');
     if (!listContainer) return;
 
-    listContainer.innerHTML = '';
+    listContainer.replaceChildren();
     const platforms = ['YouTube', 'TikTok', 'Instagram'];
 
     platforms.forEach(p => {
@@ -832,7 +832,7 @@ function animateCounter() {
 function renderDashboardData() {
     const sourceContainer = document.getElementById('sources-stream-list');
     if (sourceContainer) {
-        sourceContainer.innerHTML = '';
+        sourceContainer.replaceChildren();
         state.sources.forEach(s => {
             sourceContainer.innerHTML += `
                 <div class="space-y-sm" style="margin-bottom: 20px;">
@@ -858,7 +858,7 @@ function renderDashboardData() {
 
     const activityStream = document.getElementById('activity-stream-os');
     if (activityStream) {
-        activityStream.innerHTML = '';
+        activityStream.replaceChildren();
         if (state.activities.length === 0) {
             activityStream.innerHTML = `
                 <div class="p-6 text-center text-text-secondary text-sm border border-dashed border-white/10 rounded-2xl bg-surface/30">
@@ -893,7 +893,7 @@ function renderFullStreams() {
 
     const revStream = document.getElementById('full-revenue-stream');
     if (revStream) {
-        revStream.innerHTML = '';
+        revStream.replaceChildren();
         const incomeItems = state.activities.filter(a => a.type === 'income');
         if (incomeItems.length === 0) {
             revStream.innerHTML = '<div class="py-6 text-center text-text-secondary text-xs">No revenue records found.</div>';
@@ -912,7 +912,7 @@ function renderFullStreams() {
 
     const expStream = document.getElementById('full-expense-stream');
     if (expStream) {
-        expStream.innerHTML = '';
+        expStream.replaceChildren();
         const expenseItems = state.activities.filter(a => a.type === 'expense');
         if (expenseItems.length === 0) {
             expStream.innerHTML = '<div class="py-6 text-center text-text-secondary text-xs">No expense records found.</div>';
@@ -1461,7 +1461,7 @@ function exitDemoMode() {
 
 function updateDemoTimeline() {
     const timelineMap = {};
-    state.activities.slice().reverse().forEach(a => {
+    state.activities.toReversed().forEach(a => {
         const dateKey = a.date;
         if (!timelineMap[dateKey]) timelineMap[dateKey] = { rev: 0, exp: 0 };
         if (a.type === 'income') timelineMap[dateKey].rev += a.amount;
@@ -1593,7 +1593,7 @@ function recalculateBusinessMetrics() {
     // 2. Business Insights Briefing (AI Analyst)
     const insightsEl = document.getElementById('ai-insights-list');
     if (insightsEl) {
-        insightsEl.innerHTML = '';
+        insightsEl.replaceChildren();
         const insights = [];
 
         if (highestPct > 0.70) {
