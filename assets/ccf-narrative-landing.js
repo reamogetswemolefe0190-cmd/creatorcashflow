@@ -48,6 +48,9 @@
       root.querySelector('#ccf-handoff-state').textContent = item.state;
     }));
     if ('IntersectionObserver' in window) {
+      // Nav highlight is CSS-driven via scroll-target-group/:target-current (see ccf-narrative.css);
+      // this observer remains as the fallback for browsers without scroll-target-group and to mirror
+      // the visual state to aria-current, which :target-current does not expose to screen readers.
       const observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-revealed');
