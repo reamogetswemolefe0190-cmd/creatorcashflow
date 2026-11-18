@@ -83,11 +83,21 @@
       scaleX: 1, ease: 'none', transformOrigin: 'left center',
       scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
     });
+    // Hero drifts up and fades as you scroll away (transform/opacity only)
+    gsap.to('.ccf-n-hero', {
+      yPercent: -14, opacity: 0.35, ease: 'none',
+      scrollTrigger: { trigger: '.ccf-n-opening', start: 'top top', end: 'bottom 30%', scrub: true }
+    });
+    gsap.to('.ccf-n-stage-window', {
+      yPercent: -10, ease: 'none',
+      scrollTrigger: { trigger: '.ccf-n-opening', start: 'top top', end: 'bottom 40%', scrub: true }
+    });
+    // Stronger scrubbed parallax/zoom on each chapter visual
     root.querySelectorAll('.ccf-n-chapter').forEach(chapter => {
       const img = chapter.querySelector('.ccf-n-chapter-visual img');
       if (!img) return;
-      gsap.fromTo(img, { yPercent: -6, scale: 1.08 }, {
-        yPercent: 6, scale: 1, ease: 'none',
+      gsap.fromTo(img, { yPercent: -12, scale: 1.18 }, {
+        yPercent: 12, scale: 1, ease: 'none',
         scrollTrigger: { trigger: chapter, start: 'top bottom', end: 'bottom top', scrub: true }
       });
     });
