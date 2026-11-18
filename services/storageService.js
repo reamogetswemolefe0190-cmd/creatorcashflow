@@ -74,7 +74,10 @@ function sanitizeFileName(name) {
 }
 
 /**
- * Upload an asset buffer to Supabase Storage (with local disk fallback).
+ * Upload an asset buffer. Order of backends:
+ *   1. Cloudflare R2 (Worker runtime, globalThis.__CCF_R2__ set by worker entry)
+ *   2. Supabase Storage (legacy node deployments with supabase configured)
+ *   3. Local disk (node dev fallback)
  */
 async function uploadAsset({ buffer, originalName, mimeType, folder = 'general' }) {
     await ensureBucket();
@@ -82,6 +85,21 @@ async function uploadAsset({ buffer, originalName, mimeType, folder = 'general' 
     const cleanBase = sanitizeFileName(path.basename(originalName || 'asset', cleanExt));
     const randomSuffix = crypto.randomBytes(4).toString('hex');
     const storagePath = `${folder}/${Date.now()}_${randomSuffix}_${cleanBase}${cleanExt}`;
+
+    // Cloudflare R2 (Worker runtime)
+    if (globalThis.__CCF_R2__) {
+        await globalThis.__CCF_R2__.put(storagePath, buffer, {
+            httpMetadata: { contentType: mimeType || 'application/octet-stream' }
+        });
+        return {
+            url: `/assets-r2/${storagePath}`,
+            path: storagePath,
+            storage: 'r2',
+            size: buffer.length,
+            mimeType,
+            originalName
+        };
+    }
 
     if (supabase && supabase.storage) {
         try {
@@ -113,9 +131,9 @@ async function uploadAsset({ buffer, originalName, mimeType, folder = 'general' 
         }
     }
 
-    // Local Disk Fallback (unavailable inside the Cloudflare Worker until the R2 phase)
+    // Local Disk Fallback (node dev only; Workers always have __CCF_R2__)
     if (IS_WORKER) {
-        throw new Error('Asset storage is not configured in this runtime (R2 phase pending)');
+        throw new Error('Asset storage is not configured in this runtime');
     }
     const localTargetDir = path.join(UPLOADS_DIR, folder);
     if (!fs.existsSync(localTargetDir)) {

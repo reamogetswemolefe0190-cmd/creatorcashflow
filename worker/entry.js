@@ -47,6 +47,20 @@ export default {
             return handleWithExpress(app, request);
         }
 
+        // R2 object storage serving (uploaded campaign assets). In production a
+        // custom domain can front this later; the worker route works everywhere.
+        if (path.startsWith('/assets-r2/')) {
+            const key = decodeURIComponent(path.slice('/assets-r2/'.length));
+            if (!key || key.includes('..')) return new Response('Not found', { status: 404 });
+            const object = await env.ASSETS_BUCKET.get(key);
+            if (!object) return new Response('Not found', { status: 404 });
+            const headers = new Headers();
+            object.writeHttpMetadata(headers);
+            if (!headers.has('content-type')) headers.set('content-type', 'application/octet-stream');
+            headers.set('cache-control', 'public, max-age=31536000, immutable');
+            return new Response(request.method === 'HEAD' ? null : object.body, { headers });
+        }
+
         // Static assets (html/css/js/png/...). With the default assets-first
         // behavior this handler only runs when no asset matched directly.
         let resp = await env.ASSETS.fetch(request);
