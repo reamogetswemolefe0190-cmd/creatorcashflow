@@ -15,8 +15,17 @@
     '.campaign-card', '.campaign-form', '.campaign-deliverable', '.campaign-summary', '.campaign-events',
     '.role-panel', '.role-metric', '.cd-queue-row', '.cd-request', '.cd-deliverable'
   ].join(',');
-  var OPTS = { scale: -60, chroma: 4, blur: 6, saturate: 1.3 }; // subtle: -60/4 per skill
+  var OPTS = { scale: -96, chroma: 6, blur: 10, saturate: 1.45 }; // near the skill's -112 default; needs translucent element backgrounds to be visible
   var applied = new WeakSet();
+
+  // Surfaces whose own background must become translucent for the refraction to show.
+  // Buttons are excluded — their solid brand color should stay solid.
+  var SURFACE = /header|nav|modal|panel|card|pill|progress|window|sheet|queue|request|deliverable|summary|events|metric|row|dock/i;
+
+  function alphaOf(color) {
+    var m = String(color).match(/[\d.]+/g);
+    return m && m.length >= 4 ? parseFloat(m[m.length - 1]) : 1;
+  }
 
   function enhance(el) {
     if (!window.liquidGlass || applied.has(el) || !el.isConnected) return;
@@ -29,6 +38,16 @@
     // overrides (ccf-system.css) so the effect actually shows on those pages.
     el.style.setProperty('backdrop-filter', el.style.backdropFilter, 'important');
     el.style.setProperty('-webkit-backdrop-filter', el.style.backdropFilter, 'important');
+    // Some surfaces carry an opaque background that hides the refraction entirely.
+    // Lower it to 58% — inline !important wins every stylesheet, including ones with
+    // their own !important backgrounds. Skip if already translucent (alpha < 0.9) or
+    // if the background is a gradient (backgroundColor is transparent then).
+    if (SURFACE.test(el.tagName + ' ' + el.className)) {
+      var cs = getComputedStyle(el);
+      if (cs.backgroundImage === 'none' && cs.backgroundColor && !/transparent/.test(cs.backgroundColor) && alphaOf(cs.backgroundColor) >= 0.9) {
+        el.style.setProperty('background', 'color-mix(in srgb, ' + cs.backgroundColor + ' 58%, transparent)', 'important');
+      }
+    }
     el.classList.add('lg-glass');
     el.dataset.lgSupported = String(g.supported);
   }

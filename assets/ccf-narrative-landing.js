@@ -92,15 +92,8 @@
       yPercent: -10, ease: 'none',
       scrollTrigger: { trigger: '.ccf-n-opening', start: 'top top', end: 'bottom 40%', scrub: true }
     });
-    // Stronger scrubbed parallax/zoom on each chapter visual
-    root.querySelectorAll('.ccf-n-chapter').forEach(chapter => {
-      const img = chapter.querySelector('.ccf-n-chapter-visual img');
-      if (!img) return;
-      gsap.fromTo(img, { yPercent: -12, scale: 1.18 }, {
-        yPercent: 12, scale: 1, ease: 'none',
-        scrollTrigger: { trigger: chapter, start: 'top bottom', end: 'bottom top', scrub: true }
-      });
-    });
+    // Chapter previews stay static — the CSS reveal (clip-path/translate on
+    // .ccf-n-chapter-visual) is enough; scaling the screenshots crops their details.
     ScrollTrigger.refresh(); // landing markup is injected dynamically after load
   }
   document.addEventListener('submit', async event => {

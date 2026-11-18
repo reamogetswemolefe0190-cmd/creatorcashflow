@@ -33,3 +33,5 @@
 .campaign-live :is(a,button,input,select,textarea):focus-visible{outline:2px solid var(--ui-focus);outline-offset:2px}
 @media(max-width:800px){.campaign-header{padding:16px 24px}.campaign-root{padding:32px 24px 64px}.campaign-intro{display:block;margin-bottom:32px}.campaign-summary{margin-top:24px}.campaign-grid{grid-template-columns:1fr}.campaign-card{padding:24px}.campaign-card-head{display:block}.campaign-pill{margin-top:12px}}
 @media(max-width:420px){.campaign-header{gap:12px}.campaign-header img{width:112px}.campaign-root{padding:32px 16px 64px}.campaign-actions{display:grid}.campaign-actions button{width:100%}}
+/* Liquid glass: ccf-liquid-glass.js adds the displacement backdrop-filter inline; lower the opacity so it shows. */
+.campaign-header.lg-glass{background:color-mix(in srgb,var(--ui-surface,#fff) 58%,transparent)!important}

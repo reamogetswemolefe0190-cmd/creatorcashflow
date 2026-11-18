@@ -379,3 +379,10 @@ body :is(button,a):active{opacity:.8}
   .ccf-n-request a, .customer-main a:not(.cc-btn), .campaign-root a:not(.cc-btn) { min-height: 44px; display: inline-flex; align-items: center; }
   button:not(.admin-tab-btn) { min-height: 44px; }
 }
+
+/* Liquid glass surfaces: ccf-liquid-glass.js adds the SVG-displacement backdrop-filter
+   inline; here we only lower the surface opacity so the refraction is actually visible.
+   (Landing header keeps its own more-transparent rule in ccf-narrative.css.) */
+.public-header.lg-glass, .campaign-header.lg-glass, .invite-header.lg-glass {
+  background: color-mix(in srgb, var(--ui-surface, #fff) 58%, transparent) !important;
+}
