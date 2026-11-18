@@ -129,3 +129,11 @@ body.ccf-marketing .public-nav .primary-link{padding:0 26px;font-weight:700}
 @media(max-width:520px){.ccf-n-hero{padding-top:46px;padding-bottom:32px}}
 @media(max-width:520px){.ccf-n-progress{top:66px;width:100%;max-width:none;padding:8px 22px 20px;border-radius:0 0 32px 32px;background:linear-gradient(180deg,hsl(258 100% 94% / .6) 0%,hsl(0 0% 100% / .45) 68%,transparent 100%);box-shadow:none;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}.ccf-n-preview-context{display:none}.ccf-n-chapter,.ccf-n-chapter:nth-child(2){scroll-margin-top:150px}}
 @media(prefers-reduced-motion:reduce){.ccf-n-chapter::before{animation:none!important;transform:none!important;transition:none!important;opacity:0}.ccf-n-chapter.is-active::before{opacity:.7}}
+/* Word pop-up masks: ccf-narrative-landing.js splits headings into .w-mask > .w-word and GSAP
+   pops each word up (yPercent 115 -> 0, back.out). The mask clips the word while it rises;
+   padding/margin keep descenders (g, y) from being clipped by overflow:hidden. */
+.w-mask{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.14em;margin-bottom:-.14em}
+.w-word{display:inline-block;will-change:transform}
+/* When GSAP owns the heading words, switch off the CSS heading-arrive animation to avoid a double reveal. */
+.ccf-n-chapter.is-revealed .ccf-n-chapter-copy h2.is-split{animation:none}
+@media(prefers-reduced-motion:reduce){.w-mask{overflow:visible;padding-bottom:0;margin-bottom:0}.w-word{will-change:auto}}

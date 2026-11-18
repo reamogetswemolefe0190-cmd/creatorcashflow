@@ -79,6 +79,54 @@
     root.dataset.ccfScrollFx = 'true';
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // no scroll animation for reduced motion
     gsap.registerPlugin(ScrollTrigger);
+
+    // Word pop-up: split a heading into .w-mask > .w-word spans (masks defined in
+    // ccf-narrative.css) and pop each word up with a back.out stagger. Pattern per
+    // gsap-framer-scroll-animation skill (char/word stagger text reveal).
+    function splitWords(el) {
+      if (!el || el.classList.contains('is-split')) return [];
+      el.classList.add('is-split');
+      const words = [];
+      (function walk(node) {
+        Array.from(node.childNodes).forEach(child => {
+          if (child.nodeType === 3) {
+            const frag = document.createDocumentFragment();
+            child.textContent.split(/(\s+)/).forEach(part => {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+              const mask = document.createElement('span');
+              mask.className = 'w-mask';
+              const word = document.createElement('span');
+              word.className = 'w-word';
+              word.textContent = part;
+              mask.appendChild(word);
+              frag.appendChild(mask);
+              words.push(word);
+            });
+            node.replaceChild(frag, child);
+          } else if (child.nodeType === 1 && child.tagName !== 'BR') {
+            walk(child);
+          }
+        });
+      })(el);
+      return words;
+    }
+    function popWords(heading, onLoad) {
+      const words = splitWords(heading);
+      if (!words.length) return;
+      const vars = { yPercent: 115, duration: 0.7, ease: 'back.out(1.7)', stagger: 0.045 };
+      if (onLoad) gsap.from(words, Object.assign({ delay: 0.25 }, vars));
+      else gsap.from(words, Object.assign({}, vars, { scrollTrigger: { trigger: heading, start: 'top 85%', toggleActions: 'play none none none' } }));
+    }
+    // Section-by-section pop-up: the block's children rise and fade in as one staggered batch.
+    function popSection(section, selector) {
+      const items = section.querySelectorAll(selector);
+      if (!items.length) return;
+      gsap.from(items, {
+        y: 26, opacity: 0, duration: 0.65, ease: 'power3.out', stagger: 0.09,
+        scrollTrigger: { trigger: section, start: 'top 82%', toggleActions: 'play none none none' }
+      });
+    }
     gsap.to('.ccf-scroll-progress', {
       scaleX: 1, ease: 'none', transformOrigin: 'left center',
       scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
@@ -94,6 +142,22 @@
     });
     // Chapter previews stay static — the CSS reveal (clip-path/translate on
     // .ccf-n-chapter-visual) is enough; scaling the screenshots crops their details.
+
+    // Hero + stage copy pop up on load; every section and heading pops on scroll into view.
+    popWords(root.querySelector('#ccf-n-heading'), true);
+    popWords(root.querySelector('.ccf-n-stage-left h2'), true);
+    gsap.from(root.querySelectorAll('.ccf-n-hero p, .ccf-n-actions, .ccf-n-availability'), { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out', stagger: 0.08, delay: 0.55 });
+    root.querySelectorAll('.ccf-n-chapter').forEach(chapter => {
+      popWords(chapter.querySelector('h2'));
+      popSection(chapter, '.ccf-n-chapter-step, .ccf-n-chapter-copy p, .ccf-n-inline-link');
+    });
+    const intro = root.querySelector('.ccf-n-intro');
+    if (intro) { popWords(intro.querySelector('h2')); popSection(intro, 'p'); }
+    const proof = root.querySelector('.ccf-n-proof');
+    if (proof) { popWords(proof.querySelector('h2')); popSection(proof, '.ccf-n-proof-lead p, .ccf-n-proof-links a'); }
+    const request = root.querySelector('.ccf-n-request');
+    if (request) { popWords(request.querySelector('h2')); popSection(request, '.ccf-n-request-copy p, .ccf-n-form'); }
+
     ScrollTrigger.refresh(); // landing markup is injected dynamically after load
   }
   document.addEventListener('submit', async event => {
