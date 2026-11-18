@@ -27,3 +27,4 @@ sites/
 .dev.vars
 .wrangler/
 tmp/
+uploads/
