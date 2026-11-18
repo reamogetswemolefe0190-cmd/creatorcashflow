@@ -5,7 +5,8 @@
 //
 // Design rules for the templates:
 //   - table layout + inline CSS only (Gmail/Outlook strip <style> blocks)
-//   - dark brand header (#100e13) with the logo served from APP_ORIGIN
+//   - dark brand header (#100e13) with the approved paper (light) logo PNG
+//     served from APP_ORIGIN (SVG is unreliable in email clients, so use PNG)
 //   - orange pill CTA (#ff5b00), light body (#ffffff) on #f2f2f2 canvas
 //   - every HTML email ships with a plain-text fallback
 // ==========================================================================
@@ -24,7 +25,7 @@ function appOrigin() {
 
 // Branded shell. innerHtml is the body content; cta is optional.
 function renderEmail({ eyebrow, heading, intro, bodyHtml = '', ctaText, ctaUrl, note }) {
-    const logoUrl = `${appOrigin()}/logo_transparent.png`;
+    const logoUrl = `${appOrigin()}/brand/approved-logo-paper.png`;
     const eyebrowHtml = eyebrow
         ? `<p style="margin:0 0 16px;"><span style="display:inline-block;background-color:#f2f2f2;color:#ff5b00;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px;border-radius:999px;">${esc(eyebrow)}</span></p>`
         : '';
