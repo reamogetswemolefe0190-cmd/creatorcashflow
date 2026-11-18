@@ -3,8 +3,65 @@
 // Active TTL unreferenced cleanup timers and strict IP capacity caps
 // ==========================================================================
 
-// In-memory sliding-window tracker for admin login attempts
+// In-memory sliding-window tracker for admin login attempts (node runtime).
+// Inside the Cloudflare Worker (globalThis.__CCF_KV__ set) the limiters below
+// delegate to KV instead; this Map stays exported for health reporting/tests.
 const adminLoginAttempts = new Map();
+
+// ---------------------------------------------------------------------------
+// KV-backed sliding-window store (Worker runtime). KV TTL handles expiry, so
+// no cleanup timers are needed there. Fail-open on KV errors (logged).
+// ---------------------------------------------------------------------------
+let kvScopeCounter = 0;
+function kvKey(scope, key) {
+    return `rl:${scope}:${key}`;
+}
+async function kvGetTimestamps(kv, scope, key) {
+    const raw = await kv.get(kvKey(scope, key), 'text');
+    if (!raw) return [];
+    try {
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+    } catch (_) {
+        return [];
+    }
+}
+async function kvHit(kv, scope, key, windowMs, maxRequests, req, res, errorMessage, userFacingMessage) {
+    const now = Date.now();
+    let timestamps = (await kvGetTimestamps(kv, scope, key)).filter(t => now - t < windowMs);
+    if (timestamps.length >= maxRequests) {
+        const retryAfterSecs = Math.max(1, Math.ceil((timestamps[0] + windowMs - now) / 1000));
+        res.setHeader('Retry-After', retryAfterSecs);
+        res.status(429).json({
+            error: errorMessage,
+            message: `${userFacingMessage} Please try again after ${retryAfterSecs} seconds.`,
+            retryAfterSeconds: retryAfterSecs
+        });
+        return false;
+    }
+    timestamps.push(now);
+    await kv.put(kvKey(scope, key), JSON.stringify(timestamps), {
+        expirationTtl: Math.max(60, Math.ceil(windowMs / 1000))
+    });
+    return true;
+}
+function kvAdminLoginLimiter(req, res, next) {
+    const kv = globalThis.__CCF_KV__;
+    kvHit(kv, 'admin-login', getClientIp(req), 15 * 60 * 1000, 5, req, res,
+        'Too many login attempts',
+        'Rate limit exceeded. Too many login attempts from this IP.')
+        .then(ok => { if (ok) next(); })
+        .catch(err => { console.warn('[RATE LIMIT] KV error, failing open:', err.message); next(); });
+}
+function createKvLimiter({ windowMs, maxRequests, errorMessage, userFacingMessage, keyGenerator }) {
+    const scope = 'lim' + (++kvScopeCounter);
+    return function limiter(req, res, next) {
+        const kv = globalThis.__CCF_KV__;
+        kvHit(kv, scope, keyGenerator(req), windowMs, maxRequests, req, res, errorMessage, userFacingMessage)
+            .then(ok => { if (ok) next(); })
+            .catch(err => { console.warn('[RATE LIMIT] KV error, failing open:', err.message); next(); });
+    };
+}
 
 // Reliable client IP extraction prioritizing reverse proxy headers
 function getClientIp(req) {
@@ -42,6 +99,7 @@ if (adminLoginCleanupTimer.unref) {
  * 5 attempts per 15-minute sliding window, max 1000 tracked IPs
  */
 function rateLimitAdminLogin(req, res, next) {
+    if (globalThis.__CCF_KV__) return kvAdminLoginLimiter(req, res, next);
     const ip = getClientIp(req);
     const now = Date.now();
     const WINDOW_MS = 15 * 60 * 1000; // 15 minutes window
@@ -91,6 +149,9 @@ function createSlidingWindowLimiter({
     keyGenerator = (req) => getClientIp(req),
     maxTrackedKeys = 1000
 }) {
+    if (globalThis.__CCF_KV__) {
+        return createKvLimiter({ windowMs, maxRequests, errorMessage, userFacingMessage, keyGenerator });
+    }
     const tracker = new Map();
 
     const cleanupTimer = setInterval(() => {

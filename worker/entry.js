@@ -74,8 +74,11 @@ export default {
     async scheduled(event, env, ctx) {
         ctx.waitUntil((async () => {
             console.log('[cron] fired at', new Date(event.scheduledTime).toISOString(), 'cron:', event.cron);
-            // Phase 3 (automation v1) hooks in here: invitation expiry sweep,
-            // due-date nudges, report-on-publish. Kept a no-op until then.
-        })());
+            globalThis.__CCF_D1__ = env.DB;
+            globalThis.__CCF_KV__ = env.KV;
+            globalThis.__CCF_R2__ = env.ASSETS_BUCKET;
+            const { runCronJobs } = require('./cron');
+            await runCronJobs(env);
+        })().catch((err) => console.error('[cron] run failed:', err)));
     }
 };

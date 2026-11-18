@@ -51,7 +51,8 @@
 
   // Non-secret config. Secrets go in .dev.vars (local) / `cf secret` (prod).
   "vars": {
-    "APP_ENV": "local"
+    "APP_ENV": "local",
+    "APP_ORIGIN": "http://127.0.0.1:5001"
   },
 
   "dev": {
