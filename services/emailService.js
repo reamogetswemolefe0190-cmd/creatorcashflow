@@ -85,20 +85,28 @@ async function sendEmail({ to, subject, html, text, replyTo }) {
         ...(text ? { text } : {}),
         ...(replyTo ? { reply_to: replyTo } : {})
     };
-    try {
-        const res = await fetch(`${RESEND_API_URL || 'https://api.resend.com'}/emails`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(10000)
-        });
-        const body = await res.json().catch(() => ({}));
-        if (!res.ok) console.warn('[EMAIL] send failed:', res.status, JSON.stringify(body).slice(0, 200));
-        return { ok: res.ok, status: res.status, id: body.id };
-    } catch (err) {
-        console.warn('[EMAIL] error:', err.message);
-        return { ok: false, status: 0 };
+    const run = (async () => {
+        try {
+            const res = await fetch(`${RESEND_API_URL || 'https://api.resend.com'}/emails`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: AbortSignal.timeout(10000)
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) console.warn('[EMAIL] send failed:', res.status, JSON.stringify(body).slice(0, 200));
+            return { ok: res.ok, status: res.status, id: body.id };
+        } catch (err) {
+            console.warn('[EMAIL] error:', err.message);
+            return { ok: false, status: 0 };
+        }
+    })();
+    // In the Worker, keep the isolate alive until the send finishes even when
+    // the caller does not await (fire-and-forget from controllers).
+    if (typeof globalThis.__CCF_WAITUNTIL__ === 'function') {
+        globalThis.__CCF_WAITUNTIL__(run.catch(() => {}));
     }
+    return run;
 }
 
 // --------------------------------------------------------------------------
@@ -211,6 +219,43 @@ function reportDueEmail({ managerName, campaignName, publishedCount, campaignId 
     return { subject, html, text };
 }
 
+// Big centered code box used by the one-time-code emails.
+function codeBox(code) {
+    return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+        <tr><td style="background-color:#f2f2f2;border:1px solid #e4e4e4;border-radius:12px;padding:18px 32px;">
+            <span style="font-family:'Courier New',monospace;font-size:32px;font-weight:700;letter-spacing:10px;color:#100e13;">${esc(code)}</span>
+        </td></tr>
+    </table>`;
+}
+
+function signupCodeEmail({ name, code, expiresInHours = 24 }) {
+    const subject = 'Your Creator Cash Flow verification code';
+    const html = renderEmail({
+        eyebrow: 'Verify your email',
+        heading: `Confirm your email${name ? `, ${name}` : ''}`,
+        intro: 'Enter this code in the app to verify your email address and finish setting up your account.',
+        bodyHtml: codeBox(code),
+        note: `This code expires in ${expiresInHours} hours. If you didn't create a Creator Cash Flow account, you can safely ignore this email.`
+    });
+    const text = `Hi${name ? ` ${name}` : ''},\n\nYour Creator Cash Flow verification code is: ${code}\n\nEnter it in the app to verify your email. It expires in ${expiresInHours} hours.\n\nIf you didn't create an account, ignore this email.\n\nCreator Cash Flow`;
+    return { subject, html, text };
+}
+
+function passwordResetEmail({ name, code, resetUrl, expiresInMinutes = 15 }) {
+    const subject = 'Reset your Creator Cash Flow password';
+    const html = renderEmail({
+        eyebrow: 'Password reset',
+        heading: 'Reset your password',
+        intro: `Hi${name ? ` ${name}` : ''}, we received a request to reset the password for your Creator Cash Flow account. Use this code in the app's reset form:`,
+        bodyHtml: codeBox(code),
+        ctaText: 'Open Creator Cash Flow',
+        ctaUrl: resetUrl,
+        note: `This code expires in ${expiresInMinutes} minutes and can only be used once. If you didn't request a password reset, you can safely ignore this email — your password stays unchanged.`
+    });
+    const text = `Hi${name ? ` ${name}` : ''},\n\nWe received a request to reset your Creator Cash Flow password. Your reset code is: ${code}\n\nEnter it in the app's reset form (${resetUrl}). It expires in ${expiresInMinutes} minutes and works once.\n\nIf you didn't request this, ignore this email — your password stays unchanged.\n\nCreator Cash Flow`;
+    return { subject, html, text };
+}
+
 module.exports = {
     esc,
     renderEmail,
@@ -221,5 +266,7 @@ module.exports = {
     demoRequestNotification,
     dueSoonEmail,
     needsDecisionEmail,
-    reportDueEmail
+    reportDueEmail,
+    signupCodeEmail,
+    passwordResetEmail
 };

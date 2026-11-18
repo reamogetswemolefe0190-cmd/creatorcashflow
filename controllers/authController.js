@@ -113,10 +113,13 @@ async function signup(req, res) {
         );
 
         if (RESEND_API_KEY) {
-            console.log('[RESEND] Sending account welcome email');
-            const tpl = emailService.welcomeEmail({ name });
-            emailService.sendEmail({ to: email.toLowerCase(), subject: tpl.subject, html: tpl.html, text: tpl.text })
-                .catch(err => console.error('[RESEND DISPATCH ERROR]', err));
+            console.log('[RESEND] Sending signup verification code email');
+            const code = await createAuthCode(email, 'signup_code', SIGNUP_CODE_TTL_MIN).catch(err => { console.error('[AUTH CODE]', err.message); return null; });
+            if (code) {
+                const tpl = emailService.signupCodeEmail({ name, code, expiresInHours: SIGNUP_CODE_TTL_MIN / 60 });
+                emailService.sendEmail({ to: email.toLowerCase(), subject: tpl.subject, html: tpl.html, text: tpl.text })
+                    .catch(err => console.error('[RESEND DISPATCH ERROR]', err));
+            }
         }
 
         res.status(201).json({
@@ -215,7 +218,166 @@ async function login(req, res) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// One-time auth codes (signup verification + password reset).
+// Codes are 6 digits; only the SHA-256 hash is stored (auth_codes table in D1,
+// memoryDb.auth_codes in the node fallback).
+// ---------------------------------------------------------------------------
+
+const SIGNUP_CODE_TTL_MIN = 24 * 60;
+const RESET_CODE_TTL_MIN = 15;
+const MAX_CODE_ATTEMPTS = 5;
+
+function hashCode(code) {
+    return crypto.createHash('sha256').update(String(code)).digest('hex');
+}
+
+function generateCode() {
+    return String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+}
+
+async function createAuthCode(email, purpose, ttlMinutes) {
+    const code = generateCode();
+    const row = {
+        id: 'cod_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex'),
+        email: email.toLowerCase(),
+        code_hash: hashCode(code),
+        purpose,
+        expires_at: new Date(Date.now() + ttlMinutes * 60000).toISOString(),
+        used_at: null,
+        attempts: 0,
+        created_at: new Date().toISOString()
+    };
+    if (supabase) {
+        const { error } = await supabase.from('auth_codes').insert([row]);
+        if (error) throw error;
+    } else {
+        memoryDb.auth_codes.push(row);
+    }
+    return code;
+}
+
+// Returns the matching unused, unexpired row if the code is correct; otherwise null.
+// Every attempt (right or wrong) bumps `attempts`; after MAX_CODE_ATTEMPTS the code is dead.
+async function consumeAuthCode(email, purpose, code) {
+    if (!/^[0-9]{6}$/.test(String(code || ''))) return null;
+    const normalized = email.toLowerCase();
+    let rows = [];
+    if (supabase) {
+        const { data, error } = await supabase.from('auth_codes').select('*').eq('email', normalized).eq('purpose', purpose);
+        if (error) throw error;
+        rows = data || [];
+    } else {
+        rows = memoryDb.auth_codes.filter(r => r.email === normalized && r.purpose === purpose);
+    }
+    const candidates = rows
+        .filter(r => !r.used_at && r.expires_at > new Date().toISOString() && r.attempts < MAX_CODE_ATTEMPTS)
+        .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    for (const row of candidates) {
+        row.attempts = (row.attempts || 0) + 1;
+        if (supabase) await supabase.from('auth_codes').update({ attempts: row.attempts }).eq('id', row.id);
+        if (row.code_hash === hashCode(code)) {
+            row.used_at = new Date().toISOString();
+            if (supabase) await supabase.from('auth_codes').update({ used_at: row.used_at }).eq('id', row.id);
+            else { const i = memoryDb.auth_codes.findIndex(r => r.id === row.id); if (i >= 0) memoryDb.auth_codes[i] = row; }
+            return row;
+        }
+    }
+    return null;
+}
+
+async function findUserRowByEmail(email) {
+    const normalized = String(email || '').trim().toLowerCase();
+    if (supabase) {
+        const { data } = await supabase.from('users').select('*').eq('email', normalized).maybeSingle();
+        return data || null;
+    }
+    return findUserByEmail(normalized) || null;
+}
+
+// POST /api/auth/verify-signup { email, code } — verifies the signup code, sends welcome email.
+async function verifySignup(req, res) {
+    try {
+        const email = String(req.body?.email || '').trim().toLowerCase();
+        const code = String(req.body?.code || '').trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ success: false, error: 'A valid email address is required.', code: 'INVALID_EMAIL' });
+        }
+        const user = await findUserRowByEmail(email);
+        if (!user) return res.status(400).json({ success: false, error: 'No account found for this email.', code: 'NO_ACCOUNT' });
+        const row = await consumeAuthCode(email, 'signup_code', code);
+        if (!row) return res.status(400).json({ success: false, error: 'Invalid or expired code.', code: 'INVALID_CODE' });
+        if (RESEND_API_KEY) {
+            const tpl = emailService.welcomeEmail({ name: user.name });
+            emailService.sendEmail({ to: email, subject: tpl.subject, html: tpl.html, text: tpl.text })
+                .catch(err => console.error('[RESEND DISPATCH ERROR]', err));
+        }
+        return res.json({ success: true, message: 'Email verified. Welcome to Creator Cash Flow!' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, error: 'Server error during verification.', code: 'VERIFY_ERROR' });
+    }
+}
+
+// POST /api/auth/forgot-password { email } — always 202; sends a reset code if the account exists.
+async function forgotPassword(req, res) {
+    try {
+        const email = String(req.body?.email || '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ success: false, error: 'A valid email address is required.', code: 'INVALID_EMAIL' });
+        }
+        const user = await findUserRowByEmail(email);
+        if (user && RESEND_API_KEY) {
+            const code = await createAuthCode(email, 'password_reset', RESET_CODE_TTL_MIN);
+            const tpl = emailService.passwordResetEmail({
+                name: user.name,
+                code,
+                resetUrl: `${process.env.APP_ORIGIN || 'https://creatorcashflow.co.za'}/index.html`
+            });
+            emailService.sendEmail({ to: email, subject: tpl.subject, html: tpl.html, text: tpl.text })
+                .catch(err => console.error('[RESEND DISPATCH ERROR]', err));
+        }
+        return res.status(202).json({ success: true, message: 'If an account exists for this email, a reset code is on its way.' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, error: 'Server error during password reset request.', code: 'RESET_REQUEST_ERROR' });
+    }
+}
+
+// POST /api/auth/reset-password { email, code, password } — consumes the code and sets a new password.
+async function resetPassword(req, res) {
+    try {
+        const email = String(req.body?.email || '').trim().toLowerCase();
+        const code = String(req.body?.code || '').trim();
+        const password = req.body?.password;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ success: false, error: 'A valid email address is required.', code: 'INVALID_EMAIL' });
+        }
+        if (typeof password !== 'string' || password.length < 8 || password.length > 128) {
+            return res.status(400).json({ success: false, error: 'Password must be between 8 and 128 characters.', code: 'INVALID_PASSWORD_LENGTH' });
+        }
+        const user = await findUserRowByEmail(email);
+        if (!user) return res.status(400).json({ success: false, error: 'Invalid or expired code.', code: 'INVALID_CODE' });
+        const row = await consumeAuthCode(email, 'password_reset', code);
+        if (!row) return res.status(400).json({ success: false, error: 'Invalid or expired code.', code: 'INVALID_CODE' });
+        const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        if (supabase) {
+            const { error } = await supabase.from('users').update({ password_hash: passwordHash }).eq('id', user.id);
+            if (error) throw error;
+        }
+        const memUser = findUserByEmail(email);
+        if (memUser) { memUser.passwordHash = passwordHash; memUser.password_hash = passwordHash; }
+        return res.json({ success: true, message: 'Password updated. You can sign in with your new password.' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, error: 'Server error during password reset.', code: 'RESET_ERROR' });
+    }
+}
+
 module.exports = {
     signup,
-    login
+    login,
+    verifySignup,
+    forgotPassword,
+    resetPassword
 };

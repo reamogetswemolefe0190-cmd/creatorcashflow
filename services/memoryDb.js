@@ -24,6 +24,7 @@ const memoryDb = {
     users: [],
     usersByEmail: new Map(),
     usersById: new Map(),
+    auth_codes: [],
     transactions: [],
     transactionsByUserId: {},
     transactionIdsSet: new Set(),

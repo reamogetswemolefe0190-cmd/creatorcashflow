@@ -15,4 +15,9 @@ router.post('/register', authRateLimiter, validateSignup, authController.signup)
 // User Login
 router.post('/login', authRateLimiter, validateLogin, authController.login);
 
+// Email verification code (sent by /signup) & password reset code flow
+router.post('/verify-signup', authRateLimiter, authController.verifySignup);
+router.post('/forgot-password', authRateLimiter, authController.forgotPassword);
+router.post('/reset-password', authRateLimiter, authController.resetPassword);
+
 module.exports = router;

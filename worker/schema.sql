@@ -273,3 +273,16 @@ CREATE TABLE IF NOT EXISTS campaign_brand_requests (
 );
 CREATE INDEX IF NOT EXISTS idx_campaign_brand_requests_org ON campaign_brand_requests(brand_organization_id, status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_campaign_brand_one_pending ON campaign_brand_requests(campaign_id) WHERE status = 'pending';
+
+-- One-time auth codes (signup verification + password reset). See migrations/0002_auth_codes.sql
+CREATE TABLE IF NOT EXISTS auth_codes (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  purpose TEXT NOT NULL CHECK (purpose IN ('signup_code', 'password_reset')),
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_auth_codes_email_purpose ON auth_codes(email, purpose);

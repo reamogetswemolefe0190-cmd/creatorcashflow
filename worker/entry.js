@@ -45,6 +45,10 @@ export default {
         const url = new URL(request.url);
         const path = url.pathname;
 
+        // Fire-and-forget promises (e.g. emails) must survive the response:
+        // register them with waitUntil or the isolate freezes before they finish.
+        globalThis.__CCF_WAITUNTIL__ = (p) => { try { ctx.waitUntil(p); } catch (_) {} };
+
         if (BLOCKED_PATH.test(path)) {
             return new Response('Not found', { status: 404 });
         }
