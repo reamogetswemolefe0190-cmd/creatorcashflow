@@ -333,10 +333,10 @@ const DEMO_TELEMETRY = [
 ];
 
 window.loadDemoData = function() {
-    state.creators = JSON.parse(JSON.stringify(DEMO_CREATORS));
-    state.metrics = JSON.parse(JSON.stringify(DEMO_METRICS));
-    state.auditLogs = JSON.parse(JSON.stringify(DEMO_AUDIT));
-    state.telemetry = JSON.parse(JSON.stringify(DEMO_TELEMETRY));
+    state.creators = structuredClone(DEMO_CREATORS);
+    state.metrics = structuredClone(DEMO_METRICS);
+    state.auditLogs = structuredClone(DEMO_AUDIT);
+    state.telemetry = structuredClone(DEMO_TELEMETRY);
     
     document.getElementById('metric-total-creators').textContent = state.metrics.totalCreators;
     document.getElementById('metric-gpv').textContent = formatZAR(state.metrics.gpvZar);
@@ -353,7 +353,7 @@ window.loadDemoData = function() {
 
 window.resetZeroBaseline = function() {
     state.creators = [];
-    state.metrics = JSON.parse(JSON.stringify(EMPTY_METRICS));
+    state.metrics = structuredClone(EMPTY_METRICS);
     state.auditLogs = [];
     state.telemetry = [];
     
