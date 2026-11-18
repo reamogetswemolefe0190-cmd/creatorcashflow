@@ -20,6 +20,13 @@ async function getExpressApp(env) {
             globalThis.__CCF_KV__ = env.KV;
             globalThis.__CCF_R2__ = env.ASSETS_BUCKET;
             globalThis.__CCF_ASSETS__ = env.ASSETS;
+            // config/env.js and controllers read process.env; surface string
+            // bindings (vars + secrets) there before the app modules load.
+            for (const [key, value] of Object.entries(env)) {
+                if (typeof value === 'string' && process.env[key] === undefined) {
+                    process.env[key] = value;
+                }
+            }
             const { app } = require('../server');
             return app;
         })().catch((err) => {
