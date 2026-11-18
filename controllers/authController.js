@@ -30,7 +30,7 @@ async function signup(req, res) {
         }
         const effectiveOrgName = organization_name || organizationName || '';
         const orgName = typeof effectiveOrgName === 'string' ? effectiveOrgName.trim().slice(0, 120) : '';
-        if (role !== 'creator' && orgName.length < 2) return res.status(400).json({ error: 'Organisation name is required for an agency or brand account.' });
+        if (role !== 'creator' && orgName.length < 2) return res.status(400).json({ error: 'Organization name is required for an agency or brand account.' });
 
         const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
         const userId = 'usr_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');

@@ -1035,17 +1035,17 @@ function setupAuthModalTrigger() {
 function openAccountAuthModal() {
     openModal('Authentication', `
         <div class="flex gap-sm p-xs bg-surface border border-white/[0.08] rounded-2xl mb-lg">
-            <button class="flex-1 font-label-lg py-sm rounded-xl bg-white text-black shadow-sm" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
-            <button class="flex-1 font-label-lg py-sm rounded-xl text-text-secondary hover:text-white" id="auth-tab-login" onclick="switchAuthTab('login')">Sign In</button>
+            <button class="flex-1 font-label-lg py-sm rounded-xl bg-white text-black shadow-sm" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create account</button>
+            <button class="flex-1 font-label-lg py-sm rounded-xl text-text-secondary hover:text-white" id="auth-tab-login" onclick="switchAuthTab('login')">Sign in</button>
         </div>
 
         <div id="auth-signup-fields" class="space-y-md">
             <div class="space-y-xs text-left">
-                <label class="text-xs text-text-secondary font-bold uppercase">Full Creator Name</label>
+                <label class="text-xs text-text-secondary font-bold uppercase">Full name</label>
                 <input type="text" id="reg-name" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="e.g. Thabo Ndlovu">
             </div>
             <div class="space-y-xs text-left">
-                <label class="text-xs text-text-secondary font-bold uppercase">Email Address</label>
+                <label class="text-xs text-text-secondary font-bold uppercase">Email address</label>
                 <input type="email" id="reg-email" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="creator@creatorcashflow.co.za">
             </div>
             <div class="space-y-xs text-left">
@@ -1053,13 +1053,13 @@ function openAccountAuthModal() {
                 <input type="password" id="reg-pass" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="••••••••••••">
             </div>
             <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeCreateAccount()">
-                Create Creator Account
+                Create account
             </button>
         </div>
 
         <div id="auth-login-fields" class="space-y-md hidden">
             <div class="space-y-xs text-left">
-                <label class="text-xs text-text-secondary font-bold uppercase">Email Address</label>
+                <label class="text-xs text-text-secondary font-bold uppercase">Email address</label>
                 <input type="email" id="login-email" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="creator@creatorcashflow.co.za">
             </div>
             <div class="space-y-xs text-left">
@@ -1067,7 +1067,7 @@ function openAccountAuthModal() {
                 <input type="password" id="login-pass" class="w-full px-md py-sm rounded-xl border border-white/[0.08] bg-background text-white focus:border-accent-emerald focus:ring-0" placeholder="••••••••••••">
             </div>
             <button class="w-full bg-white text-black font-bold font-label-lg py-md rounded-xl shadow-lg active:scale-95 transition-transform mt-lg" onclick="executeLogin()">
-                Sign In To OS
+                Sign in
             </button>
         </div>
     `);
@@ -1728,7 +1728,7 @@ async function executeOnboardingLogin() {
     }
 
     if (loginBtn) {
-        loginBtn.innerText = 'Signing In...';
+        loginBtn.innerText = 'Signing in…';
         loginBtn.disabled = true;
     }
 

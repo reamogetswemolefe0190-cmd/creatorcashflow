@@ -23,7 +23,7 @@ window.CCFReports = (() => {
     function render() {
         const { root, campaigns, role } = context;
         if (!campaigns.length) {
-            root.innerHTML = `<div class="ccf-reports"><div class="ccf-reports-head"><span class="cc-kicker">Campaign records</span><h1>Campaign reports</h1><p>Reports become available when a campaign is linked to your organisation.</p></div></div>`;
+            root.innerHTML = `<div class="ccf-reports"><div class="ccf-reports-head"><span class="cc-kicker">Campaign records</span><h1>Campaign reports</h1><p>Reports become available when a campaign is linked to your organization.</p></div></div>`;
             return;
         }
         selectedCampaign = campaigns.some(c => c.id === selectedCampaign) ? selectedCampaign : campaigns[0].id;
@@ -33,7 +33,7 @@ window.CCFReports = (() => {
             <div class="ccf-report-panel"><label for="ccf-report-campaign">Campaign</label><select id="ccf-report-campaign">${campaigns.map(c => `<option value="${escape(c.id)}" ${c.id === selectedCampaign ? 'selected' : ''}>${escape(c.name)}</option>`).join('')}</select></div>
             ${role === 'agency' ? `<form id="ccf-report-form" class="ccf-report-panel">
                 <div class="ccf-report-panel-head"><div><span class="cc-kicker">Prepare a snapshot</span><h2>Create a report</h2></div><span class="ccf-report-badge">Agency review</span></div>
-                <p id="ccf-report-sharing-note">Review the summary and results before creating. ${linkedBrand ? 'The linked brand can download the client version after you save it.' : 'An agency PDF is available now. Brand access requires a linked brand organisation.'}</p>
+                <p id="ccf-report-sharing-note">Review the summary and results before creating. ${linkedBrand ? 'The linked brand can download the client version after you save it.' : 'An agency PDF is available now. Brand access requires a linked brand organization.'}</p>
                 <div class="ccf-report-section-intro"><span class="cc-kicker">01 / The story</span><h3>Give the results context</h3><p>Write for a client seeing this campaign for the first time. Distinguish what happened from what the numbers suggest.</p></div>
                 <label>Campaign objective <span class="ccf-report-required">Required</span><textarea name="objective" rows="2" minlength="15" maxlength="800" required placeholder="What was the campaign trying to achieve for the brand?"></textarea></label>
                 <label>Success measure or benchmark <span class="ccf-report-private">Optional</span><textarea name="successMeasure" rows="2" maxlength="500" placeholder="What agreed target or previous result should this be compared with? Leave blank if none exists."></textarea></label>
@@ -55,7 +55,7 @@ window.CCFReports = (() => {
             const note = root.querySelector('#ccf-report-sharing-note');
             if (note) note.textContent = context.campaigns.find(c => c.id === selectedCampaign)?.brand_organization_id
                 ? 'Review the summary and results before creating. The linked brand can download the client version after you save it.'
-                : 'Review the summary and results before creating. An agency PDF is available now. Brand access requires a linked brand organisation.';
+                : 'Review the summary and results before creating. An agency PDF is available now. Brand access requires a linked brand organization.';
             loadList();
         });
         if (role === 'agency') {
@@ -118,7 +118,7 @@ window.CCFReports = (() => {
             form.reset();
             status.textContent = context.campaigns.find(c => c.id === selectedCampaign)?.brand_organization_id
                 ? 'Report saved. The linked brand can now download its version.'
-                : 'Agency report saved. Link a brand organisation to give its team access to the client version.';
+                : 'Agency report saved. Link a brand organization to give its team access to the client version.';
             await loadList();
         } catch (error) { status.textContent = error.message; }
         finally { button.disabled = false; }

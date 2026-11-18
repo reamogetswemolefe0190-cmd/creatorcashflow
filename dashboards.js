@@ -190,7 +190,7 @@
     function renderCampaigns() {
         const campaigns = state.workspace?.campaigns || [];
         const agencyOrgs = (state.workspace?.organizations || []).filter(org => org.type === 'agency');
-        const createForm = user.role === 'agency' ? `<section class="cd-create"><div><h2>Start a campaign</h2><p>A clear brief gives every participant the same starting point. You can add the creator and brand after creation.</p></div><form id="agency-create-campaign" class="cd-create-form"><label>Campaign name<input name="name" required minlength="2" maxlength="160" autocomplete="off"></label><label>Brief<textarea name="brief" maxlength="4000" rows="4" placeholder="What needs to be made, by whom, and for when?"></textarea></label><div class="cd-form-pair"><label>Agreed creator fee (ZAR)<input name="fixedFee" type="number" min="0" step="0.01" value="0"></label><label>Agency<select name="organizationId" required>${agencyOrgs.map(org => `<option value="${escape(org.id)}">${escape(org.name)}</option>`).join('')}</select></label></div><button class="cc-btn cc-primary" type="submit" ${agencyOrgs.length ? '' : 'disabled'}>Create campaign</button><p id="campaign-create-status" role="status" aria-live="polite"></p>${agencyOrgs.length ? '' : '<p>Create an agency organisation before starting a campaign.</p>'}</form></section>` : '';
+        const createForm = user.role === 'agency' ? `<section class="cd-create"><div><h2>Start a campaign</h2><p>A clear brief gives every participant the same starting point. You can add the creator and brand after creation.</p></div><form id="agency-create-campaign" class="cd-create-form"><label>Campaign name<input name="name" required minlength="2" maxlength="160" autocomplete="off"></label><label>Brief<textarea name="brief" maxlength="4000" rows="4" placeholder="What needs to be made, by whom, and for when?"></textarea></label><div class="cd-form-pair"><label>Agreed creator fee (ZAR)<input name="fixedFee" type="number" min="0" step="0.01" value="0"></label><label>Agency<select name="organizationId" required>${agencyOrgs.map(org => `<option value="${escape(org.id)}">${escape(org.name)}</option>`).join('')}</select></label></div><button class="cc-btn cc-primary" type="submit" ${agencyOrgs.length ? '' : 'disabled'}>Create campaign</button><p id="campaign-create-status" role="status" aria-live="polite"></p>${agencyOrgs.length ? '' : '<p>Create an agency organization before starting a campaign.</p>'}</form></section>` : '';
         const a = aggregates();
         return pageHead('Campaigns', `${campaigns.length} total`, '')
             + kpiStrip([
@@ -267,7 +267,7 @@
                 { label: 'Creator assignments', value: assignments.length, base: 'active' },
                 { label: 'Accepted', value: assignments.filter(a => a.consent_status === 'accepted').length, base: 'of ' + assignments.length + ' assigned' },
                 { label: 'Pending invitations', value: pendingCount, base: 'awaiting reply', warn: pendingCount > 0 },
-                { label: 'Agency organisations', value: agencyOrgs.length, base: 'in workspace' }
+                { label: 'Agency organizations', value: agencyOrgs.length, base: 'in workspace' }
             ])
             + `${inviteSection}
         <section class="cd-all-campaigns">

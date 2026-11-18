@@ -71,7 +71,7 @@ async function createOrganization(req, res) {
     try {
         const name = clean(req.body?.name, 120);
         const type = clean(req.body?.type, 20).toLowerCase();
-        if (name.length < 2 || !['agency', 'brand'].includes(type)) return res.status(400).json({ error: 'A valid organisation name and type are required.' });
+        if (name.length < 2 || !['agency', 'brand'].includes(type)) return res.status(400).json({ error: 'A valid organization name and type are required.' });
         const organization = await insert('organizations', { id: id('org'), name, type, created_by: req.user.id, created_at: new Date().toISOString() });
         await insert('organization_members', { organization_id: organization.id, user_id: req.user.id, role: 'owner', status: 'active', created_at: new Date().toISOString() });
         return res.status(201).json({ organization });
@@ -99,7 +99,7 @@ async function inviteMember(req, res) {
         } else {
             org = memoryDb.organizations.find(o => o.id === req.params.organizationId);
         }
-        if (!org) return res.status(404).json({ error: 'Organisation not found.' });
+        if (!org) return res.status(404).json({ error: 'Organization not found.' });
 
         const invitationId = id('inv');
         const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();

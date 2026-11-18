@@ -199,7 +199,7 @@ const state = {
 
                         <div class="cc-login-form">
                             <div class="cc-kicker">Welcome back</div>
-                            <h2>Let’s get to work.</h2>
+                            <h2>See it in action.</h2>
                             <p class="cc-small">Select a demo persona. This is not an account sign-in.</p>
 
                             <label class="cc-field">

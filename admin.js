@@ -625,7 +625,7 @@ async function handleMutationSubmit(e) {
     const btn = document.getElementById('submit-mutation-btn');
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span class="animate-pulse">Signing & Saving...</span>';
+        btn.innerHTML = '<span class="animate-pulse">Saving…</span>';
     }
 
     const payload = {
