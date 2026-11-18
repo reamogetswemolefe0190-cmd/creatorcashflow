@@ -97,7 +97,11 @@ app.use(corsErrorHandler);
 
 // Body Parsing & Static Asset Serving
 app.use(express.json());
-app.use(express.static(__dirname));
+// Inside the Cloudflare Worker, static files are served by the ASSETS binding
+// (worker/entry.js), not express.static — there is no filesystem to read.
+if (typeof __dirname !== 'undefined' && !globalThis.__CCF_D1__) {
+    app.use(express.static(__dirname));
+}
 
 // ==========================================================================
 // API ROUTE MOUNTING & ENDPOINT DECLARATIONS

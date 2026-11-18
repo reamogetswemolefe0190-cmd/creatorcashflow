@@ -15,6 +15,7 @@ const {
 async function getHealth(req, res) {
     const mem = process.memoryUsage();
     const dbPing = await pingSupabase();
+    const dbLabel = globalThis.__CCF_D1__ ? "Cloudflare D1 (SQLite)" : (supabase ? "Supabase Cloud PostgreSQL" : "Memory Backup");
 
     const isHealthy = dbPing.status === 'connected' || dbPing.status === 'memory_fallback';
 
@@ -25,9 +26,9 @@ async function getHealth(req, res) {
         version: "3.0.0",
         timestamp: new Date().toISOString(),
         uptimeSeconds: Math.floor(process.uptime()),
-        database: supabase ? "Supabase Cloud PostgreSQL" : "Memory Backup",
+        database: dbLabel,
         databaseDetails: {
-            provider: supabase ? "Supabase Cloud PostgreSQL" : "Memory Backup",
+            provider: dbLabel,
             status: dbPing.status,
             latencyMs: dbPing.latencyMs,
             ...(dbPing.error ? { error: dbPing.error } : {})

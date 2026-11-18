@@ -1,0 +1,29 @@
+# Workers assets ignore (gitignore syntax). Keeps code/config/tooling out of the upload.
+# All dotfiles and dot-directories (.git, .wrangler, .video-tools, .env, ...)
+.*
+node_modules/
+worker/
+tests/
+test_*.js
+test_*.cjs
+stress_*
+tmp/
+uploads/
+tasks/
+videos/
+output/
+docs/
+sites/
+netlify/
+migrations/
+database_setup.sql
+package.json
+package-lock.json
+server.js
+Dockerfile
+*.md
+*.py
+*.cjs
+vercel.json
+netlify.toml
+CNAME

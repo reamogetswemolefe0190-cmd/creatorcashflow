@@ -7,17 +7,19 @@ const multer = require('multer');
 const { supabase } = require('./supabase');
 
 const BUCKET_NAME = 'campaign-assets';
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOADS_DIR = typeof __dirname !== 'undefined' ? path.join(__dirname, '..', 'uploads') : '/uploads';
 
-// Ensure local uploads directory exists for fallback
-if (!fs.existsSync(UPLOADS_DIR)) {
+// Ensure local uploads directory exists for fallback (skipped inside the
+// Cloudflare Worker, where the fs is unavailable; R2 handles uploads there)
+const IS_WORKER = !!globalThis.__CCF_D1__;
+if (!IS_WORKER && !fs.existsSync(UPLOADS_DIR)) {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 // Ensure Supabase bucket exists if connected
 let bucketChecked = false;
 async function ensureBucket() {
-    if (!supabase || bucketChecked) return;
+    if (!supabase || !supabase.storage || bucketChecked) return;
     try {
         const { data: buckets, error } = await supabase.storage.listBuckets();
         if (error) {
@@ -81,7 +83,7 @@ async function uploadAsset({ buffer, originalName, mimeType, folder = 'general' 
     const randomSuffix = crypto.randomBytes(4).toString('hex');
     const storagePath = `${folder}/${Date.now()}_${randomSuffix}_${cleanBase}${cleanExt}`;
 
-    if (supabase) {
+    if (supabase && supabase.storage) {
         try {
             const { data, error } = await supabase.storage
                 .from(BUCKET_NAME)
@@ -111,7 +113,10 @@ async function uploadAsset({ buffer, originalName, mimeType, folder = 'general' 
         }
     }
 
-    // Local Disk Fallback
+    // Local Disk Fallback (unavailable inside the Cloudflare Worker until the R2 phase)
+    if (IS_WORKER) {
+        throw new Error('Asset storage is not configured in this runtime (R2 phase pending)');
+    }
     const localTargetDir = path.join(UPLOADS_DIR, folder);
     if (!fs.existsSync(localTargetDir)) {
         fs.mkdirSync(localTargetDir, { recursive: true });

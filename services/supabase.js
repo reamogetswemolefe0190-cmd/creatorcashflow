@@ -18,7 +18,13 @@ const bcrypt = require('./bcrypt');
 
 let supabase = null;
 
-if (!isStressTest && SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key') {
+// Cloudflare Worker runtime: the worker entry sets globalThis.__CCF_D1__ = env.DB
+// before requiring server.js, so every controller transparently talks to D1.
+if (globalThis.__CCF_D1__) {
+    const { createD1Client } = require('./d1Client');
+    supabase = createD1Client(globalThis.__CCF_D1__);
+    console.log('Connected to Cloudflare D1 (SQLite)');
+} else if (!isStressTest && SUPABASE_URL && SUPABASE_KEY && SUPABASE_KEY !== 'your-supabase-anon-key') {
     supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('🔌 Connected to Supabase Cloud Database: ' + SUPABASE_URL);
 } else {

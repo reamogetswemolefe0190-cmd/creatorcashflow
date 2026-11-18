@@ -12,7 +12,10 @@
     "test:demo-request": "node tests/demo_request_test.cjs",
     "test:ui": "node tests/instagram_ui_test.cjs",
     "test:admin": "node test_admin_auth.js && node test_admin_metrics.js && node test_admin_m3.js && node test_admin_ui.js",
-    "test:stress": "node stress_harness.js --concurrency 150 --duration 15"
+    "test:stress": "node stress_harness.js --concurrency 150 --duration 15",
+    "dev:cf": "wrangler dev",
+    "d1:schema:local": "wrangler d1 execute DB --local --file=worker/schema.sql",
+    "d1:query:local": "wrangler d1 execute DB --local --command"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
@@ -27,6 +30,11 @@
     "pdfkit": "^0.20.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "wrangler": "^4.164.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261117.1": true
   }
 }
