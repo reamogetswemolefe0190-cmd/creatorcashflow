@@ -7,10 +7,9 @@ const jwt = require('jsonwebtoken');
 const {
     JWT_SECRET,
     BCRYPT_ROUNDS,
-    RESEND_API_KEY,
-    RESEND_API_URL,
-    FROM_EMAIL
+    RESEND_API_KEY
 } = require('../config/env');
+const emailService = require('../services/emailService');
 const bcrypt = require('../services/bcrypt');
 const { supabase } = require('../services/supabase');
 const { memoryDb, findUserByEmail } = require('../services/memoryDb');
@@ -115,21 +114,9 @@ async function signup(req, res) {
 
         if (RESEND_API_KEY) {
             console.log('[RESEND] Sending account welcome email');
-            fetch(`${RESEND_API_URL}/emails`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${RESEND_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    from: FROM_EMAIL,
-                    to: email.toLowerCase(),
-                    subject: 'Welcome to Creator Cash Flow',
-                    text: 'Welcome to Creator Cash Flow. Your account has been created. For support, contact reamogetswemolefe@creatorcashflow.co.za. This email does not verify ownership of your email address.'
-                })
-            }).catch(err => {
-                console.error('[RESEND DISPATCH ERROR]', err);
-            });
+            const tpl = emailService.welcomeEmail({ name });
+            emailService.sendEmail({ to: email.toLowerCase(), subject: tpl.subject, html: tpl.html, text: tpl.text })
+                .catch(err => console.error('[RESEND DISPATCH ERROR]', err));
         }
 
         res.status(201).json({

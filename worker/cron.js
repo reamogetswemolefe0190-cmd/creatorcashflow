@@ -13,32 +13,17 @@
 // Money is never moved by cron: nudges/reports only (per the payments decision).
 // ==========================================================================
 
+const emailService = require('../services/emailService');
+
 function nowIso() { return new Date().toISOString(); }
 function appOrigin() { return process.env.APP_ORIGIN || 'http://127.0.0.1:5001'; }
 function newId(prefix) {
     return `${prefix}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
-async function sendEmail({ to, subject, html }) {
-    const key = process.env.RESEND_API_KEY;
-    const from = process.env.FROM_EMAIL || 'Creator Cash Flow <onboarding@resend.dev>';
-    const base = process.env.RESEND_API_URL || 'https://api.resend.com';
-    if (!key) {
-        console.log('[CRON] email skipped (no RESEND_API_KEY):', subject, '->', to);
-        return false;
-    }
-    try {
-        const r = await fetch(`${base}/emails`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from, to, subject, html })
-        });
-        if (!r.ok) console.warn('[CRON] email send failed:', r.status, (await r.text().catch(() => '')).slice(0, 200));
-        return r.ok;
-    } catch (err) {
-        console.warn('[CRON] email error:', err.message);
-        return false;
-    }
+async function sendEmail({ to, subject, html, text }) {
+    const r = await emailService.sendEmail({ to, subject, html, text });
+    return r.ok;
 }
 
 async function audit(db, actionType, newValue) {
@@ -48,13 +33,7 @@ async function audit(db, actionType, newValue) {
     ).bind(newId('log'), actionType, newValue, nowIso()).run();
 }
 
-function esc(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function emailShell(inner) {
-    return `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #100e13; background-color: #ffffff;">${inner}</div>`;
-}
+const esc = emailService.esc;
 
 async function expireInvitations(db) {
     const res = await db.prepare(
@@ -85,20 +64,10 @@ async function dueDateNudges(db, kv, now) {
         const dedupKey = `cron:nudge-due:${r.id}`;
         if (await kv.get(dedupKey)) continue;
         const due = new Date(r.due_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Johannesburg' });
-        await sendEmail({
-            to: r.creator_email,
-            subject: `Due soon: ${r.title} — ${r.campaign_name}`,
-            html: emailShell(`
-                <h1 style="font-size: 20px; margin: 0 0 12px;">A deliverable is due soon</h1>
-                <p style="font-size: 15px; line-height: 1.6;">Hi ${esc(r.creator_name)},</p>
-                <p style="font-size: 15px; line-height: 1.6;"><strong>${esc(r.title)}</strong> in campaign
-                <strong>${esc(r.campaign_name)}</strong> is due <strong>${esc(due)}</strong> and is still marked
-                “${esc(r.status)}”. Open the workspace to submit or update it:</p>
-                <p style="margin: 24px 0;"><a href="${appOrigin()}/campaign.html?id=${encodeURIComponent(r.campaign_id)}"
-                    style="background: #ff5b00; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 999px; font-weight: 600;">Open campaign</a></p>
-                <p style="font-size: 13px; color: #6b6b6b;">Creator Cash Flow — automated nudge, no reply needed.</p>
-            `)
+        const tpl = emailService.dueSoonEmail({
+            creatorName: r.creator_name, title: r.title, campaignName: r.campaign_name, due, campaignId: r.campaign_id
         });
+        await sendEmail({ to: r.creator_email, subject: tpl.subject, html: tpl.html, text: tpl.text });
         await kv.put(dedupKey, '1', { expirationTtl: 72 * 3600 });
         sent++;
     }
@@ -123,20 +92,10 @@ async function staleReviewNudges(db, kv, now) {
         if (r.last_event_at && r.last_event_at >= cutoff) continue;
         const dedupKey = `cron:nudge-review:${r.id}`;
         if (await kv.get(dedupKey)) continue;
-        await sendEmail({
-            to: r.manager_email,
-            subject: `Needs a decision: ${r.title} — ${r.campaign_name}`,
-            html: emailShell(`
-                <h1 style="font-size: 20px; margin: 0 0 12px;">A draft needs a decision</h1>
-                <p style="font-size: 15px; line-height: 1.6;">Hi ${esc(r.manager_name)},</p>
-                <p style="font-size: 15px; line-height: 1.6;"><strong>${esc(r.title)}</strong> in campaign
-                <strong>${esc(r.campaign_name)}</strong> has been waiting in “${esc(r.status)}” for over 3 days.
-                Approve it or request changes:</p>
-                <p style="margin: 24px 0;"><a href="${appOrigin()}/campaign.html?id=${encodeURIComponent(r.campaign_id)}"
-                    style="background: #ff5b00; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 999px; font-weight: 600;">Review draft</a></p>
-                <p style="font-size: 13px; color: #6b6b6b;">Creator Cash Flow — automated nudge, no reply needed.</p>
-            `)
+        const tpl = emailService.needsDecisionEmail({
+            managerName: r.manager_name, title: r.title, campaignName: r.campaign_name, status: r.status, campaignId: r.campaign_id
         });
+        await sendEmail({ to: r.manager_email, subject: tpl.subject, html: tpl.html, text: tpl.text });
         await kv.put(dedupKey, '1', { expirationTtl: 72 * 3600 });
         sent++;
     }
@@ -161,20 +120,10 @@ async function reportOnPublish(db, kv, now) {
     for (const r of results || []) {
         const dedupKey = `cron:report-publish:${r.campaign_id}:${day}`;
         if (await kv.get(dedupKey)) continue;
-        await sendEmail({
-            to: r.manager_email,
-            subject: `Report due: ${r.campaign_name} had ${r.published_count} deliverable(s) published`,
-            html: emailShell(`
-                <h1 style="font-size: 20px; margin: 0 0 12px;">Time to report back</h1>
-                <p style="font-size: 15px; line-height: 1.6;">Hi ${esc(r.manager_name)},</p>
-                <p style="font-size: 15px; line-height: 1.6;">${r.published_count} deliverable(s) in
-                <strong>${esc(r.campaign_name)}</strong> were published in the last 24 hours. Draft the campaign
-                report while the results are fresh:</p>
-                <p style="margin: 24px 0;"><a href="${appOrigin()}/campaign.html?id=${encodeURIComponent(r.campaign_id)}"
-                    style="background: #ff5b00; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 999px; font-weight: 600;">Open campaign</a></p>
-                <p style="font-size: 13px; color: #6b6b6b;">Creator Cash Flow — automated nudge, no reply needed.</p>
-            `)
+        const tpl = emailService.reportDueEmail({
+            managerName: r.manager_name, campaignName: r.campaign_name, publishedCount: r.published_count, campaignId: r.campaign_id
         });
+        await sendEmail({ to: r.manager_email, subject: tpl.subject, html: tpl.html, text: tpl.text });
         await kv.put(dedupKey, '1', { expirationTtl: 48 * 3600 });
         sent++;
     }

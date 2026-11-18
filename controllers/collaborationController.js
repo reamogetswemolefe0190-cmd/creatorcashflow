@@ -4,7 +4,8 @@ const crypto = require('crypto');
 const { supabase } = require('../services/supabase');
 const { memoryDb, findUserByEmail } = require('../services/memoryDb');
 const { sanitizeString } = require('../middleware/validation');
-const { RESEND_API_KEY, RESEND_API_URL, FROM_EMAIL } = require('../config/env');
+const { RESEND_API_KEY } = require('../config/env');
+const emailService = require('../services/emailService');
 
 const id = prefix => `${prefix}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
 const clean = (value, max = 160) => sanitizeString(String(value || '')).slice(0, max);
@@ -130,52 +131,15 @@ async function inviteMember(req, res) {
                     brand_viewer: 'Brand Reviewer'
                 };
                 const displayRole = roleLabels[role] || role;
-                const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-                const response = await fetch(`${RESEND_API_URL}/emails`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${RESEND_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        from: FROM_EMAIL,
-                        to: email,
-                        subject: `You've been invited to join ${orgName} on Creator Cash Flow`,
-                        html: `
-                            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #100e13; background-color: #ffffff;">
-                                <div style="margin-bottom: 24px;">
-                                    <span style="display: inline-block; background-color: #f2f2f2; color: #ff5b00; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 999px;">Workspace Invitation</span>
-                                </div>
-                                <h1 style="font-size: 24px; font-weight: 600; line-height: 1.25; margin: 0 0 12px; color: #100e13;">
-                                    Join ${escapeHtml(orgName)}
-                                </h1>
-                                <p style="font-size: 15px; line-height: 1.5; color: #444; margin: 0 0 24px;">
-                                    <strong>${escapeHtml(inviterName)}</strong> has invited you to collaborate as a <strong>${escapeHtml(displayRole)}</strong> in their Creator Cash Flow workspace.
-                                </p>
-                                <div style="margin: 28px 0;">
-                                    <a href="${inviteUrl}" style="background-color: #ff5b00; color: #ffffff; padding: 12px 26px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">Accept Invitation &rarr;</a>
-                                </div>
-                                <p style="font-size: 13px; line-height: 1.5; color: #666; margin: 24px 0 0;">
-                                    Or copy and paste this link into your browser:<br/>
-                                    <a href="${inviteUrl}" style="color: #6e2cff; word-break: break-all;">${inviteUrl}</a>
-                                </p>
-                                <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0 20px;" />
-                                <p style="font-size: 12px; color: #888; margin: 0;">
-                                    This invitation link will expire in 7 days. If you were not expecting this invitation, you can safely ignore this email.
-                                </p>
-                            </div>
-                        `,
-                        text: `You've been invited to join ${orgName} on Creator Cash Flow as a ${displayRole} by ${inviterName}.\n\nAccept your invitation here: ${inviteUrl}\n\nThis invitation link will expire in 7 days.`
-                    })
-                });
+                const tpl = emailService.inviteEmail({ orgName, inviterName, roleLabel: displayRole, inviteUrl });
+                const result = await emailService.sendEmail({ to: email, subject: tpl.subject, html: tpl.html, text: tpl.text });
 
-                if (response.ok) {
+                if (result.ok) {
                     delivery = 'sent';
                     console.log(`[RESEND] Invitation email sent to ${email} for org ${orgName}`);
                 } else {
-                    const err = await response.json().catch(() => ({}));
-                    console.error('[RESEND] Failed to send invitation email:', err);
+                    console.error('[RESEND] Failed to send invitation email:', result.status);
                     delivery = 'failed';
                 }
             } catch (sendErr) {

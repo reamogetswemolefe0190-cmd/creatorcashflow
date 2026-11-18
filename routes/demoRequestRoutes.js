@@ -2,7 +2,8 @@
 
 const express = require('express');
 const { createSlidingWindowLimiter } = require('../middleware/rateLimiter');
-const { RESEND_API_KEY, RESEND_API_URL, FROM_EMAIL } = require('../config/env');
+const { RESEND_API_KEY, FROM_EMAIL } = require('../config/env');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 const limitRequests = createSlidingWindowLimiter({
@@ -15,19 +16,6 @@ const limitRequests = createSlidingWindowLimiter({
 
 const demoUrl = process.env.DEMO_PUBLIC_URL || 'https://creatorcashflow.co.za/#journey';
 const requestInbox = process.env.DEMO_REQUEST_INBOX || 'reamogetswemolefe@creatorcashflow.co.za';
-
-async function sendEmail(payload) {
-    const response = await fetch(`${RESEND_API_URL}/emails`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ from: FROM_EMAIL, ...payload }),
-        signal: AbortSignal.timeout(10000)
-    });
-    if (!response.ok) throw new Error(`Demo email provider returned ${response.status}`);
-}
 
 router.post('/', limitRequests, async (req, res) => {
     const name = typeof req.body?.name === 'string' ? req.body.name.trim().replace(/\s+/g, ' ') : '';
@@ -43,17 +31,14 @@ router.post('/', limitRequests, async (req, res) => {
         return res.status(503).json({ error: 'Demo email delivery is not ready yet. Please email us directly.' });
     }
     try {
-        await sendEmail({
-            to: email,
-            subject: 'Your Creator Cash Flow interactive demo',
-            text: `Hi ${name},\n\nHere is your interactive Creator Cash Flow campaign demo: ${demoUrl}\n\nIt uses sample data. Actions in the demo do not notify anyone or move money.\n\nIf you would like to walk through a real campaign with us, reply to this email.\n\nCreator Cash Flow`,
-            reply_to: requestInbox
+        const tpl = emailService.demoRequestEmail({ name, demoUrl });
+        const result = await emailService.sendEmail({
+            to: email, subject: tpl.subject, html: tpl.html, text: tpl.text, replyTo: requestInbox
         });
-        sendEmail({
-            to: requestInbox,
-            subject: 'New CCF demo request',
-            text: `A visitor requested the interactive demo.\n\nName: ${name}\nEmail: ${email}\n\nThe demo email was accepted by the email provider.`
-        }).catch(error => console.error('[DEMO REQUEST NOTIFICATION]', error.message));
+        if (!result.ok) throw new Error(`Demo email provider returned ${result.status}`);
+        const note = emailService.demoRequestNotification({ name, email });
+        emailService.sendEmail({ to: requestInbox, subject: note.subject, html: note.html, text: note.text })
+            .catch(error => console.error('[DEMO REQUEST NOTIFICATION]', error.message));
         return res.status(202).json({ message: 'Your interactive demo is on its way. Check your inbox.' });
     } catch (error) {
         console.error('[DEMO REQUEST DELIVERY]', error.message);
