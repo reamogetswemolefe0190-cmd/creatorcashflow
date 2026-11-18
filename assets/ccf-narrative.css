@@ -137,3 +137,6 @@ body.ccf-marketing .public-nav .primary-link{padding:0 26px;font-weight:700}
 /* When GSAP owns the heading words, switch off the CSS heading-arrive animation to avoid a double reveal. */
 .ccf-n-chapter.is-revealed .ccf-n-chapter-copy h2.is-split{animation:none}
 @media(prefers-reduced-motion:reduce){.w-mask{overflow:visible;padding-bottom:0;margin-bottom:0}.w-word{will-change:auto}}
+/* The <picture> source switches to full-page 390x844 mobile screenshots at <=700px;
+   let them render at their natural ratio instead of cropping with a fixed aspect-ratio. */
+@media(max-width:700px){.ccf-n-chapter-visual img{aspect-ratio:auto}}
