@@ -449,7 +449,7 @@ async function getAuditLogs(req, res) {
             const { data, error } = await supabase.from('audit_logs').select('*').order('timestamp', { ascending: false });
             if (!error && data) return res.json(data);
         }
-        const logs = [...(memoryDb.audit_logs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const logs = (memoryDb.audit_logs || []).toSorted((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         return res.json(logs);
     } catch (err) {
         console.error('[ADMIN AUDIT LOGS ERROR]', err);

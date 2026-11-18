@@ -19,7 +19,7 @@
     animations.push(Motion.animate(el, frames, options));
   }
   function bars(order = 'client') {
-    const rows = [...invoices].sort((a,b) => order === 'date' ? a.day-b.day : b.amount-a.amount);
+    const rows = invoices.toSorted((a,b) => order === 'date' ? a.day-b.day : b.amount-a.amount);
     return rows.map(row => `<div class="cc-money-row" data-client="${row.name}">
       <div class="cc-money-label"><span>${row.name}</span><strong>${money(row.amount)}</strong></div>
       <div class="cc-money-track" aria-hidden="true"><span class="cc-money-fill" style="width:${row.amount/18000*100}%"></span></div>

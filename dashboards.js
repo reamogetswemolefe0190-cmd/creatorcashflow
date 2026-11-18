@@ -120,7 +120,7 @@
     }
 
     function renderAgencyOverview() {
-        const campaigns = [...(state.workspace?.campaigns || [])].sort((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
+        const campaigns = (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
         const queue = campaigns.length
             ? campaigns.map(queueRow).join('')
             : '<div class="cd-empty"><h2>Start with one real campaign.</h2><p>Add a brief, then bring in a registered creator and a brand reviewer when the work is ready.</p><button class="cc-btn cc-primary" type="button" data-open-campaigns>Create the first campaign</button></div>';
@@ -133,7 +133,7 @@
 
     function renderBrandOverview() {
         const brandOrg = (state.workspace?.organizations || []).find(org => org.type === 'brand');
-        const campaigns = [...(state.workspace?.campaigns || [])].sort((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
+        const campaigns = (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);
         const requests = state.brandRequests.map(item => `<article class="cd-request"><div><h3>${escape(item.campaign_name)}</h3><p>An agency asked this brand workspace to review the brief and submitted deliverables.</p></div><div class="cd-request-actions"><button class="cc-btn cc-primary" type="button" data-brand-request="${escape(item.id)}" data-brand-decision="accepted">Accept access</button><button class="cc-btn" type="button" data-brand-request="${escape(item.id)}" data-brand-decision="declined">Decline</button></div></article>`).join('');
         return `<header class="cd-page-head"><div><h1>Decisions waiting for your brand</h1><p>Review access and content in the context of the campaign. Nothing outside a shared campaign is visible here.</p></div></header>
             <section class="cd-work-layout" aria-label="Brand review desk"><div class="cd-work-main">
