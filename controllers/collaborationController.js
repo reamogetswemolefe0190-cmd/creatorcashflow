@@ -4,12 +4,26 @@ const crypto = require('crypto');
 const { supabase } = require('../services/supabase');
 const { memoryDb, findUserByEmail } = require('../services/memoryDb');
 const { sanitizeString } = require('../middleware/validation');
+const { RESEND_API_KEY, RESEND_API_URL, FROM_EMAIL } = require('../config/env');
 
 const id = prefix => `${prefix}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
 const clean = (value, max = 160) => sanitizeString(String(value || '')).slice(0, max);
 const isProdUnavailable = res => process.env.NODE_ENV === 'production' && !supabase
     ? (res.status(503).json({ error: 'Campaign collaboration is temporarily unavailable.' }), true)
     : false;
+
+function getAppOrigin(req) {
+    if (process.env.APP_ORIGIN) return process.env.APP_ORIGIN.replace(/\/$/, '');
+    if (process.env.DEMO_PUBLIC_URL) {
+        try {
+            const u = new URL(process.env.DEMO_PUBLIC_URL);
+            return `${u.protocol}//${u.host}`;
+        } catch (_) {}
+    }
+    const host = req.get('x-forwarded-host') || req.get('host') || '127.0.0.1:5000';
+    const proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+    return `${proto}://${host}`;
+}
 
 async function insert(table, row) {
     if (!supabase) { memoryDb[table].push(row); return row; }
@@ -28,6 +42,19 @@ async function campaignById(campaignId) {
     if (!supabase) return memoryDb.campaigns.find(c => c.id === campaignId);
     const { data } = await supabase.from('campaigns').select('*').eq('id', campaignId).maybeSingle();
     return data;
+}
+
+async function canAccessCampaign(campaign, userId) {
+    if (!campaign) return false;
+    if (await membership(campaign.organization_id, userId)) return true;
+    if (campaign.brand_organization_id && await membership(campaign.brand_organization_id, userId)) return true;
+    if (!supabase) return memoryDb.campaign_creators.some(a =>
+        a.campaign_id === campaign.id && a.creator_user_id === userId && a.consent_status === 'accepted');
+    const { data, error } = await supabase.from('campaign_creators')
+        .select('campaign_id').eq('campaign_id', campaign.id).eq('creator_user_id', userId)
+        .eq('consent_status', 'accepted').maybeSingle();
+    if (error) throw error;
+    return Boolean(data);
 }
 
 async function requireManager(req, res, orgId) {
@@ -60,12 +87,282 @@ async function inviteMember(req, res) {
         if (!await requireManager(req, res, req.params.organizationId)) return;
         const email = clean(req.body?.email, 254).toLowerCase();
         const role = clean(req.body?.role, 20).toLowerCase();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['manager', 'analyst', 'creator', 'brand_viewer'].includes(role)) return res.status(400).json({ error: 'A valid email and invitation role are required.' });
-        const invitation = await insert('organization_invitations', { id: id('inv'), organization_id: req.params.organizationId, email, role, invited_by: req.user.id, status: 'pending', expires_at: new Date(Date.now() + 7 * 86400000).toISOString(), accepted_by: null, created_at: new Date().toISOString() });
-        return res.status(201).json({ invitation, delivery: 'pending_email_integration' });
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['manager', 'analyst', 'creator', 'brand_viewer'].includes(role)) {
+            return res.status(400).json({ error: 'A valid email and invitation role are required.' });
+        }
+
+        // Fetch organization name
+        let org = null;
+        if (supabase) {
+            const { data } = await supabase.from('organizations').select('id, name, type').eq('id', req.params.organizationId).maybeSingle();
+            org = data;
+        } else {
+            org = memoryDb.organizations.find(o => o.id === req.params.organizationId);
+        }
+        if (!org) return res.status(404).json({ error: 'Organisation not found.' });
+
+        const invitationId = id('inv');
+        const expiresAt = new Date(Date.now() + 7 * 86400000).toISOString();
+        const invitation = await insert('organization_invitations', {
+            id: invitationId,
+            organization_id: req.params.organizationId,
+            email,
+            role,
+            invited_by: req.user.id,
+            status: 'pending',
+            expires_at: expiresAt,
+            accepted_by: null,
+            created_at: new Date().toISOString()
+        });
+
+        const appOrigin = getAppOrigin(req);
+        const inviteUrl = `${appOrigin}/invite.html?token=${encodeURIComponent(invitationId)}`;
+        const orgName = org.name || 'Workspace';
+        const inviterName = req.user.name || 'A team manager';
+
+        let delivery = 'pending_email_integration';
+        if (RESEND_API_KEY) {
+            try {
+                const roleLabels = {
+                    manager: 'Campaign Manager',
+                    analyst: 'Analyst',
+                    creator: 'Creator',
+                    brand_viewer: 'Brand Reviewer'
+                };
+                const displayRole = roleLabels[role] || role;
+                const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+                const response = await fetch(`${RESEND_API_URL}/emails`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${RESEND_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: FROM_EMAIL,
+                        to: email,
+                        subject: `You've been invited to join ${orgName} on Creator Cash Flow`,
+                        html: `
+                            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #100e13; background-color: #ffffff;">
+                                <div style="margin-bottom: 24px;">
+                                    <span style="display: inline-block; background-color: #f2f2f2; color: #ff5b00; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 999px;">Workspace Invitation</span>
+                                </div>
+                                <h1 style="font-size: 24px; font-weight: 600; line-height: 1.25; margin: 0 0 12px; color: #100e13;">
+                                    Join ${escapeHtml(orgName)}
+                                </h1>
+                                <p style="font-size: 15px; line-height: 1.5; color: #444; margin: 0 0 24px;">
+                                    <strong>${escapeHtml(inviterName)}</strong> has invited you to collaborate as a <strong>${escapeHtml(displayRole)}</strong> in their Creator Cash Flow workspace.
+                                </p>
+                                <div style="margin: 28px 0;">
+                                    <a href="${inviteUrl}" style="background-color: #ff5b00; color: #ffffff; padding: 12px 26px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">Accept Invitation &rarr;</a>
+                                </div>
+                                <p style="font-size: 13px; line-height: 1.5; color: #666; margin: 24px 0 0;">
+                                    Or copy and paste this link into your browser:<br/>
+                                    <a href="${inviteUrl}" style="color: #6e2cff; word-break: break-all;">${inviteUrl}</a>
+                                </p>
+                                <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0 20px;" />
+                                <p style="font-size: 12px; color: #888; margin: 0;">
+                                    This invitation link will expire in 7 days. If you were not expecting this invitation, you can safely ignore this email.
+                                </p>
+                            </div>
+                        `,
+                        text: `You've been invited to join ${orgName} on Creator Cash Flow as a ${displayRole} by ${inviterName}.\n\nAccept your invitation here: ${inviteUrl}\n\nThis invitation link will expire in 7 days.`
+                    })
+                });
+
+                if (response.ok) {
+                    delivery = 'sent';
+                    console.log(`[RESEND] Invitation email sent to ${email} for org ${orgName}`);
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    console.error('[RESEND] Failed to send invitation email:', err);
+                    delivery = 'failed';
+                }
+            } catch (sendErr) {
+                console.error('[RESEND DISPATCH ERROR]', sendErr.message);
+                delivery = 'failed';
+            }
+        }
+
+        return res.status(201).json({
+            success: true,
+            invitation,
+            inviteUrl,
+            delivery
+        });
     } catch (error) {
         console.error('[INVITE MEMBER]', error.message);
         return res.status(503).json({ error: 'The invitation could not be created.' });
+    }
+}
+
+async function listInvitations(req, res) {
+    if (isProdUnavailable(res)) return;
+    try {
+        if (!await requireManager(req, res, req.params.organizationId)) return;
+        if (!supabase) {
+            const list = memoryDb.organization_invitations.filter(i => i.organization_id === req.params.organizationId);
+            return res.json({ invitations: list });
+        }
+        const { data, error } = await supabase.from('organization_invitations')
+            .select('*')
+            .eq('organization_id', req.params.organizationId)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return res.json({ invitations: data || [] });
+    } catch (err) {
+        return res.status(503).json({ error: 'Failed to load invitations.' });
+    }
+}
+
+async function getInvitation(req, res) {
+    if (isProdUnavailable(res)) return;
+    const token = clean(req.params.token, 100);
+    try {
+        let invitation = null;
+        if (!supabase) {
+            invitation = memoryDb.organization_invitations.find(i => i.id === token);
+        } else {
+            const { data, error } = await supabase.from('organization_invitations').select('*').eq('id', token).maybeSingle();
+            if (error) throw error;
+            invitation = data;
+        }
+        if (!invitation) return res.status(404).json({ error: 'Invitation not found or invalid link.' });
+
+        const isExpired = new Date(invitation.expires_at) < new Date();
+        if (isExpired && invitation.status === 'pending') {
+            invitation.status = 'expired';
+            if (supabase) {
+                await supabase.from('organization_invitations').update({ status: 'expired' }).eq('id', token);
+            }
+        }
+
+        let org = null;
+        if (!supabase) {
+            org = memoryDb.organizations.find(o => o.id === invitation.organization_id);
+        } else {
+            const { data } = await supabase.from('organizations').select('id, name, type').eq('id', invitation.organization_id).maybeSingle();
+            org = data;
+        }
+
+        let inviterName = 'A team member';
+        if (!supabase) {
+            const u = memoryDb.users.find(u => u.id === invitation.invited_by);
+            if (u) inviterName = u.name;
+        } else {
+            const { data } = await supabase.from('users').select('name').eq('id', invitation.invited_by).maybeSingle();
+            if (data?.name) inviterName = data.name;
+        }
+
+        return res.json({
+            invitation: {
+                id: invitation.id,
+                email: invitation.email,
+                role: invitation.role,
+                status: invitation.status,
+                expires_at: invitation.expires_at
+            },
+            organization: org ? { id: org.id, name: org.name, type: org.type } : null,
+            inviter: { name: inviterName }
+        });
+    } catch (err) {
+        console.error('[GET INVITATION ERROR]', err.message);
+        return res.status(503).json({ error: 'Failed to retrieve invitation details.' });
+    }
+}
+
+async function acceptInvitation(req, res) {
+    if (isProdUnavailable(res)) return;
+    const token = clean(req.params.token, 100);
+    try {
+        let invitation = null;
+        if (!supabase) {
+            invitation = memoryDb.organization_invitations.find(i => i.id === token);
+        } else {
+            const { data, error } = await supabase.from('organization_invitations').select('*').eq('id', token).maybeSingle();
+            if (error) throw error;
+            invitation = data;
+        }
+        if (!invitation) return res.status(404).json({ error: 'Invitation not found.' });
+
+        if (invitation.status === 'accepted') {
+            return res.status(400).json({ error: 'This invitation has already been accepted.' });
+        }
+        if (invitation.status === 'revoked') {
+            return res.status(400).json({ error: 'This invitation has been revoked.' });
+        }
+        if (new Date(invitation.expires_at) < new Date() || invitation.status === 'expired') {
+            return res.status(400).json({ error: 'This invitation has expired.' });
+        }
+
+        if (req.user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+            return res.status(403).json({
+                error: `This invitation was issued to ${invitation.email}. You are currently signed in as ${req.user.email}.`
+            });
+        }
+
+        if (supabase) {
+            const { data: existingMember } = await supabase.from('organization_members')
+                .select('*')
+                .eq('organization_id', invitation.organization_id)
+                .eq('user_id', req.user.id)
+                .maybeSingle();
+
+            if (!existingMember) {
+                const { error: memberErr } = await supabase.from('organization_members').insert([{
+                    organization_id: invitation.organization_id,
+                    user_id: req.user.id,
+                    role: invitation.role,
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                }]);
+                if (memberErr) throw memberErr;
+            } else if (existingMember.status !== 'active') {
+                await supabase.from('organization_members').update({ status: 'active', role: invitation.role }).eq('organization_id', invitation.organization_id).eq('user_id', req.user.id);
+            }
+
+            const { error: invErr } = await supabase.from('organization_invitations').update({
+                status: 'accepted',
+                accepted_by: req.user.id
+            }).eq('id', token);
+            if (invErr) throw invErr;
+
+            try {
+                const { data: userData } = await supabase.from('users').select('*').eq('id', req.user.id).single();
+                if (userData && !userData.organization_id) {
+                    const targetAppRole = invitation.role === 'brand_viewer' ? 'brand' : (invitation.role === 'manager' || invitation.role === 'analyst' ? 'agency' : 'creator');
+                    await supabase.from('users').update({
+                        organization_id: invitation.organization_id,
+                        role: targetAppRole
+                    }).eq('id', req.user.id);
+                }
+            } catch (_) {
+                // Non-fatal if optional columns are not yet added to users; organization_members is authoritative
+            }
+        } else {
+            const memMember = memoryDb.organization_members.find(m => m.organization_id === invitation.organization_id && m.user_id === req.user.id);
+            if (!memMember) {
+                memoryDb.organization_members.push({
+                    organization_id: invitation.organization_id,
+                    user_id: req.user.id,
+                    role: invitation.role,
+                    status: 'active',
+                    created_at: new Date().toISOString()
+                });
+            }
+            invitation.status = 'accepted';
+            invitation.accepted_by = req.user.id;
+        }
+
+        return res.json({
+            success: true,
+            message: 'You have joined the workspace!',
+            organizationId: invitation.organization_id,
+            role: invitation.role
+        });
+    } catch (err) {
+        console.error('[ACCEPT INVITATION ERROR]', err.message);
+        return res.status(503).json({ error: 'Failed to accept invitation. Please try again.' });
     }
 }
 
@@ -76,7 +373,10 @@ async function createCampaign(req, res) {
         if (!await requireManager(req, res, organizationId)) return;
         const name = clean(req.body?.name, 160);
         if (name.length < 2) return res.status(400).json({ error: 'Campaign name is required.' });
-        const campaign = await insert('campaigns', { id: id('cmp'), organization_id: organizationId, brand_organization_id: req.body?.brandOrganizationId || null, name, brief: clean(req.body?.brief, 4000), status: 'draft', starts_on: req.body?.startsOn || null, ends_on: req.body?.endsOn || null, currency: 'ZAR', fixed_fee: Math.max(0, Number(req.body?.fixedFee || 0)), created_by: req.user.id, created_at: new Date().toISOString() });
+        const fixedFee = Number(req.body?.fixedFee || 0);
+        if (!Number.isFinite(fixedFee) || fixedFee < 0) return res.status(400).json({ error: 'The recorded fee must be zero or a positive amount.' });
+        if (req.body?.brandOrganizationId) return res.status(400).json({ error: 'A brand must accept a campaign access request before being linked.' });
+        const campaign = await insert('campaigns', { id: id('cmp'), organization_id: organizationId, brand_organization_id: null, name, brief: clean(req.body?.brief, 4000), status: 'draft', starts_on: req.body?.startsOn || null, ends_on: req.body?.endsOn || null, currency: 'ZAR', fixed_fee: fixedFee, created_by: req.user.id, created_at: new Date().toISOString() });
         return res.status(201).json({ campaign });
     } catch (error) {
         console.error('[CREATE CAMPAIGN]', error.message);
@@ -141,14 +441,16 @@ async function createMilestone(req, res) {
 async function getWorkspace(req, res) {
     if (isProdUnavailable(res)) return;
     if (!supabase) {
-        const memberships = memoryDb.organization_members.filter(m => m.user_id === req.user.id);
+        const memberships = memoryDb.organization_members.filter(m => m.user_id === req.user.id && m.status === 'active');
         const orgIds = memberships.map(m => m.organization_id);
         const assignments = memoryDb.campaign_creators.filter(a => a.creator_user_id === req.user.id);
         const campaignIds = assignments.map(a => a.campaign_id);
-        return res.json({ organizations: memoryDb.organizations.filter(o => orgIds.includes(o.id)), memberships, campaigns: memoryDb.campaigns.filter(c => orgIds.includes(c.organization_id) || orgIds.includes(c.brand_organization_id) || campaignIds.includes(c.id)), assignments });
+        const campaigns = memoryDb.campaigns.filter(c => orgIds.includes(c.organization_id) || orgIds.includes(c.brand_organization_id) || campaignIds.includes(c.id))
+            .map(c => orgIds.includes(c.organization_id) || orgIds.includes(c.brand_organization_id) ? c : { ...c, fixed_fee: null });
+        return res.json({ organizations: memoryDb.organizations.filter(o => orgIds.includes(o.id)), memberships, campaigns, assignments });
     }
     try {
-        const memberResult = await supabase.from('organization_members').select('*').eq('user_id', req.user.id);
+        const memberResult = await supabase.from('organization_members').select('*').eq('user_id', req.user.id).eq('status', 'active');
         const assignmentResult = await supabase.from('campaign_creators').select('*').eq('creator_user_id', req.user.id);
         if (memberResult.error || assignmentResult.error) throw memberResult.error || assignmentResult.error;
         const orgIds = memberResult.data.map(m => m.organization_id);
@@ -159,7 +461,8 @@ async function getWorkspace(req, res) {
         const assignedCampaigns = campaignIds.length ? await supabase.from('campaigns').select('*').in('id', campaignIds) : { data: [] };
         if (orgResult.error || ownedCampaigns.error || brandCampaigns.error || assignedCampaigns.error) throw orgResult.error || ownedCampaigns.error || brandCampaigns.error || assignedCampaigns.error;
         const merged = [...(ownedCampaigns.data || []), ...(brandCampaigns.data || []), ...(assignedCampaigns.data || [])].filter((c, index, all) => all.findIndex(x => x.id === c.id) === index);
-        return res.json({ organizations: orgResult.data || [], memberships: memberResult.data, campaigns: merged, assignments: assignmentResult.data });
+        const visibleCampaigns = merged.map(c => orgIds.includes(c.organization_id) || orgIds.includes(c.brand_organization_id) ? c : { ...c, fixed_fee: null });
+        return res.json({ organizations: orgResult.data || [], memberships: memberResult.data, campaigns: visibleCampaigns, assignments: assignmentResult.data });
     } catch (error) {
         return res.status(503).json({ error: 'Workspace data is unavailable. Confirm the collaboration database migration is installed.' });
     }
@@ -168,6 +471,13 @@ async function getWorkspace(req, res) {
 async function getMessages(req, res) {
     if (isProdUnavailable(res)) return;
     const campaignId = clean(req.params.campaignId, 100);
+    try {
+        if (!await canAccessCampaign(await campaignById(campaignId), req.user.id)) {
+            return res.status(404).json({ error: 'Campaign not found.' });
+        }
+    } catch (error) {
+        return res.status(503).json({ error: 'Campaign access could not be verified.' });
+    }
     if (!supabase) {
         const messages = memoryDb.campaign_messages.filter(m => m.campaign_id === campaignId);
         // Map sender details
@@ -198,6 +508,9 @@ async function addMessage(req, res) {
     if (!content || content.length === 0) return res.status(400).json({ error: 'Message content is required.' });
     
     try {
+        if (!await canAccessCampaign(await campaignById(campaignId), req.user.id)) {
+            return res.status(404).json({ error: 'Campaign not found.' });
+        }
         const message = await insert('campaign_messages', {
             id: id('msg'),
             campaign_id: campaignId,
@@ -218,8 +531,24 @@ async function addMessage(req, res) {
         return res.status(201).json({ message: { ...message, sender_name: senderName } });
     } catch (error) {
         console.error('[ADD MESSAGE]', error.message);
-        return res.status(503).json({ error: 'The message could not be sent.' });
+        return res.status(503).json({ error: 'The message could not be sent or campaign access could not be verified.' });
     }
 }
 
-module.exports = { createOrganization, inviteMember, createCampaign, assignCreator, acceptAssignment, createMilestone, getWorkspace, getMessages, addMessage };
+module.exports = {
+    createOrganization,
+    inviteMember,
+    listInvitations,
+    getInvitation,
+    acceptInvitation,
+    createCampaign,
+    assignCreator,
+    acceptAssignment,
+    createMilestone,
+    getWorkspace,
+    getMessages,
+    addMessage,
+    campaignById,
+    membership,
+    canAccessCampaign
+};

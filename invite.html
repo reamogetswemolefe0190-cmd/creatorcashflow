@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accept Workspace Invitation | Creator Cash Flow</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/assets/ccf-stitch.css?v=1">
+    <link rel="stylesheet" href="/assets/ccf-system.css?v=1">
+    <link rel="stylesheet" href="/assets/ccf-campaign-desk.css?v=1">
+    <style>
+        body {
+            background-color: var(--st-paper, #fcfbfb);
+            color: var(--st-ink, #0e242c);
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .invite-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--st-line, #e2e8f0);
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .invite-container {
+            max-width: 540px;
+            margin: 48px auto;
+            padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
+            flex: 1;
+        }
+        .invite-card {
+            background: #ffffff;
+            border: 1px solid var(--st-line, #e2e8f0);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            padding: 32px;
+        }
+        .invite-badge {
+            display: inline-block;
+            background: rgba(255, 91, 0, 0.1);
+            color: #ff5b00;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+        .invite-badge.expired {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+        }
+        .invite-title {
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 0 0 10px;
+            letter-spacing: -0.02em;
+        }
+        .invite-sub {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.5;
+            margin: 0 0 24px;
+        }
+        .invite-meta-box {
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 28px;
+        }
+        .invite-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13.5px;
+            padding: 6px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .invite-meta-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .invite-meta-row:first-child {
+            padding-top: 0;
+        }
+        .invite-meta-label {
+            color: #64748b;
+        }
+        .invite-meta-val {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+            gap: 8px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            margin-bottom: -1px;
+            transition: all 0.15s ease;
+        }
+        .tab-btn.active {
+            color: #ff5b00;
+            border-bottom-color: #ff5b00;
+        }
+        .invite-form label {
+            display: block;
+            margin-bottom: 16px;
+        }
+        .invite-form span {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .invite-form input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .invite-form input:focus {
+            outline: none;
+            border-color: #ff5b00;
+            box-shadow: 0 0 0 3px rgba(255, 91, 0, 0.12);
+        }
+        .invite-form input:disabled {
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #ff5b00;
+            color: #ffffff;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            box-shadow: 0 2px 8px rgba(255, 91, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-submit:hover:not(:disabled) {
+            background: #e04f00;
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .status-msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            line-height: 1.4;
+            display: none;
+        }
+        .status-msg.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .status-msg.success {
+            display: block;
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .user-switch-bar {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn-link {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="invite-header">
+        <a class="cc-logo" href="/#landing">
+            <img src="/brand/logo-primary.svg" alt="Creator Cash Flow" width="144" height="42">
+        </a>
+        <a href="/#login" style="font-size: 13.5px; color: #64748b; text-decoration: none; font-weight: 600;">Sign In</a>
+    </header>
+
+    <main class="invite-container">
+        <div id="loading-state" class="invite-card" style="text-align: center; padding: 60px 20px;">
+            <p style="color: #64748b; font-size: 15px;">Validating your invitation...</p>
+        </div>
+
+        <div id="error-state" class="invite-card" style="display: none; text-align: center;">
+            <span class="invite-badge expired">Invalid Invitation</span>
+            <h1 class="invite-title" id="error-title">Invitation Unavailable</h1>
+            <p class="invite-sub" id="error-desc">This invitation link is invalid, expired, or has already been used.</p>
+            <a href="/#landing" class="btn-submit" style="display: inline-flex; width: auto; padding: 10px 24px; text-decoration: none;">Return to Home</a>
+        </div>
+
+        <div id="active-state" class="invite-card" style="display: none;">
+            <span class="invite-badge">Workspace Invitation</span>
+            <h1 class="invite-title" id="inv-org-title">Join Workspace</h1>
+            <p class="invite-sub" id="inv-sub-desc">You've been invited to join this team on Creator Cash Flow.</p>
+
+            <div class="invite-meta-box">
+                <div class="invite-meta-row">
+                    <span class="invite-meta-label">Organisation</span>
+                    <span class="invite-meta-val" id="meta-org-name">—</span>
+                </div>
+                <div class="invite-meta-row">
+                    <span class="invite-meta-label">Your Role</span>
+                    <span class="invite-meta-val" id="meta-role-name">—</span>
+                </div>
+                <div class="invite-meta-row">
+                    <span class="invite-meta-label">Invited By</span>
+                    <span class="invite-meta-val" id="meta-inviter-name">—</span>
+                </div>
+                <div class="invite-meta-row">
+                    <span class="invite-meta-label">Invited Email</span>
+                    <span class="invite-meta-val" id="meta-invited-email">—</span>
+                </div>
+            </div>
+
+            <!-- Shown if user is logged in with matching email -->
+            <div id="logged-in-matching" style="display: none;">
+                <div class="user-switch-bar">
+                    <span>Signed in as <strong id="logged-in-email">—</strong></span>
+                    <button class="btn-link" onclick="signOutAndReload()">Switch account</button>
+                </div>
+                <button id="btn-one-click-accept" class="btn-submit" type="button">
+                    Accept Invitation & Enter Workspace &rarr;
+                </button>
+            </div>
+
+            <!-- Shown if user is logged in with mismatched email -->
+            <div id="logged-in-mismatched" style="display: none;">
+                <div class="status-msg error" style="display: block; margin-bottom: 20px;">
+                    You are signed in as <strong id="mismatch-current-email"></strong>, but this invitation was sent to <strong id="mismatch-invited-email"></strong>.
+                </div>
+                <button class="btn-submit" type="button" onclick="signOutAndReload()">
+                    Sign Out & Switch to Invited Account
+                </button>
+            </div>
+
+            <!-- Shown if user is not logged in -->
+            <div id="guest-flow" style="display: none;">
+                <div class="tab-nav">
+                    <button id="tab-signup" class="tab-btn active" type="button" onclick="switchTab('signup')">Create Account</button>
+                    <button id="tab-login" class="tab-btn" type="button" onclick="switchTab('login')">I Have an Account</button>
+                </div>
+
+                <!-- Signup Form -->
+                <form id="form-signup" class="invite-form">
+                    <label>
+                        <span>Full name</span>
+                        <input id="signup-name" name="name" type="text" required minlength="2" maxlength="70" placeholder="e.g. Alex Ndlovu" autocomplete="name">
+                    </label>
+                    <label>
+                        <span>Email address</span>
+                        <input id="signup-email" name="email" type="email" required disabled>
+                    </label>
+                    <label>
+                        <span>Password (min. 8 characters)</span>
+                        <input id="signup-password" name="password" type="password" required minlength="8" maxlength="128" placeholder="••••••••" autocomplete="new-password">
+                    </label>
+                    <button id="btn-signup-submit" class="btn-submit" type="submit">
+                        Create Account & Join &rarr;
+                    </button>
+                </form>
+
+                <!-- Login Form -->
+                <form id="form-login" class="invite-form" style="display: none;">
+                    <label>
+                        <span>Email address</span>
+                        <input id="login-email" name="email" type="email" required disabled>
+                    </label>
+                    <label>
+                        <span>Password</span>
+                        <input id="login-password" name="password" type="password" required placeholder="••••••••" autocomplete="current-password">
+                    </label>
+                    <button id="btn-login-submit" class="btn-submit" type="submit">
+                        Sign In & Join &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <div id="action-status" class="status-msg"></div>
+        </div>
+    </main>
+
+    <script>
+        const roleLabels = {
+            manager: 'Campaign Manager',
+            analyst: 'Analyst',
+            creator: 'Creator',
+            brand_viewer: 'Brand Reviewer'
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+
+        let inviteData = null;
+
+        function getSession() {
+            const raw = sessionStorage.getItem('ccf_session') || localStorage.getItem('ccf_session');
+            if (!raw) return null;
+            try {
+                const payload = JSON.parse(atob(raw.split('.')[1]));
+                return { token: raw, payload };
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function signOutAndReload() {
+            sessionStorage.removeItem('ccf_session');
+            localStorage.removeItem('ccf_session');
+            window.location.reload();
+        }
+
+        function switchTab(tab) {
+            const isSignup = tab === 'signup';
+            document.getElementById('tab-signup').classList.toggle('active', isSignup);
+            document.getElementById('tab-login').classList.toggle('active', !isSignup);
+            document.getElementById('form-signup').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('form-login').style.display = isSignup ? 'none' : 'block';
+            hideStatus();
+        }
+
+        function showStatus(msg, isError = false) {
+            const el = document.getElementById('action-status');
+            el.textContent = msg;
+            el.className = 'status-msg ' + (isError ? 'error' : 'success');
+        }
+
+        function hideStatus() {
+            const el = document.getElementById('action-status');
+            el.style.display = 'none';
+        }
+
+        function routeUserToWorkspace(role) {
+            if (role === 'manager' || role === 'analyst' || role === 'agency') {
+                window.location.href = '/agency.html';
+            } else if (role === 'brand_viewer' || role === 'brand') {
+                window.location.href = '/brand.html';
+            } else {
+                window.location.href = '/#account';
+            }
+        }
+
+        async function acceptInviteWithToken(jwtToken) {
+            const res = await fetch(`/api/collaboration/invitations/${encodeURIComponent(token)}/accept`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to accept invitation.');
+            return data;
+        }
+
+        async function loadInvitation() {
+            if (!token) {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-title').textContent = 'Missing Invitation Token';
+                document.getElementById('error-desc').textContent = 'No invitation token was provided in the link. Please check your invitation email.';
+                document.getElementById('error-state').style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/collaboration/invitations/${encodeURIComponent(token)}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Invalid invitation.');
+
+                inviteData = data;
+                const { invitation, organization, inviter } = data;
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('active-state').style.display = 'block';
+
+                const orgName = organization?.name || 'Workspace';
+                const displayRole = roleLabels[invitation.role] || invitation.role;
+
+                document.getElementById('inv-org-title').textContent = `Join ${orgName}`;
+                document.getElementById('inv-sub-desc').textContent = `${inviter?.name || 'A team manager'} has invited you to join ${orgName} as a ${displayRole}.`;
+                document.getElementById('meta-org-name').textContent = orgName;
+                document.getElementById('meta-role-name').textContent = displayRole;
+                document.getElementById('meta-inviter-name').textContent = inviter?.name || 'Manager';
+                document.getElementById('meta-invited-email').textContent = invitation.email;
+
+                document.getElementById('signup-email').value = invitation.email;
+                document.getElementById('login-email').value = invitation.email;
+
+                // Check session
+                const session = getSession();
+                if (session) {
+                    const sessionEmail = (session.payload.email || '').toLowerCase();
+                    const targetEmail = invitation.email.toLowerCase();
+
+                    if (sessionEmail === targetEmail) {
+                        document.getElementById('logged-in-matching').style.display = 'block';
+                        document.getElementById('logged-in-email').textContent = sessionEmail;
+                    } else {
+                        document.getElementById('logged-in-mismatched').style.display = 'block';
+                        document.getElementById('mismatch-current-email').textContent = sessionEmail;
+                        document.getElementById('mismatch-invited-email').textContent = targetEmail;
+                    }
+                } else {
+                    document.getElementById('guest-flow').style.display = 'block';
+                }
+
+            } catch (err) {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-title').textContent = 'Invitation Unavailable';
+                document.getElementById('error-desc').textContent = err.message;
+                document.getElementById('error-state').style.display = 'block';
+            }
+        }
+
+        // 1. One-click accept for currently logged-in user
+        document.getElementById('btn-one-click-accept').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-one-click-accept');
+            btn.disabled = true;
+            btn.textContent = 'Joining workspace...';
+            hideStatus();
+            try {
+                const session = getSession();
+                const result = await acceptInviteWithToken(session.token);
+                showStatus('Success! Redirecting to your workspace...', false);
+                setTimeout(() => routeUserToWorkspace(result.role), 1000);
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Accept Invitation & Enter Workspace →';
+                showStatus(err.message, true);
+            }
+        });
+
+        // 2. Signup form submit
+        document.getElementById('form-signup').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-signup-submit');
+            btn.disabled = true;
+            btn.textContent = 'Creating account & joining...';
+            hideStatus();
+            try {
+                const name = document.getElementById('signup-name').value.trim();
+                const email = inviteData.invitation.email;
+                const password = document.getElementById('signup-password').value;
+                const role = inviteData.invitation.role === 'brand_viewer' ? 'brand' : (inviteData.invitation.role === 'creator' ? 'creator' : 'agency');
+
+                const signupRes = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role })
+                });
+                const signupData = await signupRes.json();
+                if (!signupRes.ok) throw new Error(signupData.error || 'Failed to create account.');
+
+                const jwtToken = signupData.token;
+                sessionStorage.setItem('ccf_session', jwtToken);
+
+                const acceptResult = await acceptInviteWithToken(jwtToken);
+                showStatus('Account created! Joining workspace...', false);
+                setTimeout(() => routeUserToWorkspace(acceptResult.role), 1000);
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Create Account & Join →';
+                showStatus(err.message, true);
+            }
+        });
+
+        // 3. Login form submit
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            btn.disabled = true;
+            btn.textContent = 'Signing in & joining...';
+            hideStatus();
+            try {
+                const email = inviteData.invitation.email;
+                const password = document.getElementById('login-password').value;
+
+                const loginRes = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const loginData = await loginRes.json();
+                if (!loginRes.ok) throw new Error(loginData.error || 'Invalid credentials.');
+
+                const jwtToken = loginData.token;
+                sessionStorage.setItem('ccf_session', jwtToken);
+
+                const acceptResult = await acceptInviteWithToken(jwtToken);
+                showStatus('Signed in! Joining workspace...', false);
+                setTimeout(() => routeUserToWorkspace(acceptResult.role), 1000);
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Sign In & Join →';
+                showStatus(err.message, true);
+            }
+        });
+
+        loadInvitation();
+    </script>
+</body>
+</html>

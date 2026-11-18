@@ -29,7 +29,7 @@ window.CCFReports = (() => {
         selectedCampaign = campaigns.some(c => c.id === selectedCampaign) ? selectedCampaign : campaigns[0].id;
         const linkedBrand = Boolean(campaigns.find(c => c.id === selectedCampaign)?.brand_organization_id);
         root.innerHTML = `<div class="ccf-reports">
-            <div class="ccf-reports-head"><span class="cc-kicker">Campaign records</span><h1>Campaign reports</h1><p>${role === 'agency' ? 'Create a dated report for your team and the linked brand.' : 'Download the campaign report prepared by your agency.'}</p></div>
+            <div class="ccf-reports-head"><span class="cc-kicker">Campaign records</span><h1>Campaign reports</h1><p>${role === 'agency' ? 'Create a dated decision brief for your team and any linked brand.' : 'Download the campaign report prepared by your agency.'}</p></div>
             <div class="ccf-report-panel"><label for="ccf-report-campaign">Campaign</label><select id="ccf-report-campaign">${campaigns.map(c => `<option value="${escape(c.id)}" ${c.id === selectedCampaign ? 'selected' : ''}>${escape(c.name)}</option>`).join('')}</select></div>
             ${role === 'agency' ? `<form id="ccf-report-form" class="ccf-report-panel">
                 <div class="ccf-report-panel-head"><div><span class="cc-kicker">Prepare a snapshot</span><h2>Create a report</h2></div><span class="ccf-report-badge">Agency review</span></div>

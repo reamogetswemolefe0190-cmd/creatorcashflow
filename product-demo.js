@@ -21,25 +21,25 @@ const state = {
 
         const stages = [
             [
-                'Brand',
+                'Agency',
                 'Create the brief',
-                'Set the budget, deliverables, usage rights and deadline.',
-                'Publish campaign brief',
-                'Agency receives a campaign invitation.',
-                'R60,000 campaign budget'
+                'Define the scope, deliverables, usage rights and deadline in one place.',
+                'Save campaign brief',
+                'The agency can now assign a creator and invite a brand reviewer.',
+                'Campaign brief · Spring in motion'
             ],
             [
                 'Agency',
                 'Build the creator team',
-                'Match the brief to the roster and agree each creator’s fee.',
-                'Send creator invitation',
-                'Creator receives the scope, dates and offer.',
-                'R12,000 creator offer'
+                'Match the brief to a creator and set out the assignment.',
+                'Assign a creator',
+                'Creator sees the scope and due date in their workspace.',
+                'Thando Mokoena · first video'
             ],
             [
                 'Creator',
                 'Accept and create',
-                'Accept the offer, then submit the first video for review.',
+                'Accept the assignment, then share the first draft link for review.',
                 'Submit deliverable',
                 'Agency receives the draft and creator notes.',
                 '1 video · 3 stories'
@@ -55,18 +55,18 @@ const state = {
             [
                 'Brand',
                 'Approve for publishing',
-                'Approve the content or request a revision in the same thread.',
+                'Approve the agency-reviewed content or request a revision in the same record.',
                 'Approve deliverable',
-                'Creator receives approval and the publishing schedule.',
+                'Creator can add the published post link.',
                 'Approved · publish 18 Sep'
             ],
             [
                 'Creator',
-                'Track payment',
-                'Upload the live link and invoice; agency confirms the payment status.',
-                'Mark invoice as sent',
-                'Brand and agency see the invoice; creator sees the due date.',
-                'R12,000 · due 30 Sep'
+                'Publish and record results',
+                'Add the live post link. Campaign results can be recorded manually and labelled as such.',
+                'Add published link',
+                'Agency and brand can see the published work and labelled results.',
+                'Published link · manual results'
             ]
         ];
 
@@ -231,581 +231,106 @@ const state = {
                         </div>
                     </div>
                 `;
-            } else if (['creator', 'agency', 'brand'].includes(state.page)) {
+} else if (['creator', 'agency', 'brand'].includes(state.page)) {
                 const role = state.page;
-                const isCreator = role === 'creator';
                 const isAgency = role === 'agency';
                 const isBrand = role === 'brand';
-
-                const roleLabel = isCreator ? 'Creator' : isAgency ? 'Agency' : 'Brand';
-                const roleName = isCreator ? 'Thando' : isAgency ? 'Studio North' : 'Vela Active';
-                const roleAvatar = isCreator ? 'TM' : isAgency ? 'SN' : 'VA';
-
-                const metrics = isCreator ? [
-                    ['Received this month', 'R38,500', 'Across 4 payments'],
-                    ['Awaiting payment', 'R18,000', '2 invoices outstanding'],
-                    ['Active campaigns', '3', '1 action needs you']
-                ] : isAgency ? [
-                    ['Active campaigns', '8', 'Across 4 brand clients'],
-                    ['Creators on roster', '24', '6 on active briefs'],
-                    ['Awaiting review', '5', '2 due this week']
-                ] : [
-                    ['Campaign budget', 'R60,000', 'Spring in motion'],
-                    ['Committed spend', 'R42,000', 'R18,000 unallocated'],
-                    ['Deliverables approved', '8 / 12', '4 still in review']
-                ];
-
-                // Sub-view rendering based on state.activeWorkspaceTab
-                let subViewContent = '';
-
-                if (state.activeWorkspaceTab === 'Overview') {
-                    subViewContent = `
-                        <div class="cc-creator-next">
-                            <div>
-                                <h3>Sample campaign needs attention</h3>
-                                <p>Your action is required to move the Spring in Motion campaign forward.</p>
-                            </div>
-                            <button class="cc-btn cc-primary cc-btn-nav" data-command="openCampaignFlow('${role}')">Open shared campaign <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
-                        </div>
-                        <div class="cc-metrics">
-                            ${metrics.map(m => `
-                                <div class="cc-metric">
-                                    <div>
-                                        <div class="cc-small">${m[0]}</div>
-                                        <div class="cc-num">${m[1]}</div>
-                                    </div>
-                                    <span class="cc-small">${m[2]}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <div class="cc-columns">
-                            <div>
-                                <!-- Needs Attention Banner -->
-                                <div class="cc-campaign-banner">
-                                    ${getPhotoHtml(isCreator ? 'creator' : 'team').replace('<img ', '<img class="ce-mini-photo" ')}
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span class="cc-small" style="letter-spacing: 1px; color: #A3E635; font-weight: 700;">NEEDS YOUR ATTENTION</span>
-                                        <span>↗</span>
-                                    </div>
-                                    <h3>Spring in motion</h3>
-                                    <p class="cc-small" style="color: #C6D8CB; margin-bottom: 18px;">
-                                        ${isCreator ? 'Your first video draft is due on 16 September.' : isAgency ? 'Thando’s first video is ready for your quality check.' : 'The agency has sent 2 deliverables for final approval.'}
-                                    </p>
-                                    <button class="cc-btn cc-primary" data-command="openCampaignFlow('${role}')">
-                                        ${isCreator ? 'Open deliverables' : isAgency ? 'Review submissions' : 'Review & approve'} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                                    </button>
-                                </div>
-
-                                <!-- Middle Box (Payments / Roster / Performance) -->
-                                <div class="cc-box">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                                        <h3>${isCreator ? 'Upcoming payments' : isAgency ? 'Creator roster' : 'Campaign performance'}</h3>
-                                        <button class="cc-link" data-command="setWorkspaceTab('${isCreator ? 'Income' : isAgency ? 'Roster' : 'Partners'}')">View all <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
-                                    </div>
-                                    ${isCreator ? (
-                                        renderRow('Vela Active', 'Spring in motion · due 30 Sep', 'R12,000') +
-                                        renderRow('Homegrown Coffee', 'Morning ritual · due 24 Sep', 'R6,000')
-                                    ) : isAgency ? (
-                                        renderRow('Thando Mokoena', 'Lifestyle · Spring in motion', 'Draft ready') +
-                                        renderRow('Naledi Dube', 'Wellness · Spring in motion', 'Creating') +
-                                        renderRow('Sipho Khumalo', 'Fitness · Weekend movement', 'Approved')
-                                    ) : (
-                                        renderRow('Views', 'Across 8 published deliverables', '128,400') +
-                                        renderRow('Engagement rate', 'Interactions ÷ views', '4.8%') +
-                                        renderRow('Link clicks', 'Tracked campaign links', '2,140')
-                                    )}
+                const roleLabel = isAgency ? 'Agency' : isBrand ? 'Brand' : 'Creator';
+                const roleName = isAgency ? 'Studio North' : isBrand ? 'Vela Active' : 'Thando Mokoena';
+                const tabs = isAgency ? ['Overview', 'Campaigns', 'People'] : isBrand ? ['Overview', 'Campaigns', 'Reviews'] : ['Overview', 'Campaigns', 'Finances'];
+                const activeTab = tabs.includes(state.activeWorkspaceTab) ? state.activeWorkspaceTab : 'Overview';
+                const sample = isAgency ? {
+                    eyebrow: 'Agency desk / Sample data',
+                    title: 'Work that needs a decision.',
+                    description: 'One campaign record keeps the brief, creator handoff and review trail together.',
+                    action: 'Review the first draft',
+                    owner: 'Agency review',
+                    next: 'Check Thando’s first video against the brief, then send a decision.',
+                    status: 'Needs review'
+                } : isBrand ? {
+                    eyebrow: 'Brand view / Sample data',
+                    title: 'See what is ready for you.',
+                    description: 'A clear view of the campaign you share with the agency—without its private roster or other clients.',
+                    action: 'Review the approved draft',
+                    owner: 'Brand decision',
+                    next: 'The agency has checked the first video. Approve it or request a revision.',
+                    status: 'Awaiting decision'
+                } : {
+                    eyebrow: 'Creator view / Sample data',
+                    title: 'Know what comes next.',
+                    description: 'Your assignments and feedback live beside the brief. Personal finances stay in your own space.',
+                    action: 'Open your assignment',
+                    owner: 'Creator handoff',
+                    next: 'Confirm the brief and share the first draft link with the agency.',
+                    status: 'Draft in progress'
+                };
+                let previewBody = '';
+                if (activeTab === 'Overview') {
+                    previewBody = `
+                        <div class="ccf-preview-grid">
+                            <div class="ccf-preview-main">
+                                <div class="ccf-preview-section-head"><span>01 / NEXT HANDOFF</span><span>Spring in motion</span></div>
+                                <article class="ccf-preview-decision">
+                                    <div class="ccf-preview-decision-top"><span class="ccf-preview-dot"></span><span>${sample.owner}</span><strong>${sample.status}</strong></div>
+                                    <h2>${sample.next}</h2>
+                                    <p>Vela Active × Studio North × Thando Mokoena</p>
+                                    <button type="button" class="cc-btn cc-primary" data-command="openCampaignFlow('${role}')">${sample.action} ↗</button>
+                                </article>
+                                <div class="ccf-preview-section-head"><span>02 / CAMPAIGN RECORD</span><span>Shared where relevant</span></div>
+                                <div class="ccf-preview-record">
+                                    <div><span>Brief</span><strong>Outdoor movement campaign</strong></div>
+                                    <div><span>Deliverable</span><strong>First video draft</strong></div>
+                                    <div><span>Review</span><strong>${sample.owner}</strong></div>
+                                    <div><span>Published results</span><strong>Added after posting</strong></div>
                                 </div>
                             </div>
-
-                            <div>
-                                <!-- Right Box: Progress Checklist & Chat Snippet -->
-                                <div class="cc-box">
-                                    <h3>${isCreator ? 'Your campaign checklist' : isAgency ? 'Approval queue' : 'Delivery progress'}</h3>
-                                    ${renderRow('Brief & fee agreed', 'Vela Active · campaign #024', 'Done', 'cc-tag-completed')}
-                                    ${renderRow('First video draft', 'Thando Mokoena · 16 Sep', isCreator ? 'Due next' : 'In review', 'cc-tag-pending')}
-                                    ${renderRow('Brand approval', 'Vela Active · 18 Sep', 'Upcoming')}
-                                    
-                                    <div class="cc-progress">
-                                        <span style="width: 40%;"></span>
-                                    </div>
-                                    <div class="cc-small">2 of 5 milestones complete</div>
-
-                                    <hr style="border: 0; border-top: 1px solid var(--cc-line); margin: 22px 0;">
-
-                                    <h3>Campaign conversation</h3>
-                                    <div class="cc-small" style="display: flex; align-items: center; gap: 8px;">
-                                        <span class="cc-avatar" style="width: 24px; height: 24px; font-size: 10px;">SN</span>
-                                        Studio North · 10:24
-                                    </div>
-                                    <p style="font-size: 13px; margin: 12px 0; color: #E0E7E1; font-style: italic;">
-                                        “The updated brief is ready. Please keep the opening shot outdoors.”
-                                    </p>
-                                    <button class="cc-link" data-command="setWorkspaceTab('Inbox')">
-                                        Open conversation <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                                    </button>
-                                </div>
-                            </div>
+                            <aside class="ccf-preview-aside">
+                                <span class="ccf-preview-aside-label">The working agreement</span>
+                                <h3>Everyone sees their part.</h3>
+                                <p>${isAgency ? 'The agency owns coordination and quality review. The brand sees its campaign; the creator sees their assignment.' : isBrand ? 'See only campaigns shared with your team, with the relevant deliverables and decisions.' : 'See your scope and feedback. Your personal income and expenses are not shared with the agency or brand.'}</p>
+                                <button type="button" class="ccf-preview-text-action" data-command="setPage('journey')">Explore the full handoff <span aria-hidden="true">↗</span></button>
+                            </aside>
+                        </div>`;
+                } else if (activeTab === 'Campaigns') {
+                    previewBody = `
+                        <div class="ccf-preview-section-head"><span>CAMPAIGN WORK / SAMPLE DATA</span><span>1 active record</span></div>
+                        <div class="ccf-preview-list">
+                            <button type="button" data-command="openCampaignFlow('${role}')">
+                                <span class="ccf-preview-list-index">01</span>
+                                <span><strong>Spring in motion</strong><small>Vela Active × Studio North × Thando Mokoena</small></span>
+                                <em>${sample.status}</em><b aria-hidden="true">↗</b>
+                            </button>
                         </div>
-                    `;
-                } else if (state.activeWorkspaceTab === 'Campaigns') {
-                    subViewContent = isCreator ? `
-                        <div class="cc-subnav-row">
-                            <div class="cc-filter-pills">
-                                <button class="cc-filter-pill active">All Campaigns (3)</button>
-                                <button class="cc-filter-pill">In Production (1)</button>
-                                <button class="cc-filter-pill">In Review (1)</button>
-                                <button class="cc-filter-pill">Completed (12)</button>
-                            </div>
-                            <button class="cc-btn cc-primary cc-btn-nav" data-command="setPage('journey')">View Shared Journey Pipeline ↗</button>
-                        </div>
-
-                        <div class="cc-table-wrap">
-                            <table class="cc-table">
-                                <thead>
-                                    <tr>
-                                        <th>Campaign</th>
-                                        <th>Brand & Agency</th>
-                                        <th>Scope</th>
-                                        <th>Payout</th>
-                                        <th>Deadline</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Spring in motion</strong><br><span class="cc-small">#CCF-024</span></td>
-                                        <td>Vela Active<br><span class="cc-small">via Studio North</span></td>
-                                        <td>1 Video + 3 Stories</td>
-                                        <td><strong style="color:#A3E635;">R12,000</strong></td>
-                                        <td>16 Sep 2026</td>
-                                        <td><span class="cc-tag cc-tag-pending">Draft In Progress</span></td>
-                                        <td><button class="cc-btn cc-btn-nav cc-primary" data-command="setPage('journey')">Submit Draft <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Morning Ritual</strong><br><span class="cc-small">#CCF-019</span></td>
-                                        <td>Homegrown Coffee<br><span class="cc-small">Direct Partnership</span></td>
-                                        <td>2 TikTok Videos</td>
-                                        <td><strong style="color:#A3E635;">R6,000</strong></td>
-                                        <td>24 Sep 2026</td>
-                                        <td><span class="cc-tag cc-tag-completed">Draft Approved</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-084')">View Invoice</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Urban Movement</strong><br><span class="cc-small">#CCF-012</span></td>
-                                        <td>Peak Athletics<br><span class="cc-small">via Studio North</span></td>
-                                        <td>1 Reel + Photos</td>
-                                        <td><strong style="color:#A3E635;">R8,500</strong></td>
-                                        <td>31 Aug 2026</td>
-                                        <td><span class="cc-tag cc-tag-completed">Paid ✓</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-077')">Sample receipt details</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ` : isAgency ? `
-                        <div class="cc-subnav-row">
-                            <div class="cc-filter-pills">
-                                <button class="cc-filter-pill active">All Client Campaigns (8)</button>
-                                <button class="cc-filter-pill">Production (3)</button>
-                                <button class="cc-filter-pill">Reviewing (5)</button>
-                            </div>
-                            <button class="cc-btn cc-primary cc-btn-nav" data-command="setPage('journey')">Open Collaborative Pipeline ↗</button>
-                        </div>
-
-                        <div class="cc-table-wrap">
-                            <table class="cc-table">
-                                <thead>
-                                    <tr>
-                                        <th>Campaign Name</th>
-                                        <th>Client Brand</th>
-                                        <th>Roster Allocation</th>
-                                        <th>Total Budget</th>
-                                        <th>Deliverables Status</th>
-                                        <th>Stage</th>
-                                        <th>Management</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Spring in motion</strong></td>
-                                        <td>Vela Active</td>
-                                        <td>Thando Mokoena, Naledi D., Sipho K.</td>
-                                        <td><strong>R60,000</strong></td>
-                                        <td>8 / 12 Approved</td>
-                                        <td><span class="cc-tag cc-tag-pending">Draft QC</span></td>
-                                        <td><button class="cc-btn cc-btn-nav cc-primary" data-command="setPage('journey')">Manage Brief <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Morning Ritual</strong></td>
-                                        <td>Homegrown Coffee</td>
-                                        <td>Thando Mokoena, Zanele N.</td>
-                                        <td><strong>R25,000</strong></td>
-                                        <td>4 / 4 Approved</td>
-                                        <td><span class="cc-tag cc-tag-completed">Payment Prep</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Client Thread</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Urban Movement 2026</strong></td>
-                                        <td>Peak Athletics</td>
-                                        <td>Sipho Khumalo, 4 creators</td>
-                                        <td><strong>R95,000</strong></td>
-                                        <td>Brief Issued</td>
-                                        <td><span class="cc-tag">Contracting</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Roster')">Assign Talent</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ` : `
-                        <!-- Brand Campaign Management Deck -->
-                        <div class="cc-subnav-row">
-                            <div class="cc-filter-pills">
-                                <button class="cc-filter-pill active">Spring in motion (Active)</button>
-                                <button class="cc-filter-pill">Winter Fitness (Archived)</button>
-                            </div>
-                            <button class="cc-btn cc-primary cc-btn-nav" data-command="setPage('journey')">Inspect Full Brief Pipeline ↗</button>
-                        </div>
-
-                        <div class="cc-box">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                                <div>
-                                    <div class="cc-kicker" style="color:#A3E635;">DELIVERABLES AWAITING BRAND APPROVAL</div>
-                                    <h3 style="font-size:20px; margin-top:4px;">Pending Creative Sign-off</h3>
-                                </div>
-                                <span class="cc-tag cc-tag-pending">2 Items Need Your Review</span>
-                            </div>
-
-                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
-                                <div class="cc-box" style="padding:20px; border-radius:12px;">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                                        <strong>Thando Mokoena</strong>
-                                        <span class="cc-tag cc-tag-pending">Version 1 · Checked by Agency</span>
-                                    </div>
-                                    <p class="cc-small" style="margin-bottom:14px;">1x 60s Reel: Outdoor Run & Natural Product Integration in Camps Bay</p>
-                                    <div style="display:flex; gap:10px;">
-                                        <button class="cc-btn cc-primary cc-btn-nav" data-command="approveBrandDeliverable('Thando Mokoena')">Approve Deliverable ✓</button>
-                                        <button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Request Revision</button>
-                                    </div>
-                                </div>
-
-                                <div class="cc-box" style="padding:20px; border-radius:12px;">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                                        <strong>Naledi Dube</strong>
-                                        <span class="cc-tag cc-tag-completed">Approved for 18 Sep</span>
-                                    </div>
-                                    <p class="cc-small" style="margin-bottom:14px;">3x Instagram Stories: Hydration Routine & Discount Link Sticker</p>
-                                    <div style="display:flex; gap:10px;">
-                                        <button class="cc-btn cc-btn-nav" data-command="setPage('journey')">View Pipeline Status</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else if (state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') {
-                    subViewContent = isCreator ? `
-                        <!-- Creator Cash Flow Ledger -->
-                        <div class="cc-metrics">
-                            <div class="cc-metric">
-                                <div class="cc-small">September Cash Inflow</div>
-                                <div class="cc-num" style="color:#A3E635;">R38,500.00</div>
-                                <span class="cc-small">Across 4 verified brand settlements</span>
-                            </div>
-                            <div class="cc-metric">
-                                <div class="cc-small">Outstanding Invoices</div>
-                                <div class="cc-num">R18,000.00</div>
-                                <span class="cc-small">2 contracts in payment cycle</span>
-                            </div>
-                            <div class="cc-metric">
-                                <div class="cc-small">Average Settlement Speed</div>
-                                <div class="cc-num">6.2 Days</div>
-                                <span class="cc-small">100% on-time settlement rate</span>
-                            </div>
-                        </div>
-
-                        <div class="cc-box">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                <h3>Official Financial & Invoice Ledger</h3>
-                                <button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('TAX-REPORT-2026')">About sample records</button>
-                            </div>
-
-                            <div class="cc-table-wrap">
-                                <table class="cc-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Invoice ID</th>
-                                            <th>Counterparty Brand</th>
-                                            <th>Campaign Reference</th>
-                                            <th>Amount (ZAR)</th>
-                                            <th>Due Date</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>#INV-2026-089</strong></td>
-                                            <td>Vela Active</td>
-                                            <td>Spring in motion #CCF-024</td>
-                                            <td><strong>R12,000.00</strong></td>
-                                            <td>30 Sep 2026</td>
-                                            <td><span class="cc-tag cc-tag-pending">Scheduled Payout</span></td>
-                                            <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-089')">Sample invoice details</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>#INV-2026-084</strong></td>
-                                            <td>Homegrown Coffee</td>
-                                            <td>Morning ritual #CCF-019</td>
-                                            <td><strong>R6,000.00</strong></td>
-                                            <td>24 Sep 2026</td>
-                                            <td><span class="cc-tag cc-tag-pending">Approved & Queued</span></td>
-                                            <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-084')">Sample invoice details</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>#INV-2026-077</strong></td>
-                                            <td>Peak Athletics</td>
-                                            <td>Urban movement #CCF-012</td>
-                                            <td><strong>R8,500.00</strong></td>
-                                            <td>31 Aug 2026</td>
-                                            <td><span class="cc-tag cc-tag-completed">Paid ✓</span></td>
-                                            <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-077')">Sample receipt details</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>#INV-2026-062</strong></td>
-                                            <td>Cape Botanics</td>
-                                            <td>Winter Wellness launch</td>
-                                            <td><strong>R12,000.00</strong></td>
-                                            <td>15 Aug 2026</td>
-                                            <td><span class="cc-tag cc-tag-completed">Paid ✓</span></td>
-                                            <td><button class="cc-btn cc-btn-nav" data-command="downloadInvoiceProof('INV-062')">Sample receipt details</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ` : isAgency ? `
-                        <!-- Agency Creator Roster Directory -->
-                        <div class="cc-subnav-row">
-                            <div class="cc-filter-pills">
-                                <button class="cc-filter-pill active">All Roster (24)</button>
-                                <button class="cc-filter-pill">Lifestyle & Tech (8)</button>
-                                <button class="cc-filter-pill">Wellness & Fitness (11)</button>
-                                <button class="cc-filter-pill">Food & Culture (5)</button>
-                            </div>
-                            <button class="cc-btn cc-primary cc-btn-nav" disabled aria-label="Creator invitations are not available in the demo">Invitations · not available</button>
-                        </div>
-
-                        <div class="cc-table-wrap">
-                            <table class="cc-table">
-                                <thead>
-                                    <tr>
-                                        <th>Creator</th>
-                                        <th>Niche Focus</th>
-                                        <th>Audience Reach</th>
-                                        <th>Engagement Rate</th>
-                                        <th>Active Campaigns</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div style="display:flex; align-items:center; gap:10px;">
-                                                <span class="cc-avatar" style="width:30px; height:30px; font-size:11px;">TM</span>
-                                                <strong>Thando Mokoena</strong>
-                                            </div>
-                                        </td>
-                                        <td>Lifestyle & Outdoor Video</td>
-                                        <td>84,200</td>
-                                        <td><strong style="color:#A3E635;">4.9%</strong></td>
-                                        <td>Spring in motion, Morning ritual</td>
-                                        <td><span class="cc-tag cc-tag-completed">Active Brief</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Direct Message</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div style="display:flex; align-items:center; gap:10px;">
-                                                <span class="cc-avatar" style="width:30px; height:30px; font-size:11px;">ND</span>
-                                                <strong>Naledi Dube</strong>
-                                            </div>
-                                        </td>
-                                        <td>Wellness & Hydration</td>
-                                        <td>112,000</td>
-                                        <td><strong style="color:#A3E635;">5.2%</strong></td>
-                                        <td>Spring in motion</td>
-                                        <td><span class="cc-tag cc-tag-completed">Active Brief</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Direct Message</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div style="display:flex; align-items:center; gap:10px;">
-                                                <span class="cc-avatar" style="width:30px; height:30px; font-size:11px;">SK</span>
-                                                <strong>Sipho Khumalo</strong>
-                                            </div>
-                                        </td>
-                                        <td>Athletics & Gym Training</td>
-                                        <td>65,400</td>
-                                        <td><strong style="color:#A3E635;">6.1%</strong></td>
-                                        <td>Spring in motion</td>
-                                        <td><span class="cc-tag cc-tag-completed">Active Brief</span></td>
-                                        <td><button class="cc-btn cc-btn-nav" data-command="setWorkspaceTab('Inbox')">Direct Message</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ` : `
-                        <!-- Brand Creator Partners & ROI Scorecard -->
-                        <div class="cc-box">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                                <div>
-                                    <div class="cc-kicker" style="color:#A3E635;">CAMPAIGN ROSTER & PERFORMANCE METRICS</div>
-                                    <h3 style="font-size:20px; margin-top:4px;">Vela Active Activated Partners</h3>
-                                </div>
-                                <span class="cc-tag cc-tag-completed">3 Creators Active</span>
-                            </div>
-
-                            <div class="cc-table-wrap">
-                                <table class="cc-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Creator</th>
-                                            <th>Deliverables</th>
-                                            <th>Allocated Fee</th>
-                                            <th>Projected Views</th>
-                                            <th>Engagement Rate</th>
-                                            <th>Tracked Clicks</th>
-                                            <th>Deliverable QC</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Thando Mokoena</strong></td>
-                                            <td>1 Video + 3 Stories</td>
-                                            <td><strong>R12,000</strong></td>
-                                            <td>45,000</td>
-                                            <td><strong style="color:#A3E635;">4.9%</strong></td>
-                                            <td>920 clicks</td>
-                                            <td><span class="cc-tag cc-tag-pending">Draft In Review</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Naledi Dube</strong></td>
-                                            <td>3 Instagram Stories</td>
-                                            <td><strong>R15,000</strong></td>
-                                            <td>60,000</td>
-                                            <td><strong style="color:#A3E635;">5.2%</strong></td>
-                                            <td>810 clicks</td>
-                                            <td><span class="cc-tag cc-tag-completed">Approved</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Sipho Khumalo</strong></td>
-                                            <td>1 TikTok Video</td>
-                                            <td><strong>R15,000</strong></td>
-                                            <td>40,000</td>
-                                            <td><strong style="color:#A3E635;">6.1%</strong></td>
-                                            <td>410 clicks</td>
-                                            <td><span class="cc-tag cc-tag-completed">Approved</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    `;
-                } else if (state.activeWorkspaceTab === 'Inbox') {
-                    const messages = state.chatMessages[role] || [];
-                    subViewContent = `
-                        <div class="cc-inbox-layout">
-                            <div class="cc-inbox-threads">
-                                <div class="cc-thread-item active">
-                                    <span class="cc-avatar-mini" style="color:var(--cc-accent);">SN</span>
-                                    <div class="cc-thread-info">
-                                        <strong>Studio North <span>10:24 AM</span></strong>
-                                        <p>Spring in motion: brief update</p>
-                                    </div>
-                                </div>
-                                <div class="cc-thread-item">
-                                    <span class="cc-avatar-mini" style="color:#60A5FA;">VA</span>
-                                    <div class="cc-thread-info">
-                                        <strong>Vela Active <span>Yesterday</span></strong>
-                                        <p>Approved deliverable schedule</p>
-                                    </div>
-                                </div>
-                                <div class="cc-thread-item">
-                                    <span class="cc-avatar-mini" style="color:#FBBF24;">HC</span>
-                                    <div class="cc-thread-info">
-                                        <strong>Homegrown Coffee <span>31 Aug</span></strong>
-                                        <p>Payment processed successfully</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="cc-chat-pane">
-                                <div class="cc-chat-header">
-                                    <div style="display:flex; align-items:center; gap:12px;">
-                                        <span class="cc-avatar-mini" style="color:var(--cc-accent);">SN</span>
-                                        <div>
-                                            <strong style="font-size:14px; color:#FFFFFF;">Studio North (Nadia - Campaign Lead)</strong>
-                                            <div class="cc-small">Campaign #CCF-024 · Spring in motion</div>
-                                        </div>
-                                    </div>
-                                    <button class="cc-btn cc-btn-nav" data-command="setPage('journey')">View Brief Pipeline ↗</button>
-                                </div>
-
-                                <div class="cc-chat-messages" id="chat-messages-container">
-                                    ${messages.map(m => `
-                                        <div class="cc-msg-bubble ${m.incoming ? 'cc-msg-incoming' : 'cc-msg-outgoing'}">
-                                            <div style="font-size:11px; font-weight:700; opacity:0.8; margin-bottom:4px;">${m.sender}</div>
-                                            <div>${m.text}</div>
-                                            <span class="cc-msg-time">${m.time}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-
-                                <div class="cc-chat-input-bar">
-                                    <input type="text" id="chat-input-field" class="cc-chat-input" placeholder="Type a message or brief update..." />
-                                    <button class="cc-btn cc-primary cc-btn-nav" data-command="sendChatMessage('${role}')">Send</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                        <p class="ccf-preview-footnote">This sample illustrates the workflow. The live workspace shows only campaigns your account can access.</p>`;
+                } else {
+                    const heading = isAgency ? 'People in the work.' : isBrand ? 'Decisions with context.' : 'A separate personal space.';
+                    const detail = isAgency ? 'See creators attached to a campaign, their assignment and the current handoff. A standalone searchable roster is planned, not available in this release.' : isBrand ? 'Review the agency-checked draft with the brief beside it. Approval and revision decisions stay in the campaign record.' : 'Your campaign assignments are shared with collaborators. Your income and expenses remain private and are never shown in this preview.';
+                    previewBody = `
+                        <div class="ccf-preview-explainer">
+                            <span>${activeTab.toUpperCase()} / SAMPLE DATA</span>
+                            <h2>${heading}</h2><p>${detail}</p>
+                            <button type="button" class="cc-btn cc-primary" data-command="openCampaignFlow('${role}')">See the shared campaign ↗</button>
+                        </div>`;
                 }
-
                 viewport.innerHTML = `
-                    <div class="cc-shell cc-demo-shell cc-role-${role}">
-                        <aside class="cc-side cc-demo-side">
-                            <div class="cc-kicker">${roleLabel} workspace · preview</div>
-                            <button class="${state.activeWorkspaceTab === 'Overview' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Overview' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Overview')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Overview
-                            </button>
-                            <button class="${state.activeWorkspaceTab === 'Campaigns' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Campaigns' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Campaigns')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg> Campaigns
-                            </button>
-                            <button class="${(state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') ? 'cc-active' : ''}" ${(state.activeWorkspaceTab === 'Income' || state.activeWorkspaceTab === 'Partners' || state.activeWorkspaceTab === 'Roster') ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('${isCreator ? 'Income' : isAgency ? 'Roster' : 'Partners'}')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ${isCreator ? 'Income' : isAgency ? 'Creator roster' : 'Creator partners'}
-                            </button>
-                            <button class="${state.activeWorkspaceTab === 'Inbox' ? 'cc-active' : ''}" ${state.activeWorkspaceTab === 'Inbox' ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('Inbox')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Inbox
-                            </button>
-                            <button data-command="setPage('journey')">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-left"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg> Shared journey
-                            </button>
+                    <section class="ccf-preview-shell" aria-label="${roleLabel} sample workspace">
+                        <aside class="ccf-preview-side">
+                            <a href="#landing" data-command="setPage('landing')" class="ccf-preview-brand">Creator Cash Flow<span>Campaign desk</span></a>
+                            <span class="ccf-preview-side-label">${roleLabel} perspective</span>
+                            <nav aria-label="Preview sections">
+                                ${tabs.map(tab => `<button type="button" class="${activeTab === tab ? 'is-active' : ''}" ${activeTab === tab ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('${tab}')">${tab}</button>`).join('')}
+                            </nav>
+                            <div class="ccf-preview-side-bottom">Illustrative sample.<br>No live data or payment actions.</div>
                         </aside>
-
-                        <div class="cc-main cc-demo-main">
-                            <div class="cc-demo-context"><span><i></i>Interactive product preview</span><b>${roleLabel} perspective</b></div>
-                            <div class="cc-title-row cc-demo-title">
-                                <div>
-                                    <div class="cc-kicker">${roleLabel} / ${state.activeWorkspaceTab}</div>
-                                    <h1>${isCreator ? 'Good morning, ' : ''}${roleName}${isCreator ? '.' : ''}</h1>
-                                    <p>${isCreator ? 'Your work is moving. Here’s where your money stands.' : isAgency ? 'Your campaigns, creators and next decisions.' : 'See what’s working. Keep your campaign moving.'}</p>
-                                </div>
-                                <div class="cc-demo-title-actions"><button class="cc-btn cc-primary" data-command="openCampaignFlow('${role}')">Open shared campaign <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button><span class="cc-avatar">${roleAvatar}</span></div>
+                        <div class="ccf-preview-content">
+                            <div class="ccf-preview-topline"><span>${roleName}</span><span>Product preview / ${roleLabel}</span></div>
+                            <div class="ccf-preview-mobile-tabs" role="navigation" aria-label="Preview sections">
+                                ${tabs.map(tab => `<button type="button" class="${activeTab === tab ? 'is-active' : ''}" ${activeTab === tab ? 'aria-current="page"' : ''} data-command="setWorkspaceTab('${tab}')">${tab}</button>`).join('')}
                             </div>
-
-                            ${subViewContent}
+                            <header class="ccf-preview-hero"><span>${sample.eyebrow}</span><h1>${sample.title}</h1><p>${sample.description}</p></header>
+                            ${previewBody}
                         </div>
-                    </div>
+                    </section>
                 `;
             } else if (state.page === 'journey') {
                 const s = stages[state.step];
@@ -843,13 +368,13 @@ const state = {
 
                                 <button class="cc-btn cc-primary" data-command="nextStep()" style="padding: 12px 24px; font-size: 14px;">${s[3]} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px; vertical-align: -2px; display: inline-block;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
                                 <div class="cc-small" style="margin-top: 14px;">
-                                    ${state.step === 5 ? 'Payment is tracked separately from content approval.' : 'Next handoff: ' + s[4]}
+                                    ${state.step === 5 ? 'Participant-entered results are labelled manual, not platform-verified.' : 'Next handoff: ' + s[4]}
                                 </div>
                             </div>
 
                             <div class="cc-box">
                                 <h3>Who sees what</h3>
-                                ${renderRow('Creator', 'Own fee, tasks and invoice', 'Personal')}
+                                ${renderRow('Creator', 'Own assignment and private finances', 'Private')}
                                 ${renderRow('Agency', 'Assigned creators, reviews and budget', 'Managed')}
                                 ${renderRow('Brand', 'Campaign spend and final approvals', 'Campaign')}
                                 <div class="cc-small" style="margin-top: 18px; line-height: 1.6;">
@@ -864,6 +389,8 @@ const state = {
             if (window.lucide) {
                 lucide.createIcons();
             }
+            const demoLink = document.querySelector('.public-header .public-nav .primary-link');
+            if (demoLink) { demoLink.href = '#request-demo'; demoLink.textContent = 'Request the demo'; }
         }
 
         function syncDemoEmail(role) {
@@ -890,6 +417,11 @@ const state = {
 
             window.addEventListener('hashchange', () => {
                 const newHash = window.location.hash.replace('#', '');
+                if (newHash === 'request-demo') {
+                    setPage('landing', false);
+                    requestAnimationFrame(() => document.getElementById('request-demo')?.scrollIntoView());
+                    return;
+                }
                 if (['landing', 'login', 'creator', 'agency', 'brand', 'journey'].includes(newHash)) {
                     if (state.page !== newHash) {
                         setPage(newHash, false);

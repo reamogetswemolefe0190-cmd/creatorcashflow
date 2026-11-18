@@ -68,23 +68,6 @@ function renderCampaignReport(report, audience) {
         section('What was delivered');
         label('Published links', `${report.posts.length} post${report.posts.length === 1 ? '' : 's'} included; ${measuredPosts} with manually entered results.`);
         if (latestResult) label('Latest results date', date(latestResult));
-        label('Campaign record', `${value(snap.status).replace(/_/g, ' ')} at report creation${snap.starts_on || snap.ends_on ? `; ${date(snap.starts_on)} to ${date(snap.ends_on)}` : '; campaign dates not recorded'}.`);
-
-        section('Results and evidence');
-        if (!report.posts.length) doc.font('Helvetica').fontSize(10).fillColor(muted).text('No published post links or results were supplied for this snapshot.');
-        report.posts.forEach((post, index) => {
-            ensure(105);
-            doc.x = margin;
-            doc.font('Helvetica-Bold').fontSize(11).fillColor(ink).text(`${value(post.label || `Post ${index + 1}`)}  |  Published ${date(post.publishedOn)}`);
-            doc.moveDown(.28).font('Helvetica').fontSize(9).fillColor(orange).text(post.url, { width: contentWidth, link: post.url, underline: true });
-            doc.moveDown(.25);
-            const entries = Object.entries(post.metrics || {});
-            if (entries.length) {
-                doc.font('Helvetica').fontSize(10).fillColor(ink).text(entries.map(([name, number]) => `${name[0].toUpperCase()}${name.slice(1)}: ${Number(number).toLocaleString('en-ZA')}`).join('   |   '), { width: contentWidth, lineGap: 2 });
-                doc.moveDown(.22).font('Helvetica').fontSize(9).fillColor(muted).text(`${post.source}  |  Results as of ${date(post.asOf)}`);
-            } else doc.font('Helvetica').fontSize(9).fillColor(muted).text('No performance results supplied.');
-            doc.moveDown(.8);
-        });
 
         section('What the evidence means');
         doc.x = margin;
@@ -93,6 +76,33 @@ function renderCampaignReport(report, audience) {
         section('What happens next');
         label('Recommended action', narrative.nextStep || 'No next action was recorded.');
         if (narrative.decisionNeeded) label('Decision requested from the brand', narrative.decisionNeeded);
+
+        doc.addPage();
+        doc.x = margin;
+        doc.font('Helvetica-Bold').fontSize(18).fillColor(ink).text('Evidence appendix');
+        doc.moveDown(.2).font('Helvetica').fontSize(9).fillColor(muted).text('The linked content and results behind the executive readout.');
+        section('Campaign record');
+        label('Status and dates', `${value(snap.status).replace(/_/g, ' ')} at report creation${snap.starts_on || snap.ends_on ? `; ${date(snap.starts_on)} to ${date(snap.ends_on)}` : '; campaign dates not recorded'}.`);
+        label('Brief', snap.brief || 'No brief recorded.');
+        section('Published content and results');
+        if (!report.posts.length) doc.font('Helvetica').fontSize(10).fillColor(muted).text('No published post links or results were supplied for this snapshot.');
+        report.posts.forEach((post, index) => {
+            ensure(105);
+            doc.x = margin;
+            doc.font('Helvetica-Bold').fontSize(11).fillColor(ink).text(`${value(post.label || `Post ${index + 1}`)}  |  Published ${date(post.publishedOn)}`);
+            doc.moveDown(.28).font('Helvetica').fontSize(9).fillColor(orange).text(post.url, { width: contentWidth, link: post.url, underline: true });
+            doc.moveDown(.4);
+            for (const name of ['reach', 'views', 'likes', 'comments', 'shares', 'saves']) {
+                ensure(22);
+                const rowY = doc.y;
+                doc.font('Helvetica').fontSize(9).fillColor(muted).text(name[0].toUpperCase() + name.slice(1), margin, rowY, { width: 220 });
+                doc.font('Helvetica-Bold').fontSize(9).fillColor(ink).text(post.metrics?.[name] == null ? 'Not supplied' : Number(post.metrics[name]).toLocaleString('en-ZA'), margin + 250, rowY, { width: 220 });
+                doc.x = margin;
+                doc.y = rowY + 17;
+            }
+            doc.moveDown(.4).font('Helvetica').fontSize(9).fillColor(muted).text(Object.keys(post.metrics || {}).length ? `${post.source}  |  Results as of ${date(post.asOf)}` : 'No performance results supplied.');
+            doc.moveDown(.8);
+        });
 
         if (audience === 'agency') {
             section('Agency notes');

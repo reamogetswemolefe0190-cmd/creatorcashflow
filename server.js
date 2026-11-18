@@ -39,6 +39,7 @@ const youtubeRoutes = require('./routes/youtubeRoutes');
 const agencyRoutes = require('./routes/agencyRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const collaborationRoutes = require('./routes/collaborationRoutes');
+const demoRequestRoutes = require('./routes/demoRequestRoutes');
 
 // Express Application Initialization
 const app = express();
@@ -70,7 +71,13 @@ app.use(helmet({
             imgSrc: [
                 "'self'",
                 "data:",                     // base64 embedded images
-                "https://images.unsplash.com"
+                "https://images.unsplash.com",
+                "https://*.supabase.co"
+            ],
+            mediaSrc: [
+                "'self'",
+                "data:",
+                "https://*.supabase.co"
             ],
             connectSrc: [
                 "'self'",
@@ -124,6 +131,7 @@ app.use('/api/gemini', aiRoutes);
 
 // Consent-scoped agency, brand and creator collaboration
 app.use('/api/collaboration', collaborationRoutes);
+app.use('/api/demo-requests', demoRequestRoutes);
 
 // 404 Route Not Found Envelope & Centralized Error Handler
 app.use(notFoundHandler);

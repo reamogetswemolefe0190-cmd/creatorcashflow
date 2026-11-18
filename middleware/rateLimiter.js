@@ -147,7 +147,7 @@ function createSlidingWindowLimiter({
 // Endpoint-specific bounded rate limiters
 const authRateLimiter = createSlidingWindowLimiter({
     windowMs: 15 * 60 * 1000,
-    maxRequests: 10,
+    maxRequests: process.env.NODE_ENV === 'test' ? 2000 : 60,
     errorMessage: 'Too many requests',
     userFacingMessage: 'Rate limit exceeded. Too many authentication attempts from this IP.',
     maxTrackedKeys: 1000

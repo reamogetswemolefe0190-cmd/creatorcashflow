@@ -1,14 +1,12 @@
-/* Canonical semantic theme across marketing, authentication and working surfaces.
-   Primitive Stitch colours stay immutable. Existing layout and route contracts stay intact.
-   note: warm neutrals derive from orange (H21.4 S100 L50): canvas S25 L97,
-   border S18 L88, supporting text S6 L38, selected S65 L94, emphasis S65 L30.
-   Primitives stay unchanged; these related HSL tones connect orange to the surfaces. */
+/* CCF's light operating theme, informed by Stitch's colour rhythm.
+   White carries content, orange identifies the primary action, and violet marks
+   shared context. Selected/emphasis are HSL adjustments of Stitch's #6e2cff. */
 :root{
   color-scheme:light;
-  --ui-canvas:hsl(21.4 25% 97%);--ui-surface:var(--st-white);--ui-text:var(--st-panel);
-  --ui-muted:hsl(21.4 6% 38%);--ui-border:hsl(21.4 18% 88%);--ui-action:var(--st-primary);
-  --ui-selected:hsl(21.4 65% 94%);--ui-emphasis:hsl(21.4 65% 30%);
-  --ui-focus:var(--ui-emphasis);--ui-inverse:var(--st-panel);--ui-on-inverse:var(--st-white);
+  --ui-canvas:#f2f2f2;--ui-surface:#ffffff;--ui-text:#100e13;
+  --ui-muted:#333333;--ui-border:#dddddd;--ui-action:#ff5b00;
+  --ui-selected:hsl(258 100% 96%);--ui-emphasis:hsl(258 73% 38%);
+  --ui-focus:#6e2cff;--ui-inverse:#100e13;--ui-on-inverse:#ffffff;
   --cc-bg:var(--ui-canvas);--cc-panel:var(--ui-surface);--cc-panel-elevated:var(--ui-canvas);
   --cc-ink:var(--ui-text);--cc-muted:var(--ui-muted);--cc-line:var(--ui-border);
   --cc-accent:var(--ui-emphasis);--cc-tag-bg:var(--ui-canvas);--cc-tag-text:var(--ui-text);
@@ -147,6 +145,28 @@ body.ccf-marketing{background:var(--ui-canvas)!important}
 #cc-screen :is(.pilot-payment-row,.pilot-visibility,.pilot-avatars span,.pilot-thread-empty i){background:var(--ui-canvas);color:var(--ui-text);border-color:var(--ui-border)}
 #cc-screen :is(.pilot-thread-empty,.pilot-thread-empty strong,.pilot-visibility>span){color:var(--ui-muted)}
 #cc-screen .pilot-action-bar .cc-btn:not(.cc-primary){background:var(--ui-surface);color:var(--ui-text);border-color:var(--ui-border)}
+/* Keep the native recipient selector and its popup in the light CCF palette. */
+#cc-screen .pilot-message-form select,
+#cc-screen .pilot-message-form select option{background:var(--ui-surface)!important;color:var(--ui-text)!important;color-scheme:light!important}
+#cc-screen .pilot-message-form select{border-color:var(--ui-border)!important;min-height:56px;cursor:pointer}
+#cc-screen .pilot-recipient-note{margin:0 0 12px;color:var(--ui-muted);font-size:14px;line-height:1.5}
+#cc-screen .pilot-media-preview{background:var(--ui-selected)}
+#cc-screen .pilot-draft-mark{position:relative;z-index:1;padding:32px;border:2px solid var(--ui-action);color:var(--ui-text);font-size:clamp(32px,5vw,64px);font-weight:700;letter-spacing:-.06em;line-height:.95;text-align:center;transform:rotate(-3deg)}
+
+/* Mobile demo: keep the current and upcoming handoffs in view without a six-card horizontal rail. */
+@media(max-width:760px){
+  #cc-screen .cc-demo-context,#cc-screen .cc-demo-title .cc-kicker,#cc-screen .cc-demo-title-actions .cc-avatar{display:none}
+  #cc-screen .cc-demo-title-actions:has(> .cc-avatar:only-child){display:none}
+  #cc-screen .pilot-campaign-head h1{font-size:40px;letter-spacing:-.04em;margin:8px 0 12px}
+  #cc-screen .pilot-campaign-owner{display:none}
+  #cc-screen .pilot-stage-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;gap:0}
+  #cc-screen .pilot-stage-rail>div{display:none;min-width:0;padding:12px}
+  #cc-screen .pilot-stage-rail>div.is-current,#cc-screen .pilot-stage-rail>div.is-current+div{display:flex}
+  #cc-screen .pilot-stage-rail>div:only-child{grid-column:1/-1}
+  #cc-screen .pilot-media-preview{height:200px}
+  #cc-screen .pilot-deliverable-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  #cc-screen .pilot-deliverable-meta>div+div{padding:0 0 0 12px;border-top:0;border-left:1px solid var(--ui-border)}
+}
 
 /* Authenticated agency/brand entry points share the exact same tokens. */
 body.role-workspace :is(.role-rail,.role-panel,.role-sheet,.role-metric,.modal-content){background:var(--ui-surface)!important;color:var(--ui-text);border-color:var(--ui-border);box-shadow:none}

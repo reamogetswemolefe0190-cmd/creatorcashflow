@@ -1,56 +1,56 @@
-﻿/* CCF landing component: semantic, route-native links; no simulated live metrics. */
+/* CCF landing: one clear story, one sample interaction, no invented traction. */
 window.CCFLanding = function () {
   const arrow='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const pilot='mailto:reamogetswemolefe@creatorcashflow.co.za?subject=CCF%20one-campaign%20pilot&body=Hi%20CCF%2C%20I%27d%20like%20to%20walk%20through%20one%20upcoming%20campaign.%20Our%20agency%20is%3A%20';
   // Licensed stock for marketing only. Provenance: assets/photography/README.md.
-  const image=document.createElement('img');
-  image.src='/assets/photography/creator-recording-1280.jpg';
-  image.srcset='/assets/photography/creator-recording-640.jpg 640w, /assets/photography/creator-recording-1280.jpg 1280w';
-  image.sizes='(max-width: 800px) calc(100vw - 64px), (max-width: 1100px) 45vw, 568px';
-  image.alt='Creator positioning a smartphone beside a ring light in a bright home studio';
-  image.width=1280;image.height=853;image.loading='lazy';image.decoding='async';
-  return `<div class="ccf-site">
-    <section class="ccf-hero" aria-labelledby="ccf-heading">
-      <div class="ccf-hero-copy">
-        <p class="ccf-eyebrow">For creators, agencies &amp; brands</p>
-        <h1 id="ccf-heading">The business behind<br><span>great content.</span></h1>
-        <p class="ccf-lead">One workspace to take a campaign from brief to payment. Track deliverables, manage reviews and keep income records in one place.</p>
-        <div class="ccf-actions"><a class="ccf-button ccf-primary" href="#signup">Create free account ${arrow}</a><a class="ccf-text-link" href="#journey">See how it works ${arrow}</a></div>
-        <p class="ccf-availability">Free for creators &nbsp;·&nbsp; Agency &amp; brand pilot</p>
+  return `<div class="ccf-site ccf2-site">
+    <section class="ccf2-hero" aria-labelledby="ccf-heading">
+      <div class="ccf2-hero-copy">
+        <p class="ccf-eyebrow">Creator campaigns, without the chase</p>
+        <h1 id="ccf-heading">The campaign shouldn't live in your inbox.</h1>
+        <p class="ccf2-lead">Briefs. Drafts. Approvals. Post links. One clear path from idea to done.</p>
+        <div class="ccf2-actions"><a class="ccf-button ccf-primary" href="#how-it-works">See the handoff ${arrow}</a><a class="ccf-text-link" href="${pilot}">Discuss a pilot ${arrow}</a></div>
+        <p class="ccf2-hero-note">Built for creator agencies · <a href="#signup">Free for creators</a></p>
       </div>
-      <div class="ccf-hero-visual">${image.outerHTML.replace('loading="lazy"','loading="eager" fetchpriority="high"')}<div class="ccf-hero-caption"><img src="/brand/connection-mark.svg" alt="" width="56" height="56"><p>More room to create.<br><span>One place for the work behind it.</span><a class="ccf-photo-credit" href="https://www.pexels.com/photo/happy-black-woman-preparing-for-online-recording-with-smartphone-6954098/" target="_blank" rel="noopener noreferrer">Stock photo · George Milton / Pexels</a></p></div></div>
+      <figure class="ccf2-visual">
+        <img src="/assets/photography/creator-recording-1280.jpg" srcset="/assets/photography/creator-recording-640.jpg 640w, /assets/photography/creator-recording-1280.jpg 1280w" sizes="(max-width: 800px) calc(100vw - 64px), 45vw" alt="Creator preparing to record content in a bright studio" width="1280" height="853" fetchpriority="high" decoding="async">
+        <figcaption class="ccf2-visual-card"><span class="ccf2-visual-label">Sample campaign · Spring in motion</span><strong>Draft ready for review</strong><span>Creator → agency <span aria-hidden="true">↗</span></span></figcaption>
+        <a class="ccf2-credit" href="https://www.pexels.com/photo/happy-black-woman-preparing-for-online-recording-with-smartphone-6954098/" target="_blank" rel="noopener noreferrer">Stock photo · George Milton / Pexels</a>
+      </figure>
     </section>
-    <div class="ccf-workflow"><span>A connected campaign workflow</span><ol><li>Brief</li><li>Create</li><li>Review</li><li>Record</li></ol></div>
-    <section class="ccf-preview" aria-labelledby="ccf-preview-heading">
-      <div class="ccf-preview-intro"><p class="ccf-eyebrow">From brief to review</p><h2 id="ccf-preview-heading">See the work.<br>Know the next step.</h2><p>A shared campaign keeps the brief, creator submissions and review decisions in view.</p><a class="ccf-text-link" href="#journey">Explore sample campaign ${arrow}</a></div>
-      <div class="ccf-workspace" aria-label="Illustrative campaign preview">
-        <div class="ccf-workspace-bar"><span>CCF / Campaign workspace</span><span class="ccf-sample-label">Sample data</span></div>
-        <div class="ccf-workspace-content"><p class="ccf-eyebrow">Campaign overview</p><h3>Vela Active</h3><p class="ccf-workspace-caption">Content, reviews and records in one place.</p>
-          <dl class="ccf-preview-stats"><div><dt>Campaign budget</dt><dd>R60,000</dd></div><div><dt>Approved deliverables</dt><dd>8 <span>/ 12</span></dd></div></dl>
-          <ul class="ccf-preview-tasks"><li><div><strong>Campaign brief</strong><span>Scope and deliverables</span></div><span class="ccf-status">Published</span></li><li><div><strong>Creator video</strong><span>Agency quality check</span></div><span class="ccf-status ccf-status-review">In review</span></li></ul>
-          <p class="ccf-next-step"><strong>Next step</strong> Review the creator’s submission.</p>
-        </div>
+
+    <section id="how-it-works" class="ccf2-story" aria-labelledby="ccf2-story-heading">
+      <div class="ccf2-story-intro"><p class="ccf-eyebrow">See it from every side</p><h2 id="ccf2-story-heading">One campaign.<br>Three clear next moves.</h2><p>Choose a perspective to see what happens after the creator submits a draft.</p>
+        <div class="ccf2-perspectives" aria-label="Campaign perspective"><button type="button" data-ccf-perspective="agency" aria-pressed="true">Agency</button><button type="button" data-ccf-perspective="brand" aria-pressed="false">Brand</button><button type="button" data-ccf-perspective="creator" aria-pressed="false">Creator</button></div>
       </div>
+      <div class="ccf2-stage" aria-live="polite"><div class="ccf2-stage-top"><span>CCF / Campaign workspace</span><span>Interactive sample</span></div><div class="ccf2-stage-body"><div class="ccf2-stage-progress" aria-label="Campaign steps"><span>Brief</span><span>Draft</span><span class="is-active">Review</span><span>Publish</span></div><p class="ccf2-stage-role" id="ccf2-role">Agency perspective</p><h3 id="ccf2-moment">The creator draft is ready.</h3><p id="ccf2-detail">Review it once, then send a clear version to the brand.</p><div class="ccf2-stage-next"><span>Next move</span><strong id="ccf2-next">Agency reviews the draft</strong></div></div><a class="ccf2-stage-link" href="#journey">Explore the full sample campaign ${arrow}</a></div>
     </section>
-    <section class="ccf-roles" aria-labelledby="ccf-roles-heading">
-      <div class="ccf-section-heading"><div><p class="ccf-eyebrow">One campaign. Three perspectives.</p><h2 id="ccf-roles-heading">Built around the people<br>behind every campaign.</h2></div><a class="ccf-text-link" href="#journey">Explore the workflow ${arrow}</a></div>
-      <div class="ccf-role-grid">
-        <article><div class="ccf-card-body"><span class="ccf-role-index">For creators</span><h3>More room to create.</h3><p>Track income, organise deliverables and see payment records in one private workspace.</p><div class="ccf-role-bottom"><span>Free creator account</span><a href="#creator">Explore creator view ${arrow}</a></div></div></article>
-        <article><div class="ccf-card-body"><span class="ccf-role-index">For agencies</span><h3>Keep the work moving.</h3><p>Follow campaign progress, coordinate creator work and keep the next review in view.</p><div class="ccf-role-bottom"><span>Early-access pilot</span><a href="#agency">Explore agency view ${arrow}</a></div></div></article>
-        <article><div class="ccf-card-body"><span class="ccf-role-index">For brands</span><h3>Clarity at every stage.</h3><p>Stay close to the brief, review deliverables and follow the campaign’s milestones.</p><div class="ccf-role-bottom"><span>Early-access pilot</span><a href="#brand">Explore brand view ${arrow}</a></div></div></article>
-      </div>
-    </section>
-    <section class="ccf-feature" aria-labelledby="ccf-feature-heading"><div class="ccf-feature-photo">${image?image.outerHTML:''}<span>Made for the business behind the content.</span></div><div class="ccf-feature-copy"><p class="ccf-eyebrow">Less admin. More perspective.</p><h2 id="ccf-feature-heading">Good work deserves<br>a clear picture.</h2><p>Campaign activity and financial records belong in the same conversation. CCF brings them closer, without another spreadsheet to chase.</p><ul><li><span>01</span> Income and expense records</li><li><span>02</span> Shared campaign milestones</li><li><span>03</span> Authorised Instagram post insights</li></ul><p class="ccf-feature-note">Instagram access depends on Meta permissions and account eligibility.</p><a class="ccf-text-link" href="#availability">Explore what’s available ${arrow}</a></div></section>
-    <section class="ccf-close"><p class="ccf-eyebrow">A clearer way to work</p><div><h2>Less chasing.<br>More creating.</h2><a class="ccf-button ccf-primary" href="#signup">Sign up for free ${arrow}</a></div><p>Agencies and brands can <a href="mailto:reamogetswemolefe@creatorcashflow.co.za?subject=CCF%20pilot">contact the team about the pilot</a>.</p></section>
+
+    <section class="ccf2-invite" aria-labelledby="ccf2-invite-heading"><div><p class="ccf-eyebrow">Start small. Prove the value.</p><h2 id="ccf2-invite-heading">Bring one real campaign.</h2><p>We’ll set up your brief and approval steps with you. You decide if it saves your team the chase.</p></div><div class="ccf2-invite-action"><a class="ccf-button ccf-primary" href="${pilot}">Discuss a one-campaign pilot ${arrow}</a><p>Agency collaboration is early access. Automated payments and client-ready reports are not available yet.</p></div></section>
   </div>`;
 };
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-      const btn = document.querySelector('[data-action="menu"][aria-expanded="true"]');
-      if (btn) {
-          btn.setAttribute('aria-expanded', 'false');
-          const nav = document.getElementById(btn.getAttribute('aria-controls'));
-          if(nav) nav.classList.remove('is-open');
-      }
+const ccfPerspectives={
+  agency:{role:'Agency perspective',moment:'The creator draft is ready.',detail:'Review it once, then send a clear version to the brand.',next:'Agency reviews the draft'},
+  brand:{role:'Brand perspective',moment:'A reviewed version is waiting.',detail:'See the deliverable and leave one decision where the work lives.',next:'Brand approves or requests changes'},
+  creator:{role:'Creator perspective',moment:'The next step is visible.',detail:'See the brief, feedback and publish link in the same campaign.',next:'Creator responds to feedback'}
+};
+document.addEventListener('click',event=>{
+  const button=event.target.closest('[data-ccf-perspective]');
+  if(!button)return;
+  const view=ccfPerspectives[button.dataset.ccfPerspective];
+  if(!view)return;
+  document.querySelectorAll('[data-ccf-perspective]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  for(const [id,value] of [['ccf2-role',view.role],['ccf2-moment',view.moment],['ccf2-detail',view.detail],['ccf2-next',view.next]]){
+    const target=document.getElementById(id);
+    if(target)target.textContent=value;
   }
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const button=document.querySelector('[data-action="menu"][aria-expanded="true"]');
+  if(!button)return;
+  button.setAttribute('aria-expanded','false');
+  document.getElementById(button.getAttribute('aria-controls'))?.classList.remove('is-open');
 });

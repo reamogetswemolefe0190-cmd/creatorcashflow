@@ -55,6 +55,10 @@ async function seedAdminAccountInSupabase() {
 // Auto-seeding helper for Default Creators in Supabase
 async function seedDefaultCreatorsInSupabase(seedCreators, seedTransactions) {
     if (!supabase) return;
+    if (process.env.NODE_ENV === 'production' || process.env.SEED_DEMO_DATA === 'false') {
+        // In production or when demo seeding is disabled, do not populate fictional creator seed data
+        return;
+    }
     try {
         const { count, error } = await supabase.from('users').select('*', { count: 'exact', head: true });
         if (!error && (count === 0 || count === null)) {

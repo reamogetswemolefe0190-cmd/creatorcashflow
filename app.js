@@ -248,11 +248,20 @@ async function loadUserTransactions() {
                 };
             });
         } else {
-            loadLocalBackupData();
+            // Real authenticated account with clean ledger
+            state.activities = [];
+            state.balance = 0;
+            state.timelineData = [];
         }
     } catch (err) {
-        console.warn('Backend connection failed. Loading local backup.', err);
-        loadLocalBackupData();
+        console.warn('Backend connection failed.', err);
+        if (state.token === 'demo_token') {
+            loadLocalBackupData();
+        } else {
+            state.activities = [];
+            state.balance = 0;
+            state.timelineData = [];
+        }
     }
 
     recalculateBusinessMetrics();
@@ -850,7 +859,17 @@ function renderDashboardData() {
     const activityStream = document.getElementById('activity-stream-os');
     if (activityStream) {
         activityStream.innerHTML = '';
-        state.activities.slice(0, 4).forEach(a => {
+        if (state.activities.length === 0) {
+            activityStream.innerHTML = `
+                <div class="p-6 text-center text-text-secondary text-sm border border-dashed border-white/10 rounded-2xl bg-surface/30">
+                    <p class="font-medium text-white mb-1">No activities recorded yet</p>
+                    <p class="text-xs text-text-secondary mb-3">Add your first transaction record or connect a revenue stream.</p>
+                    <button onclick="openUploadRecordModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-black font-semibold text-xs hover:opacity-90 transition-opacity">
+                        + Add Record
+                    </button>
+                </div>
+            `;
+        } else state.activities.slice(0, 4).forEach(a => {
             const amountClass = a.type === 'income' ? 'class="font-display font-bold text-accent-emerald text-sm"' : 'class="font-display font-bold text-white text-sm"';
             const prefix = a.type === 'income' ? '+' : '-';
             activityStream.innerHTML += `
@@ -875,7 +894,10 @@ function renderFullStreams() {
     const revStream = document.getElementById('full-revenue-stream');
     if (revStream) {
         revStream.innerHTML = '';
-        state.activities.filter(a => a.type === 'income').forEach(a => {
+        const incomeItems = state.activities.filter(a => a.type === 'income');
+        if (incomeItems.length === 0) {
+            revStream.innerHTML = '<div class="py-6 text-center text-text-secondary text-xs">No revenue records found.</div>';
+        } else incomeItems.forEach(a => {
             revStream.innerHTML += `
                 <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>
@@ -891,7 +913,10 @@ function renderFullStreams() {
     const expStream = document.getElementById('full-expense-stream');
     if (expStream) {
         expStream.innerHTML = '';
-        state.activities.filter(a => a.type === 'expense').forEach(a => {
+        const expenseItems = state.activities.filter(a => a.type === 'expense');
+        if (expenseItems.length === 0) {
+            expStream.innerHTML = '<div class="py-6 text-center text-text-secondary text-xs">No expense records found.</div>';
+        } else expenseItems.forEach(a => {
             expStream.innerHTML += `
                 <div class="flex justify-between items-center py-md border-b border-white/[0.05]">
                     <div>

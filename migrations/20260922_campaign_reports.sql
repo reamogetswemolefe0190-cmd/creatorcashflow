@@ -1,9 +1,6 @@
--- Persistent, reviewed campaign report snapshots and role-aware account fields.
--- Run after 20260909_campaign_collaboration.sql.
+-- Shelved campaign report prototype. Do not apply while reports are shelved.
+-- If revived, run after 20260909_campaign_collaboration.sql.
 begin;
-
-alter table public.users add column if not exists role text not null default 'creator';
-alter table public.users add column if not exists organization_id text;
 
 create table if not exists public.campaign_reports (
   id text primary key,

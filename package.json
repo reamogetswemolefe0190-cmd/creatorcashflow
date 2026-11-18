@@ -9,6 +9,7 @@
     "dev": "nodemon server.js",
     "test": "node test_pivot_validation.js && node test_full_site.js && node tests/phyllo_integration_test.js && node tests/collaboration_flow_test.js && node tests/instagram_integration_test.js && node tests/instagram_ui_contract_test.js",
     "test:instagram": "node tests/instagram_integration_test.js",
+    "test:demo-request": "node tests/demo_request_test.cjs",
     "test:ui": "node tests/instagram_ui_test.cjs",
     "test:admin": "node test_admin_auth.js && node test_admin_metrics.js && node test_admin_m3.js && node test_admin_ui.js",
     "test:stress": "node stress_harness.js --concurrency 150 --duration 15"
@@ -22,6 +23,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "motion": "13.4.0",
+    "multer": "^2.5.0",
     "pdfkit": "^0.20.2"
   },
   "devDependencies": {

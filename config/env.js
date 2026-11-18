@@ -23,6 +23,8 @@ const BCRYPT_ROUNDS = process.env.BCRYPT_ROUNDS ? parseInt(process.env.BCRYPT_RO
 
 // Supabase Configuration
 const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 // Admin Configuration
@@ -62,6 +64,8 @@ module.exports = {
     BCRYPT_ROUNDS,
     SUPABASE_URL,
     SUPABASE_KEY,
+    SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY,
     MASTER_ADMIN_EMAIL,
     MASTER_ADMIN_PASS,
     FALLBACK_ADMIN_EMAIL,

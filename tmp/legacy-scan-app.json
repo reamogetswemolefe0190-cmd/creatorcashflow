@@ -1,0 +1,383 @@
+{
+  "targetDir": ".",
+  "totalFindings": 30,
+  "guides": [
+    {
+      "guideId": "autofill-sign-in-form",
+      "retrieveCommand": "npx modern-web-guidance retrieve autofill-sign-in-form",
+      "count": 1,
+      "rules": [
+        {
+          "ruleId": "autofill-sign-in-form",
+          "summary": "Password input in sign-in or credential form should specify autocomplete=\"current-password\" or autocomplete=\"new-password\".",
+          "verifierRubric": {
+            "keepWhen": [
+              "The password input is part of a user-facing authentication, current-password verification, or sign-in form.",
+              "The password input lacks an autocomplete attribute or specifies autocomplete=\"off\" on credentials, preventing browser password manager autofill."
+            ],
+            "dropWhen": [
+              "The password input is disabled, readonly, hidden, or a non-interactive display widget.",
+              "The password input already provides a valid credential autocomplete token (such as \"current-password\", \"new-password\", or \"one-time-code\").",
+              "The password input is for creating or confirming a new password (owned by autofill-sign-up-form).",
+              "The password input is for external service, infrastructure, or device configuration (such as database connections, proxy credentials, SMTP settings, webhooks, or API keys/tokens).",
+              "The input is not contained within a form or form-like authentication context.",
+              "The component receives its autocomplete attribute dynamically via props, context, or JSX spread."
+            ]
+          },
+          "count": 1,
+          "findings": [
+            {
+              "file": "admin.html",
+              "line": 177,
+              "message": "Password input inside sign-in or credential form lacks autocomplete=\"current-password\".",
+              "lineContent": "<input type=\"password\" id=\"admin-password\" required class=\"w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all\" placeholder=\"••••••••••••\">"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "guideId": "customize-scrollbar-color-and-thickness",
+      "retrieveCommand": "npx modern-web-guidance retrieve customize-scrollbar-color-and-thickness",
+      "count": 3,
+      "rules": [
+        {
+          "ruleId": "customize-scrollbar-color-and-thickness",
+          "summary": "Vendor ::-webkit-scrollbar pseudo-elements customize or hide scrollbars; use standard scrollbar-color and scrollbar-width (including scrollbar-width: none) instead.",
+          "verifierRubric": {
+            "keepWhen": [
+              "The CSS rule uses vendor pseudo-elements (::-webkit-scrollbar or ::-webkit-scrollbar-thumb) to customize scrollbar dimensions/thumb colors or to hide scrollbars (display: none, width: 0, height: 0).",
+              "The custom or hidden scrollbar styling is implemented without declaring standard scrollbar-color or scrollbar-width (such as scrollbar-width: none) CSS properties."
+            ],
+            "dropWhen": [
+              "The stylesheet already defines standard scrollbar-width or scrollbar-color properties.",
+              "The rule only resets scrollbar properties using CSS cascade keywords (auto, inherit, initial, unset, revert) or sets transparent thumb backgrounds without hiding ::-webkit-scrollbar.",
+              "The rule sets a CSS gradient (linear-gradient, radial-gradient, -webkit-gradient), image, or box-shadow (-webkit-box-shadow) on ::-webkit-scrollbar-thumb or ::-webkit-scrollbar-track, styles visible ::-webkit-scrollbar-button arrows, or styles ::-webkit-scrollbar thickness when the accompanying ::-webkit-scrollbar-thumb uses gradients, images, box-shadow, backdrop-filter, or transparent backgrounds.",
+              "The rule targets ::-webkit-scrollbar for non-zero sizing without custom thumb styling, or only sets border-radius without color, thickness, or hiding.",
+              "The rule is inside a CSS reset stylesheet, targets a third-party custom JS scrollbar widget container that hides native scrollbars to render synthetic DOM scrollbars, or is inside an @supports not (scrollbar-width: ...) / @supports not (scrollbar-color: ...) fallback block."
+            ]
+          },
+          "count": 3,
+          "findings": [
+            {
+              "file": "admin.html",
+              "line": 78,
+              "message": "CSS rule uses vendor ::-webkit-scrollbar pseudo-elements to customize scrollbar appearance; add standard scrollbar-color and scrollbar-width (and wrap ::-webkit-scrollbar in @supports not (scrollbar-color: auto)).",
+              "lineContent": "::-webkit-scrollbar {"
+            },
+            {
+              "file": "admin.html",
+              "line": 85,
+              "message": "CSS rule uses vendor ::-webkit-scrollbar pseudo-elements to customize scrollbar appearance; add standard scrollbar-color and scrollbar-width (and wrap ::-webkit-scrollbar in @supports not (scrollbar-color: auto)).",
+              "lineContent": "::-webkit-scrollbar-thumb {"
+            },
+            {
+              "file": "admin.html",
+              "line": 89,
+              "message": "CSS rule uses vendor ::-webkit-scrollbar pseudo-elements to customize scrollbar appearance; add standard scrollbar-color and scrollbar-width (and wrap ::-webkit-scrollbar in @supports not (scrollbar-color: auto)).",
+              "lineContent": "::-webkit-scrollbar-thumb:hover {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "guideId": "js",
+      "retrieveCommand": "npx modern-web-guidance retrieve js",
+      "count": 24,
+      "rules": [
+        {
+          "ruleId": "js/copying-array-methods",
+          "summary": "Replace shallow-copy array sorting, reversing, and reverse search with toSorted(), toReversed(), findLast(), and findLastIndex().",
+          "verifierRubric": {
+            "keepWhen": [
+              "Array (or TypedArray via .slice()) copied via [...arr], arr.slice(), arr.slice(0), or arr.concat()."
+            ],
+            "dropWhen": [
+              "Spread [...x] on non-Array iterable (Set, Map, NodeList, HTMLCollection, DOMTokenList, FileList, arguments, string).",
+              "Sparse holes (slice preserves holes; toSorted fills undefined), callback index/array args for findLast/findLastIndex (does not apply to toReversed() or toSorted()), or un-inverted findIndex.",
+              "Visible project configuration in snippet targets pre-ES2023 (explicit engines.node < 20 or tsconfig lib/target older than ES2023; do not drop code merely because it uses var, ES5 syntax, or sits in a library/vendor file) or feature guards/polyfills."
+            ]
+          },
+          "count": 8,
+          "findings": [
+            {
+              "file": "app.js",
+              "line": 231,
+              "message": "Use state.activities.toReversed() instead of copying before .reverse().",
+              "lineContent": "state.activities.slice().reverse().forEach(a => {"
+            },
+            {
+              "file": "app.js",
+              "line": 1464,
+              "message": "Use state.activities.toReversed() instead of copying before .reverse().",
+              "lineContent": "state.activities.slice().reverse().forEach(a => {"
+            },
+            {
+              "file": "assets/ccf-creator.js",
+              "line": 22,
+              "message": "Use invoices.toSorted((a,b) => order === 'date' ? a.day-b.day : b.amount-a.amount) instead of copying before .sort().",
+              "lineContent": "const rows = [...invoices].sort((a,b) => order === 'date' ? a.day-b.day : b.amount-a.amount);"
+            },
+            {
+              "file": "controllers/adminController.js",
+              "line": 452,
+              "message": "Use (memoryDb.audit_logs || []).toSorted((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) instead of copying before .sort().",
+              "lineContent": "const logs = [...(memoryDb.audit_logs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));"
+            },
+            {
+              "file": "dashboards.js",
+              "line": 123,
+              "message": "Use (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority) instead of copying before .sort().",
+              "lineContent": "const campaigns = [...(state.workspace?.campaigns || [])].sort((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);"
+            },
+            {
+              "file": "dashboards.js",
+              "line": 136,
+              "message": "Use (state.workspace?.campaigns || []).toSorted((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority) instead of copying before .sort().",
+              "lineContent": "const campaigns = [...(state.workspace?.campaigns || [])].sort((a, b) => campaignHandoff(a).priority - campaignHandoff(b).priority);"
+            },
+            {
+              "file": "stress_harness.js",
+              "line": 207,
+              "message": "Use latencies.toSorted((a, b) => a - b) instead of copying before .sort().",
+              "lineContent": "const sorted = [...latencies].sort((a, b) => a - b);"
+            },
+            {
+              "file": "test_metrics_concurrency.js",
+              "line": 73,
+              "message": "Use durations.toSorted((a, b) => a - b) instead of copying before .sort().",
+              "lineContent": "const sorted = [...durations].sort((a, b) => a - b);"
+            }
+          ]
+        },
+        {
+          "ruleId": "js/error-cause",
+          "summary": "Pass `{ cause: err }` as the second argument to `new Error(...)` instead of attaching `.cause` manually or concatenating the cause only into the message string.",
+          "verifierRubric": {
+            "keepWhen": [
+              "A built-in Error constructor (Error, TypeError, RangeError, SyntaxError, URIError, ReferenceError, or EvalError) wraps a caught error by assigning .cause after construction (e.cause = err or Object.assign(new Error(...), { cause: err })) or by combining an outer message with err, err.toString(), or err.message without passing { cause: err }.",
+              "When err.message, err.toString(), or ${err} is concatenated into the outer error message (new Error('Failed: ' + err.message) or new Error(`Failed: ${err}`)), keep the outer .message intact and pass { cause: err } as the second argument unless callers clearly do not assert on the combined .message."
+            ],
+            "dropWhen": [
+              "The catch block sits at an RPC, IPC, HTTP response, worker, or security trust boundary that intentionally strips internal error objects or stack traces before exposing an error across the boundary.",
+              "Visible project configuration in the snippet explicitly targets pre-ES2022 runtimes (engines.node < 16.9.0 or tsconfig.json lib/target older than ES2022); do not drop code merely because it uses var, ES5 syntax, or sits in a library/shim/vendor file.",
+              "The constructor is a custom Error subclass or shadowed wrapper (HttpError, AppError, imported Error) taking positional arguments or not forwarding options to super(message, options), or a second argument is already supplied.",
+              "The catch block attaches custom properties (e.code, e.status, e.originalError) that callers inspect instead of .cause, without setting e.cause.",
+              "Downstream callers or tests assert strict deep equality or exact own property keys on the thrown Error instance where adding an own cause property fails assertions."
+            ]
+          },
+          "count": 1,
+          "findings": [
+            {
+              "file": "test_full_site.js",
+              "line": 89,
+              "message": "Pass { cause: err } as the second argument to new Error(message, { cause: err }) to preserve the original error object and stack; keep the outer .message intact if callers or tests assert on it.",
+              "lineContent": "throw new Error(`Syntax error in script block ${idx}: ${e.message}`);"
+            }
+          ]
+        },
+        {
+          "ruleId": "js/replace-children-innerhtml",
+          "summary": "Replace standalone empty innerHTML assignments (el.innerHTML = \"\") with el.replaceChildren() to avoid HTML parsing and Trusted Types CSP failures.",
+          "verifierRubric": {
+            "keepWhen": [
+              "A standalone statement clears a DOM Element, ShadowRoot, or SVGElement via .innerHTML = \"\" or .innerHTML = null (including when followed by appendChild/append calls to insert new nodes), where el.replaceChildren() avoids HTML parsing and Trusted Types CSP failures."
+            ],
+            "dropWhen": [
+              "The receiver is a <template> element (where template.innerHTML = \"\" clears template.content, whereas template.replaceChildren() leaves template.content untouched) or a DocumentFragment / template.content (DocumentFragment has no innerHTML setter, so .innerHTML = \"\" is a no-op whereas replaceChildren() removes children).",
+              "The receiver is bare document or a non-DOM mock, serializer, virtual DOM node, or plain JavaScript object that happens to define an innerHTML property.",
+              "The empty innerHTML assignment is redundantly followed by another innerHTML assignment (= or +=) on the same receiver in the same block without intervening control flow, await/yield, or reads of its HTML/text content.",
+              "The assignment is part of a chained assignment or expression context whose empty-string result is consumed, relies on Custom Element disconnectedCallback() ordering, or sits inside a genuine legacy-browser DOM polyfill/shim or explicit replaceChildren() feature-detection guard."
+            ]
+          },
+          "count": 6,
+          "findings": [
+            {
+              "file": "app.js",
+              "line": 375,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "listContainer.innerHTML = '';"
+            },
+            {
+              "file": "app.js",
+              "line": 835,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "sourceContainer.innerHTML = '';"
+            },
+            {
+              "file": "app.js",
+              "line": 861,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "activityStream.innerHTML = '';"
+            },
+            {
+              "file": "app.js",
+              "line": 896,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "revStream.innerHTML = '';"
+            },
+            {
+              "file": "app.js",
+              "line": 915,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "expStream.innerHTML = '';"
+            },
+            {
+              "file": "app.js",
+              "line": 1596,
+              "message": "Assigning empty innerHTML invokes the HTML parser and fails under Trusted Types; use element.replaceChildren() (or element.replaceChildren(newContent)) instead.",
+              "lineContent": "insightsEl.innerHTML = '';"
+            }
+          ]
+        },
+        {
+          "ruleId": "js/structured-clone",
+          "summary": "Replace JSON.parse(JSON.stringify(x)) deep-copy workarounds with structuredClone(x).",
+          "verifierRubric": {
+            "keepWhen": [
+              "JSON.parse(JSON.stringify(x)) is used to create an independent deep copy of plain objects, arrays, or plain data records so mutating or detaching the clone does not affect the original value, when the snippet shows no evidence of reactive Proxy wrappers, .toJSON() hooks, replacer/reviver arguments, non-cloneable values, or intentional JSON normalization."
+            ],
+            "dropWhen": [
+              "The snippet shows direct evidence that the cloned value is a Proxy wrapper or framework reactive state (such as new Proxy(...), Vue reactive(), ref().value, defineProps(), Vuex/Pinia $store/$state, MobX observable, or a local visibly assigned from component state) passed without unwrapping (for example toRaw()), where structuredClone() throws DataCloneError. Do not drop plain local objects, array copies, or function parameters solely because the file is a .vue component.",
+              "The input defines an own enumerable .toJSON() method (which makes structuredClone() throw DataCloneError) or an inherited/non-enumerable .toJSON() hook (which JSON.stringify invokes but structuredClone() silently ignores), or the call uses custom JSON.stringify replacer / JSON.parse reviver arguments.",
+              "The code explicitly relies on JSON serialization normalization rather than deep copying: serializing Date instances to ISO strings (date.toISOString()), explicitly stripping undefined keys or array slots, coercing NaN, ±Infinity, -0, or sparse array holes to null/0, or breaking shared internal object references into separate object identities.",
+              "The clone mirrors a payload that is immediately serialized with JSON.stringify for a wire protocol and relies on dropping undefined keys, or is passed directly to postMessage(JSON.parse(JSON.stringify(x))) where postMessage already performs structured cloning.",
+              "Surrounding code or types show the cloned value contains functions/callbacks, Symbol values, Promise, WeakMap, WeakSet, DOM Node instances, non-serializable platform objects/DOM properties (Storage/localStorage, element.dataset, element.style, element.children, element.attributes, Location, URLSearchParams, FormData, Headers, Event, AbortSignal/AbortController), streams (ReadableStream, WritableStream, TransformStream), DOM observers (MutationObserver, ResizeObserver, IntersectionObserver), or messaging ports and channels (MessagePort, MessageChannel, BroadcastChannel), where structuredClone() throws DataCloneError.",
+              "The cloned value is an imported library object or singleton that may carry own enumerable methods (which JSON.stringify strips into plain data whereas structuredClone() throws DataCloneError).",
+              "The code runs inside an isolated VM sandbox or test runner (such as a node:vm createContext realm or sandboxed plugin context) whose global object exposes only ECMAScript intrinsics, or visible project configuration declares engines.node < 17, a TypeScript lib without DOM or @types/node, or ESLint no-undef globals that omit structuredClone.",
+              "The expression appears inside a test assertion or mock expectation verifying JSON-serialized shapes."
+            ]
+          },
+          "count": 9,
+          "findings": [
+            {
+              "file": "admin.js",
+              "line": 336,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "state.creators = JSON.parse(JSON.stringify(DEMO_CREATORS));"
+            },
+            {
+              "file": "admin.js",
+              "line": 337,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "state.metrics = JSON.parse(JSON.stringify(DEMO_METRICS));"
+            },
+            {
+              "file": "admin.js",
+              "line": 338,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "state.auditLogs = JSON.parse(JSON.stringify(DEMO_AUDIT));"
+            },
+            {
+              "file": "admin.js",
+              "line": 339,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "state.telemetry = JSON.parse(JSON.stringify(DEMO_TELEMETRY));"
+            },
+            {
+              "file": "admin.js",
+              "line": 356,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "state.metrics = JSON.parse(JSON.stringify(EMPTY_METRICS));"
+            },
+            {
+              "file": "test_admin_metrics_stress.js",
+              "line": 76,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "origUsers = JSON.parse(JSON.stringify(memoryDb.users));"
+            },
+            {
+              "file": "test_admin_metrics_stress.js",
+              "line": 77,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "origTxs = JSON.parse(JSON.stringify(memoryDb.transactions));"
+            },
+            {
+              "file": "test_admin_metrics_stress.js",
+              "line": 82,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "memoryDb.users.push(...JSON.parse(JSON.stringify(origUsers)));"
+            },
+            {
+              "file": "test_admin_metrics_stress.js",
+              "line": 84,
+              "message": "JSON.parse(JSON.stringify(...)) deep-copy workaround can be replaced with native structuredClone().",
+              "lineContent": "memoryDb.transactions.push(...JSON.parse(JSON.stringify(origTxs)));"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "guideId": "scrollspy",
+      "retrieveCommand": "npx modern-web-guidance retrieve scrollspy",
+      "count": 1,
+      "rules": [
+        {
+          "ruleId": "scrollspy/js",
+          "summary": "Imperative scrollspy plugin calls, IntersectionObserver section watchers, and manual position scroll listeners should be modernized with CSS scroll-target-group: auto and :target-current.",
+          "verifierRubric": {
+            "keepWhen": [
+              "DOM element specifies legacy Bootstrap data-spy=\"scroll\" or data-bs-spy=\"scroll\" attribute (or scrollspy classes with data-target/data-bs-target) to highlight active navigation links based on scroll position.",
+              "JavaScript initializes a scrollspy plugin via $(...).scrollspy(...) or new bootstrap.ScrollSpy(...).",
+              "JavaScript scroll event listener measures section positions (offsetTop, getBoundingClientRect().top, scrollY, pageYOffset) to compute the active section and toggle \"active\" class or aria-current on navigation links.",
+              "IntersectionObserver callback tracks section visibility to toggle active or aria-current states on navigation or TOC links."
+            ],
+            "dropWhen": [
+              "The navigation container or stylesheet already implements CSS scroll-target-group: auto and :target-current.",
+              "The scroll event listener handles unrelated scroll behaviors such as infinite scroll loading, scroll-to-top floating button visibility, parallax canvas animations, or reading progress bars.",
+              "IntersectionObserver is used for lazy loading images, infinite scrolling, or animation entry triggers without managing active navigation link state.",
+              "Third-party or bundled ScrollSpy plugin definitions (e.g. $.fn.scrollspy = ..., ScrollSpy.prototype, or ScrollSpy._jQueryInterface) rather than application usage.",
+              "ScrollSpy setups that hook activate.bs.scrollspy or section-activation events to imperatively scroll a TOC container (e.g. setting scrollTop or calling scrollIntoView/scrollTo).",
+              "Complex multi-container scroll coordinators or custom interactive graph navigators with non-linear section hierarchies that cannot map to fragment links."
+            ]
+          },
+          "count": 1,
+          "findings": [
+            {
+              "file": "assets/ccf-narrative-landing.js",
+              "line": 51,
+              "message": "IntersectionObserver navigation callback toggles active link on section intersection; modernize with CSS scroll-target-group: auto and :target-current.",
+              "lineContent": "const observer = new IntersectionObserver(entries => entries.forEach(entry => {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "guideId": "secure-external-subresources",
+      "retrieveCommand": "npx modern-web-guidance retrieve secure-external-subresources",
+      "count": 1,
+      "rules": [
+        {
+          "ruleId": "secure-external-subresources",
+          "summary": "Add Subresource Integrity (integrity=\"sha384-...\"), crossorigin=\"anonymous\", and referrerpolicy=\"no-referrer\" to versioned third-party CDN <script> and <link rel=\"stylesheet\"> elements.",
+          "verifierRubric": {
+            "keepWhen": [
+              "An HTML or JSX <script src=\"https://...\"> or <link rel=\"stylesheet\" href=\"https://...\"> loads an immutable, version-pinned asset from a public third-party CDN (cdnjs.cloudflare.com, cdn.jsdelivr.net, unpkg.com, code.jquery.com, maxcdn.bootstrapcdn.com, stackpath.bootstrapcdn.com, ajax.googleapis.com) without an integrity attribute.",
+              "An external cross-origin <script src=\"https://...\"> or <link rel=\"stylesheet\" href=\"https://...\"> specifies integrity=\"sha...\" but omits the required crossorigin=\"anonymous\" attribute."
+            ],
+            "dropWhen": [
+              "The <script> or <link> element already includes both an integrity=\"sha256-... | sha384-... | sha512-...\" attribute and a crossorigin attribute.",
+              "The URL points to a mutable/unversioned endpoint (such as analytics tags, live widgets, or Google Fonts CSS) or a first-party same-origin asset."
+            ]
+          },
+          "count": 1,
+          "findings": [
+            {
+              "file": "videos/creator-cash-flow-pitch/compositions/components/cta-close.html",
+              "line": 130,
+              "message": "External third-party CDN <script> resource (https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js) lacks Subresource Integrity; add integrity=\"sha384-...\", crossorigin=\"anonymous\", and referrerpolicy=\"no-referrer\".",
+              "lineContent": "<script src=\"https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js\"></script>"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "activeRuleCount": 52,
+  "activeGuideCount": 38,
+  "note": "Checked 38 guides (52 deterministic rules; ~20% of the guidance corpus). Finding 30 items here only reflects deterministic legacy patterns; use 'search <topic>' for the rest of the catalog.",
+  "skippedDocsAndTestsCount": 27
+}

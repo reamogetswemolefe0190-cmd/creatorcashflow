@@ -1,5 +1,8 @@
 'use strict';
 
+// Shelved prototype test: report routes and dashboard entry points must be
+// deliberately restored before running this. Not part of the active suite.
+
 process.env.NODE_ENV = 'test';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -50,6 +53,7 @@ const { chromium } = require('C:/Users/User/.cache/codex-runtimes/codex-primary-
             internalNotes: 'Internal agency margin and follow-up only.',
             posts: [{ label: 'Illustrative launch post', url: 'https://www.instagram.com/p/sample-post/', publishedOn: '2026-09-20', asOf: '2026-09-22', metrics: { reach: 1234, views: 1800, likes: 93, comments: 12 } }]
         };
+        assert.equal((await request(route, agency.token, { ...payload, interpretation: '' })).status, 400);
         assert.equal((await request(route, agency.token, { ...payload, posts: [{ ...payload.posts[0], url: 'javascript:alert(1)' }] })).status, 400);
         const created = await request(route, agency.token, payload);
         assert.equal(created.status, 201, JSON.stringify(created.body));

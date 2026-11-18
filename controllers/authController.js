@@ -22,13 +22,14 @@ async function signup(req, res) {
     let createdUserId = null;
     let createdOrgId = null;
     try {
-        const { email, password, name, role = 'creator', organization_name = '' } = req.body;
+        const { email, password, name, role = 'creator', organization_name = '', organizationName = '' } = req.body;
         
         // Validate role
         if (!['creator', 'agency', 'brand'].includes(role)) {
             return res.status(400).json({ error: 'Invalid account role.' });
         }
-        const orgName = typeof organization_name === 'string' ? organization_name.trim().slice(0, 120) : '';
+        const effectiveOrgName = organization_name || organizationName || '';
+        const orgName = typeof effectiveOrgName === 'string' ? effectiveOrgName.trim().slice(0, 120) : '';
         if (role !== 'creator' && orgName.length < 2) return res.status(400).json({ error: 'Organisation name is required for an agency or brand account.' });
 
         const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -58,14 +59,23 @@ async function signup(req, res) {
                 return res.status(400).json({ success: false, error: 'An account with this email already exists.', code: 'EMAIL_ALREADY_EXISTS' });
             }
             
-            const { error } = await supabase.from('users').insert([{
+            const userRow = {
                 id: userId,
                 email: email.toLowerCase(),
                 password_hash: passwordHash,
                 name,
                 role,
                 organization_id: orgId
-            }]);
+            };
+
+            let { error } = await supabase.from('users').insert([userRow]);
+            if (error && error.message && error.message.includes('column')) {
+                // Graceful fallback if optional columns role/organization_id are not yet in public.users
+                delete userRow.role;
+                delete userRow.organization_id;
+                const retry = await supabase.from('users').insert([userRow]);
+                error = retry.error;
+            }
 
             if (error) throw error;
             createdUserId = userId;
@@ -153,13 +163,34 @@ async function login(req, res) {
             if (!data || error) {
                 return res.status(401).json({ success: false, error: 'Invalid email or password.', code: 'INVALID_CREDENTIALS' });
             }
+            let resolvedRole = data.role || 'creator';
+            let resolvedOrgId = data.organization_id || null;
+
+            if (!resolvedOrgId || resolvedRole === 'creator') {
+                try {
+                    const { data: member } = await supabase.from('organization_members')
+                        .select('organization_id, role')
+                        .eq('user_id', data.id)
+                        .eq('status', 'active')
+                        .maybeSingle();
+                    if (member) {
+                        resolvedOrgId = member.organization_id;
+                        if (['owner', 'manager', 'analyst'].includes(member.role)) {
+                            resolvedRole = 'agency';
+                        } else if (member.role === 'brand_viewer') {
+                            resolvedRole = 'brand';
+                        }
+                    }
+                } catch (_) {}
+            }
+
             user = {
                 id: data.id,
                 name: data.name,
                 email: data.email,
                 passwordHash: data.password_hash,
-                role: data.role || 'creator',
-                organization_id: data.organization_id || null
+                role: resolvedRole,
+                organization_id: resolvedOrgId
             };
         } else {
             const memUser = findUserByEmail(email);

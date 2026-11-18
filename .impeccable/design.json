@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T00:00:00+02:00",
+  "title": "Design System: Creator Cash Flow",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Decision Orange", "canonical": "#ff5b00", "tonalRamp": ["#401500", "#702500", "#a83800", "#d94b00", "#ff5b00", "#ff8750", "#ffb188", "#ffdfcd"] },
+      "collaboration": { "role": "secondary", "displayName": "Collaborative Violet", "canonical": "#6e2cff", "tonalRamp": ["#1b064a", "#2e0b7a", "#4614a8", "#5b20d5", "#6e2cff", "#955dff", "#ba95ff", "#e3d3ff"] },
+      "collaboration-text": { "role": "secondary", "displayName": "Violet Text", "canonical": "hsl(258 73% 38%)" },
+      "collaboration-tint": { "role": "secondary", "displayName": "Lavender Selection", "canonical": "hsl(258 100% 96%)" },
+      "ink": { "role": "neutral", "displayName": "Decision Ink", "canonical": "#100e13" },
+      "muted": { "role": "neutral", "displayName": "Muted Ink", "canonical": "#333333" },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#ffffff" },
+      "canvas": { "role": "neutral", "displayName": "Soft Canvas", "canonical": "#f2f2f2" },
+      "border": { "role": "neutral", "displayName": "Fine Divider", "canonical": "#dddddd" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Public hero proposition." },
+      "headline": { "displayName": "Headline", "purpose": "Campaign and working page identity." },
+      "body": { "displayName": "Body", "purpose": "Briefs, explanations, and form help." },
+      "label": { "displayName": "Label", "purpose": "Owner, state, section, and field orientation." }
+    },
+    "shadows": [
+      { "name": "floating-public-header", "value": "0 10px 34px hsl(258 100% 17% / .06)", "purpose": "Soft lift for the public navigation pill only." },
+      { "name": "showcase-window", "value": "0 32px 72px hsl(258 100% 17% / .22)", "purpose": "Separates the illustrative paper window from the violet stage." },
+      { "name": "story-image", "value": "0 22px 46px hsl(258 100% 17% / .08)", "purpose": "Quiet depth under public chapter imagery." }
+    ],
+    "motion": [
+      { "name": "state", "value": "180–200ms ease", "purpose": "Colour and border changes on public controls and navigation." },
+      { "name": "press", "value": "140ms cubic-bezier(.23,1,.32,1)", "purpose": "Small tactile press response on buttons and role switch." },
+      { "name": "story-reveal", "value": "550ms cubic-bezier(.23,1,.32,1)", "purpose": "One subtle chapter-image arrival when it enters view; disabled for reduced motion." },
+      { "name": "reduced-motion", "value": "prefers-reduced-motion: reduce", "purpose": "Remove animation, transitions, and smooth scrolling." }
+    ],
+    "breakpoints": [
+      { "name": "desk-context-stack", "value": "1100px" },
+      { "name": "campaign-aside-stack", "value": "950px" },
+      { "name": "public-story-stack", "value": "800px" },
+      { "name": "workspace-mobile", "value": "760px" },
+      { "name": "campaign-mobile", "value": "680px" },
+      { "name": "compact-phone", "value": "520px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary decision button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action in a section or current handoff.",
+      "html": "<button class=\"ds-button-primary\">Review draft →</button>",
+      "css": ".ds-button-primary{min-height:52px;padding:12px 23px;border:1px solid transparent;border-radius:1000px;background:#ff5b00;color:#000;font:700 14px/1.2 Manrope,AeonikRegular,Arial,sans-serif;cursor:pointer;transition:background-color 180ms ease,color 180ms ease,transform 140ms cubic-bezier(.23,1,.32,1)}.ds-button-primary:hover{background:#100e13;color:#fff}.ds-button-primary:focus-visible{outline:2px solid #6e2cff;outline-offset:3px}.ds-button-primary:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}.ds-button-primary:active{transform:none}}"
+    },
+    {
+      "name": "Outline button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A quiet companion to the primary decision.",
+      "html": "<button class=\"ds-button-outline\">Explore the sample</button>",
+      "css": ".ds-button-outline{min-height:52px;padding:12px 23px;border:1px solid #dddddd;border-radius:1000px;background:#fff;color:#100e13;font:700 14px/1.2 Manrope,AeonikRegular,Arial,sans-serif;cursor:pointer;transition:border-color 180ms ease,transform 140ms cubic-bezier(.23,1,.32,1)}.ds-button-outline:hover{border-color:#100e13}.ds-button-outline:focus-visible{outline:2px solid #6e2cff;outline-offset:3px}.ds-button-outline:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-button-outline{transition:none}.ds-button-outline:active{transform:none}}"
+    },
+    {
+      "name": "Campaign queue row",
+      "kind": "custom",
+      "description": "A line-based campaign record showing state and next owner.",
+      "html": "<a class=\"ds-queue-row\" href=\"#\"><span><strong>Spring in motion</strong><small>One video and three story frames</small></span><span><strong>Draft awaiting review</strong><small>Agency to review</small></span><b aria-hidden=\"true\">↗</b></a>",
+      "css": ".ds-queue-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr) 24px;align-items:center;gap:24px;min-height:106px;padding:20px 6px;border-bottom:1px solid #dddddd;color:#100e13;text-decoration:none;font:14px Manrope,AeonikRegular,Arial,sans-serif;transition:background-color 160ms ease,transform 160ms cubic-bezier(.23,1,.32,1)}.ds-queue-row:hover{background:#f2f2f2;transform:translateX(3px)}.ds-queue-row:focus-visible{outline:2px solid #6e2cff;outline-offset:3px}.ds-queue-row span{display:grid;gap:6px}.ds-queue-row strong{font-weight:650}.ds-queue-row small{font-size:12px;color:#333}.ds-queue-row b{color:hsl(258 73% 38%)}@media(max-width:520px){.ds-queue-row{grid-template-columns:minmax(0,1fr) 20px;gap:10px;min-height:118px}.ds-queue-row span:nth-child(2){grid-column:1}.ds-queue-row b{grid-column:2;grid-row:1/3}}@media(prefers-reduced-motion:reduce){.ds-queue-row{transition:none}.ds-queue-row:hover{transform:none}}"
+    },
+    {
+      "name": "Lavender decision panel",
+      "kind": "card",
+      "description": "A contextual handoff, not a generic statistic card.",
+      "html": "<section class=\"ds-decision\"><span>Next move · Agency</span><h3>Review the creator draft</h3><p>The brief and discussion stay with the deliverable.</p></section>",
+      "css": ".ds-decision{padding:27px;border-radius:16px;background:hsl(258 100% 96%);color:#100e13;font-family:Manrope,AeonikRegular,Arial,sans-serif}.ds-decision span{font-size:12px;font-weight:700;color:hsl(258 73% 38%)}.ds-decision h3{max-width:22ch;margin:18px 0 9px;font-size:27px;line-height:1.15;font-weight:550;letter-spacing:-.03em}.ds-decision p{margin:0;color:#333;font-size:13px;line-height:1.6}"
+    },
+    {
+      "name": "Labelled text field",
+      "kind": "input",
+      "description": "A white field with visible violet keyboard focus.",
+      "html": "<label class=\"ds-field\">Email address<input type=\"email\" placeholder=\"you@agency.co.za\"></label>",
+      "css": ".ds-field{display:grid;gap:9px;color:#100e13;font:700 14px Manrope,AeonikRegular,Arial,sans-serif}.ds-field input{min-height:54px;padding:12px 16px;border:1px solid #dddddd;border-radius:12px;background:#fff;color:#100e13;font:400 16px/1.4 Manrope,AeonikRegular,Arial,sans-serif}.ds-field input:focus-visible{outline:2px solid #6e2cff;outline-offset:3px}.ds-field input[aria-invalid=true]{border-color:#ff5b00}"
+    },
+    {
+      "name": "Story progress navigation",
+      "kind": "nav",
+      "description": "The active chapter is underlined in orange, not filled.",
+      "html": "<nav class=\"ds-progress\" aria-label=\"Explore the campaign flow\"><a href=\"#brief\" aria-current=\"step\">Brief</a><a href=\"#review\">Review</a><a href=\"#publish\">Publish</a></nav>",
+      "css": ".ds-progress{display:flex;justify-content:center;border-block:1px solid #dddddd;background:#fff;font-family:Manrope,AeonikRegular,Arial,sans-serif}.ds-progress a{display:flex;align-items:center;justify-content:center;min-width:110px;min-height:58px;padding:10px 22px;border-bottom:2px solid transparent;color:#333;font-size:14px;text-decoration:none;transition:color 180ms ease,border-color 180ms ease}.ds-progress a:hover{color:#100e13}.ds-progress a[aria-current=step]{border-bottom-color:#ff5b00;color:#100e13;font-weight:700}.ds-progress a:focus-visible{outline:2px solid #6e2cff;outline-offset:3px}@media(max-width:520px){.ds-progress a{flex:1;min-width:0;min-height:52px;padding:8px}}@media(prefers-reduced-motion:reduce){.ds-progress a{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The shared campaign record",
+    "overview": "CCF is a light, premium agency workflow. White space gives the campaign and its next accountable decision room to breathe; violet makes collaboration visible; orange punctuates the action. The public story has an editorial pace and an illustrative product window, while working surfaces are quieter, denser, and organised around real handoffs. Stitch.money is a reference for palette cohesion and lightness, not an asset library or a screen to copy. The CCF name, logo, campaign language, and role-specific workflow remain its own.",
+    "keyCharacteristics": ["White content surfaces and a pale neutral canvas.", "Dark ink for headings and decisions; restrained orange for the main action.", "Violet collaboration moments with a related lavender tint.", "Generous editorial spacing in the public story; line-based scanability in the desk.", "Intentional, stacked mobile composition rather than scaled-down desktop panels."],
+    "rules": [
+      { "name": "The One Decision Rule", "body": "Orange identifies the primary move or current stage; it is not a large background or a long-form text colour.", "section": "colors" },
+      { "name": "The Collaboration Rule", "body": "Use violet and its HSL-derived lavender for shared context, selected state, and focus; preserve the white working surface.", "section": "colors" },
+      { "name": "The Clear Handoff Rule", "body": "Set the next action in strong, readable type; subordinate metadata without making it low contrast.", "section": "typography" },
+      { "name": "The Next Decision Rule", "body": "Working screens begin with the present handoff and owner, not decorative totals.", "section": "layout" },
+      { "name": "The Flat Desk Rule", "body": "In the operating UI, state and hierarchy come from type, spacing, border, and tint before shadow.", "section": "elevation" }
+    ],
+    "dos": ["Do keep content white and use the canvas or lavender tint to separate meaningfully different contexts.", "Do make the campaign, next owner, and next action scannable before supporting detail.", "Do keep sample and manually entered information explicitly labelled.", "Do give mobile its own reading order and full-width actions where space requires it.", "Do keep focus visible and remove decorative motion under reduced-motion preferences."],
+    "donts": ["Don't make orange a general surface fill or violet a replacement for readable ink body copy.", "Don't add dark dashboard panels, heavy working-screen shadows, or invented KPI totals to create visual interest.", "Don't imply a sample sends notifications, moves money, or verifies platform metrics.", "Don't mix creator-private finances into the shared agency campaign record."]
+  }
+}

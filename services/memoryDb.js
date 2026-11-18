@@ -34,6 +34,8 @@ const memoryDb = {
     campaigns: [],
     campaign_creators: [],
     campaign_deliverables: [],
+    campaign_deliverable_events: [],
+    campaign_brand_requests: [],
     campaign_metric_snapshots: [],
     campaign_access_grants: [],
     campaign_milestones: [],
