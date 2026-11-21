@@ -25,6 +25,7 @@ function appOrigin() {
 
 // Branded shell. innerHtml is the body content; cta is optional.
 function renderEmail({ eyebrow, heading, intro, bodyHtml = '', ctaText, ctaUrl, note }) {
+    const logoUrl = `${appOrigin()}/brand/approved-logo-paper.png`;
     const eyebrowHtml = eyebrow
         ? `<p style="margin:0 0 16px;"><span style="display:inline-block;background-color:#f2f2f2;color:#ff5b00;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px;border-radius:999px;">${esc(eyebrow)}</span></p>`
         : '';
@@ -43,12 +44,7 @@ function renderEmail({ eyebrow, heading, intro, bodyHtml = '', ctaText, ctaUrl, 
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:14px;overflow:hidden;">
   <tr>
     <td style="background-color:#100e13;padding:22px 32px;">
-      <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-        <td style="padding-right:12px;vertical-align:middle;">
-          <img src="${esc(appOrigin())}/favicon.png" alt="Creator Cash Flow" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:50%;border:0;object-fit:cover;">
-        </td>
-        <td style="vertical-align:middle;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:17px;font-weight:600;color:#f2f2f2;">Creator Cash Flow</td>
-      </tr></table>
+      <img src="${esc(logoUrl)}" alt="Creator Cash Flow" height="30" style="display:block;height:30px;width:auto;border:0;">
     </td>
   </tr>
   <tr>
