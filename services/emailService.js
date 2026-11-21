@@ -44,14 +44,7 @@ function renderEmail({ eyebrow, heading, intro, bodyHtml = '', ctaText, ctaUrl, 
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:14px;overflow:hidden;">
   <tr>
     <td style="background-color:#100e13;padding:22px 32px;">
-      <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-        <td style="padding-right:14px;vertical-align:middle;">
-          <img src="${esc(appOrigin())}/favicon.png" alt="Creator Cash Flow" width="44" height="44" style="display:block;width:44px;height:44px;border-radius:50%;border:0;object-fit:cover;">
-        </td>
-        <td style="vertical-align:middle;">
-          <img src="${esc(logoUrl)}" alt="Creator Cash Flow" height="30" style="display:block;height:30px;width:auto;border:0;">
-        </td>
-      </tr></table>
+      <img src="${esc(logoUrl)}" alt="Creator Cash Flow" height="30" style="display:block;height:30px;width:auto;border:0;">
     </td>
   </tr>
   <tr>
